@@ -38,7 +38,7 @@ class HtmlStringOperations(average: String, warning: String, alert: String, live
   val h1EmailTag: String = "<!DOCTYPE html>\n<html style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;font-family: sans-serif;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%;font-size: 10px;-webkit-tap-highlight-color: rgba(0,0,0,0);\">\n<head style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;\">\n  <link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\" integrity=\"sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7\" crossorigin=\"anonymous\" style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;\">\n</head>\n<body style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;margin: 0;font-family: &quot;Helvetica Neue&quot;,Helvetica,Arial,sans-serif;font-size: 14px;line-height: 1.42857143;color: #333;background-color: #fff;\">\n<h1 style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;margin: .67em 0;font-size: 36px;font-family: inherit;font-weight: 500;line-height: 1.1;color: inherit;margin-top: 20px;margin-bottom: 10px;\">"
   val h2EmailTag: String = "<h2 style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;orphans: 3;widows: 3;page-break-after: avoid;font-family: inherit;font-weight: 500;line-height: 1.1;color: inherit;margin-top: 20px;margin-bottom: 10px;font-size: 30px;\">"
   val pEmailTag: String = "<p style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;orphans: 3;widows: 3;margin: 0 0 10px;\">"
-  val tableEmailTag: String = "<table class=\"table table-striped\" style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;border-spacing: 0;border-collapse: collapse!important;background-color: transparent;width: 100%;max-width: 100%;margin-bottom: 20px;\">"
+  val tableEmailTag: String = "<table class=\"table table-striped\" style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;border-spacing: 0;border-collapse: collapse!important;background-color: transparent;width: 100%;max-width: 100%;margin-bottom: 20px;\" border=1px>"
   val tableHeaderRowEmailTag: String = "<tr style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;page-break-inside: avoid;\">"
   val tableHeaderCellEmailTag: String = "<th style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;padding: 0;text-align: left;background-color: #fff!important;\">"
   val tableNormalRowEmailTag: String = "<tr style=\"background-color: ;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;page-break-inside: avoid;\" #d9edf7\";\">"
@@ -185,9 +185,8 @@ class HtmlStringOperations(average: String, warning: String, alert: String, live
         if (alertList.exists(test => test.typeOfTest == "Desktop")) {
           h2EmailTag + "Desktop Alerts</h2>" +
             pEmailTag + "The following items have been found to either take too long to load or cost too much to view on a desktop browser</p>\n" +
-            this.hTMLAlertEmailTableHeaders + "\n" +
-            (for (test <- alertList if test.typeOfTest == "Desktop") yield tableNormalRowEmailTag + test.toHTMLAlertMessageCells() + "</tr>").mkString +
-            this.hTMLTableFooters
+//            this.hTMLAlertEmailTableHeaders + "\n" +
+            (for (test <- alertList if test.typeOfTest == "Desktop") yield hTMLAlertEmailTableHeaders + tableNormalRowEmailTag + test.toHTMLAlertMessageCells() + this.hTMLTableFooters).mkString
         }
         else {
           ""
@@ -198,10 +197,8 @@ class HtmlStringOperations(average: String, warning: String, alert: String, live
           h2EmailTag + "Mobile Alerts</h2>" +
             pEmailTag + "The following items have been found to either take too long to load or cost too much to view on a mobile device</p>\n" +
             this.hTMLAlertEmailTableHeaders + "\n" +
-            (for (test <- alertList if test.typeOfTest == "Android/3G") yield tableNormalRowEmailTag + test.toHTMLAlertMessageCells() + "</tr>").mkString +
-            this.hTMLTableFooters
+            (for (test <- alertList if test.typeOfTest == "Android/3G") yield hTMLAlertEmailTableHeaders + tableNormalRowEmailTag + test.toHTMLAlertMessageCells() + this.hTMLTableFooters).mkString
 
-            pEmailTag + "All alerts have been confirmed by retesting multiple times. Tests were run without ads so all page weight is due to content" + "</p>\n"
         }
         else {
           ""
@@ -211,6 +208,40 @@ class HtmlStringOperations(average: String, warning: String, alert: String, live
     } else {
         ""
       }
+  }
+
+
+  def generateInteractiveAlertBodyElement(alertList: List[PerformanceResultsObject], averages: PageAverageObject): String = {
+    //    println("*\n \n \n **** \n \n \n averages.desktopHTMLResultString: \n" + averages.desktopHTMLResultString)
+    //    println("*\n \n \n **** \n \n \n averages.mobileHTMLResultString: \n" + averages.mobileHTMLResultString)
+    if(alertList.nonEmpty) {
+      val desktopMessageString: String =
+        if (alertList.exists(test => test.typeOfTest == "Desktop")) {
+          h2EmailTag + "Desktop Alerts</h2>" +
+            pEmailTag + "The following items have been found to either take too long to load or cost too much to view on a desktop browser</p>\n" +
+            //            this.hTMLAlertEmailTableHeaders + "\n" +
+            (for (test <- alertList if test.typeOfTest == "Desktop") yield hTMLAlertEmailTableHeaders + tableNormalRowEmailTag + test.toInteractiveAlertMessageCells() + this.hTMLTableFooters).mkString
+        }
+        else {
+          ""
+        }
+
+      val mobileMessageString: String =
+        if (alertList.exists(test => test.typeOfTest == "Android/3G")) {
+          h2EmailTag + "Mobile Alerts</h2>" +
+            pEmailTag + "The following items have been found to either take too long to load or cost too much to view on a mobile device</p>\n" +
+            this.hTMLAlertEmailTableHeaders + "\n" +
+            (for (test <- alertList if test.typeOfTest == "Android/3G") yield hTMLAlertEmailTableHeaders + tableNormalRowEmailTag + test.toInteractiveAlertMessageCells() + this.hTMLTableFooters).mkString
+
+        }
+        else {
+          ""
+        }
+      val returnString: String = desktopMessageString + mobileMessageString
+      returnString
+    } else {
+      ""
+    }
   }
 
 
