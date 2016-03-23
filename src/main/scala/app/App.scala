@@ -186,7 +186,7 @@ object App {
       val interactiveHTMLResults: List[String] = interactiveResultsList.map(x => htmlString.interactiveHTMLRow(x))
       //generate interactive alert message body
       interactiveAlertList = for (result <- interactiveResultsList if result.alertStatus) yield result
-      interactiveAlertMessageBody = htmlString.generateAlertEmailBodyElement(interactiveAlertList, interactiveAverages)
+      interactiveAlertMessageBody = htmlString.generateInteractiveAlertBodyElement(interactiveAlertList, interactiveAverages)
       // write interactive results to string
       interactiveResults = interactiveResults.concat(interactiveHTMLResults.mkString)
       interactiveResults = interactiveResults + htmlString.closeTable + htmlString.closePage
