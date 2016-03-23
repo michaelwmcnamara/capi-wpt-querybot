@@ -50,6 +50,7 @@ class LocalFileOperations {
     Array(contentApiKey, wptBaseUrl, wptApiKey, wptLocation, emailUsername, emailPassword)
   }
 
+
   def writeLocalResultFile(outputFileName: String, results: String): Int = {
     val output: FileWriter = new FileWriter(outputFileName)
     println(DateTime.now + " Writing the following to local file " + outputFileName + ":\n" + results)

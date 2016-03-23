@@ -190,6 +190,12 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
       "</tr>"
     returnString
   }
+
+  def isMedia():Boolean = {
+      contentType.contains("image") ||
+      contentType.contains("video") ||
+      contentType.contains("media")
+  }
 }
 
 
