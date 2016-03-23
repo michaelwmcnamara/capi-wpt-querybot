@@ -58,8 +58,8 @@ object App {
 
     //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
     val htmlString = new HtmlStringOperations(averageColor, warningColor, alertColor, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
-    var liveBlogResults: String = htmlString.initialisePageForLiveblog + htmlString.interactiveTable
-    var interactiveResults: String = htmlString.initialisePageForInteractive + htmlString.initialiseTable
+    var liveBlogResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
+    var interactiveResults: String = htmlString.initialisePageForInteractive + htmlString.interactiveTable
     var frontsResults: String = htmlString.initialisePageForFronts + htmlString.initialiseTable
 
     //Initialize email alerts string - this will be used to generate emails
