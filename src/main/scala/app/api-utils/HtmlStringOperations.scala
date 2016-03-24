@@ -230,7 +230,7 @@ class HtmlStringOperations(average: String, warning: String, alert: String, live
         if (alertList.exists(test => test.typeOfTest == "Android/3G")) {
           h2EmailTag + "Mobile Alerts</h2>" +
             pEmailTag + "The following items have been found to either take too long to load or cost too much to view on a mobile device</p>\n" +
-            this.hTMLAlertEmailTableHeaders + "\n" +
+            //            this.hTMLAlertEmailTableHeaders + "\n" +
             (for (test <- alertList if test.typeOfTest == "Android/3G") yield hTMLAlertEmailTableHeaders + tableNormalRowEmailTag + test.toInteractiveAlertMessageCells() + this.hTMLTableFooters).mkString
 
         }
