@@ -52,9 +52,9 @@ object App {
 
 
     //Define colors to be used for average values, warnings and alerts
-    val averageColor: String = "\"#d9edf7\""
-    val warningColor: String = "\"#fcf8e3\""
-    val alertColor: String = "\"#f2dede\""
+    val averageColor: String = "#d9edf7"
+    val warningColor: String = "#fcf8e3"
+    val alertColor: String = "#f2dede"
 
     //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
     val htmlString = new HtmlStringOperations(averageColor, warningColor, alertColor, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
