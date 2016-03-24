@@ -53,7 +53,8 @@ object App {
 
     //Define colors to be used for average values, warnings and alerts
     val averageColor: String = "#d9edf7"
-    val warningColor: String = "#fcf8e3"
+//    val warningColor: String = "#fcf8e3"
+    val warningColor: String = rgba(227, 251, 29, 0.32)
     val alertColor: String = "#f2dede"
 
     //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
