@@ -98,17 +98,17 @@ class LiveBlogDefaultAverages(averageColor: String) extends PageAverageObject {
   override val formattedHTMLResultString: String = "<tr style=\"background-color:" + averageColor + ";\">" +
     "<td>" + DateTime.now + "</td>" +
     "<td>Desktop</td>" +
-    "<td> Alerting thresholds determined by past liveblogs we have migrated</td>" +
+    "<td> Alerting thresholds for desktop browser tests</td>" +
     "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
     "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
     "<td>" + desktopMBInDocComplete + "MB</td>" +
     "<td>$(US)" + desktopEstUSPrePaidCost + "</td>" +
     "<td>$(US)" + desktopEstUSPostPaidCost + "</td>" +
     "<td>Predefined standards</td></tr>" +
-    "<tr bgcolor=\"A9BCF5\">" +
+    "<tr style=\"background-color:" + averageColor + ";\">" +
     "<td>" + DateTime.now + "</td>" +
     "<td>Mobile</td>" +
-    "<td> Yellow indicates within danger zone of threshold. Red indicates threshold has been crossed </td>" +
+    "<td> Alerting thresholds for mobile 3G browser tests </td>" +
     "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
     "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
     "<td>" + mobileMBInDocComplete + "MB</td>" +
