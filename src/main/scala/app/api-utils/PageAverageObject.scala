@@ -92,25 +92,25 @@ class LiveBlogDefaultAverages(averageColor: String) extends PageAverageObject {
   override val mobileSuccessCount = 1
 
   override val formattedHTMLResultString: String = "<tr style=\"background-color:" + averageColor + ";\">" +
-    "<td>" + DateTime.now + "/td>" +
-    "<td>Desktop/td>" +
-    "<td> Alerting thresholds for desktop browser tests/td>" +
-    "<td>" + desktopTimeFirstPaintInSeconds + "s/td>" +
-    "<td>" + desktopAboveTheFoldCompleteInSec + "s/td>" +
-    "<td>" + desktopMBInDocComplete + "MB/td>" +
-    "<td>$(US)" + desktopEstUSPrePaidCost + "/td>" +
-    "<td>$(US)" + desktopEstUSPostPaidCost + "/td>" +
-    "<td>Predefined standards/td>/tr>" +
+    "<td>" + DateTime.now + "</td>" +
+    "<td>Desktop</td>" +
+    "<td> Alerting thresholds for desktop browser tests</td>" +
+    "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
+    "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
+    "<td>" + desktopMBInDocComplete + "MB</td>" +
+    "<td>$(US)" + desktopEstUSPrePaidCost + "</td>" +
+    "<td>$(US)" + desktopEstUSPostPaidCost + "</td>" +
+    "<td>Predefined standards</td></tr>" +
     "<tr style=\"background-color:" + averageColor + ";\">" +
-    "<td>" + DateTime.now + "/td>" +
-    "<td>Mobile/td>" +
-    "<td> Alerting thresholds for mobile 3G browser tests /td>" +
-    "<td>" + mobileTimeFirstPaintInSeconds + "s/td>" +
-    "<td>" + mobileAboveTheFoldCompleteInSec + "/td>" +
-    "<td>" + mobileMBInDocComplete + "MB/td>" +
-    "<td>$(US)" + mobileEstUSPrePaidCost + "/td>" +
-    "<td>S(US)" + mobileEstUSPostPaidCost + "/td>" +
-    "<td>Predefined standards/td>/tr>"
+    "<td>" + DateTime.now + "</td>" +
+    "<td>Mobile</td>" +
+    "<td> Alerting thresholds for mobile 3G browser tests </td>" +
+    "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
+    "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
+    "<td>" + mobileMBInDocComplete + "MB</td>" +
+    "<td>$(US)" + mobileEstUSPrePaidCost + "</td>" +
+    "<td>S(US)" + mobileEstUSPostPaidCost + "</td>" +
+    "<td>Predefined standards</td></tr>"
 }
 
 class FrontsDefaultAverages extends PageAverageObject() {
@@ -137,23 +137,23 @@ class FrontsDefaultAverages extends PageAverageObject() {
   override val formattedHTMLResultString: String = "<tr bgcolor=\"A9BCF5\">" +
     "<td>" + DateTime.now + "/td>" +
     "<td>Desktop/td>" +
-    "<td> Alerting thresholds determined by chosen values/td>" +
-    "<td>" + desktopTimeFirstPaintInSeconds + "s/td>" +
-    "<td>" + desktopAboveTheFoldCompleteInSec + "s/td>" +
-    "<td>" + desktopMBInDocComplete + "MB/td>" +
-    "<td>$(US)" + desktopEstUSPrePaidCost + "/td>" +
-    "<td>$(US)" + desktopEstUSPostPaidCost + "/td>" +
-    "<td>Predefined standards/td>/tr>" +
+    "<td> Alerting thresholds determined by chosen values</td>" +
+    "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
+    "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
+    "<td>" + desktopMBInDocComplete + "MB</td>" +
+    "<td>$(US)" + desktopEstUSPrePaidCost + "</td>" +
+    "<td>$(US)" + desktopEstUSPostPaidCost + "</td>" +
+    "<td>Predefined standards</td></tr>" +
     "<tr bgcolor=\"A9BCF5\">" +
-    "<td>" + DateTime.now + "/td>" +
-    "<td>Mobile/td>" +
-    "<td> Yellow indicates within danger zone of threshold. Red indicates threshold has been crossed /td>" +
-    "<td>" + mobileTimeFirstPaintInSeconds + "s/td>" +
-    "<td>" + mobileAboveTheFoldCompleteInSec + "/td>" +
-    "<td>" + mobileMBInDocComplete + "MB/td>" +
-    "<td>$(US)" + mobileEstUSPrePaidCost + "/td>" +
-    "<td>S(US)" + mobileEstUSPostPaidCost + "/td>" +
-    "<td>Predefined standards/td>/tr>"
+    "<td>" + DateTime.now + "</td>" +
+    "<td>Mobile</td>" +
+    "<td> Yellow indicates within danger zone of threshold. Red indicates threshold has been crossed </td>" +
+    "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
+    "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
+    "<td>" + mobileMBInDocComplete + "MB</td>" +
+    "<td>$(US)" + mobileEstUSPrePaidCost + "</td>" +
+    "<td>S(US)" + mobileEstUSPostPaidCost + "</td>" +
+    "<td>Predefined standards</td></tr>"
 }
 
 class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], averageColor: String) extends PageAverageObject{
@@ -233,71 +233,71 @@ class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], 
   override val mobileSpeedIndex: Int = if (accumulatorMobileSuccessCount > 0) {roundAt(0)(accumulatorMobileSpeedIndex.toDouble/accumulatorMobileSuccessCount).toInt} else {5000}
   override val mobileSuccessCount: Int = accumulatorMobileSuccessCount
 
-  accumulatorString = accumulatorString.concat("<tr style=\"background-color:" + averageColor + ";\"><td>" + DateTime.now + "/td><td>Desktop/td>")
+  accumulatorString = accumulatorString.concat("<tr style=\"background-color:" + averageColor + ";\"><td>" + DateTime.now + "</td><td>Desktop</td>")
 
   //add desktop averaages to return string
   if(accumulatorDesktopSuccessCount > 1){
-    accumulatorString = accumulatorString.concat("<td>" + "Average of " + accumulatorDesktopSuccessCount + "pages  with recognised size issues/td>" +
-      "<td>" + desktopTimeFirstPaintInSeconds + "s/td>" +
-      "<td>" + desktopAboveTheFoldCompleteInSec + "s/td>" +
-      "<td>" + desktopMBInDocComplete + "MB/td>" +
-      "<td>$(US)" + desktopEstUSPrePaidCost + "/td>" +
-      "<td>$(US)" + desktopEstUSPostPaidCost + "/td>" +
-      "<td>" + desktopSuccessCount + " urls Tested Successfully/td>/tr>"
+    accumulatorString = accumulatorString.concat("<td>" + "Average of " + accumulatorDesktopSuccessCount + "pages  with recognised size issues</td>" +
+      "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
+      "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
+      "<td>" + desktopMBInDocComplete + "MB</td>" +
+      "<td>$(US)" + desktopEstUSPrePaidCost + "</td>" +
+      "<td>$(US)" + desktopEstUSPostPaidCost + "</td>" +
+      "<td>" + desktopSuccessCount + " urls Tested Successfully</td></tr>"
     )}
   else{
     if (accumulatorDesktopSuccessCount == 1) {
-      accumulatorString = accumulatorString.concat("<td> Results from 1 page with recognised size issues/td>" +
-        "<td>" + desktopTimeFirstPaintInSeconds + "s/td>" +
-        "<td>" + desktopAboveTheFoldCompleteInSec + "s/td>" +
-        "<td>" + desktopMBInDocComplete + "MB/td>" +
-        "<td>$(US)" + desktopEstUSPrePaidCost + "/td>" +
-        "<td>$(US)" + desktopEstUSPostPaidCost + "/td>" +
-        "<td>" + desktopSuccessCount + " urls Tested Successfully/td>/tr>"
+      accumulatorString = accumulatorString.concat("<td> Results from 1 page with recognised size issues</td>" +
+        "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
+        "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
+        "<td>" + desktopMBInDocComplete + "MB</td>" +
+        "<td>$(US)" + desktopEstUSPrePaidCost + "</td>" +
+        "<td>$(US)" + desktopEstUSPostPaidCost + "</td>" +
+        "<td>" + desktopSuccessCount + " urls Tested Successfully</td></tr>"
       )
     }
     else {
-      accumulatorString = accumulatorString.concat("<td> Standard values to be used for judging page size/td>" +
-        "<td>" + desktopTimeFirstPaintInSeconds + "s/td>" +
-        "<td>" + desktopAboveTheFoldCompleteInSec + "s/td>" +
-        "<td>" + desktopMBInDocComplete + "MB/td>" +
-        "<td>$(US)" + desktopEstUSPrePaidCost + "/td>" +
-        "<td>$(US)" + desktopEstUSPostPaidCost + "/td>" +
-        "<td>" + desktopSuccessCount + " urls Tested Successfully/td>/tr>"
+      accumulatorString = accumulatorString.concat("<td> Standard values to be used for judging page size</td>" +
+        "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
+        "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
+        "<td>" + desktopMBInDocComplete + "MB</td>" +
+        "<td>$(US)" + desktopEstUSPrePaidCost + "</td>" +
+        "<td>$(US)" + desktopEstUSPostPaidCost + "</td>" +
+        "<td>" + desktopSuccessCount + " urls Tested Successfully</td></tr>"
       )
     }
   }
   
   //add mobile averages to return string
-  accumulatorString = accumulatorString.concat("<tr style=\"background-color:" + averageColor + ";\"><td>" + DateTime.now + "/td><td>Android.toDouble/3G/td>")
+  accumulatorString = accumulatorString.concat("<tr style=\"background-color:" + averageColor + ";\"><td>" + DateTime.now + "</td><td>Android.toDouble/3G</td>")
   if(accumulatorMobileSuccessCount > 1){
-    accumulatorString = accumulatorString.concat("<td>" + "Average of " + accumulatorDesktopSuccessCount + "pages  with recognised size issues/td>" +
-      "<td>" + mobileTimeFirstPaintInSeconds + "s/td>" +
-      "<td>" + mobileAboveTheFoldCompleteInSec + "/td>" +
-      "<td>" + mobileMBInDocComplete + "MB/td>" +
-      "<td>$(US)" + mobileEstUSPrePaidCost + "/td>" +
-      "<td>S(US)" + mobileEstUSPostPaidCost + "/td>" +
-      "<td>" + mobileSuccessCount + " urls Tested Successfully/td>/tr>"
+    accumulatorString = accumulatorString.concat("<td>" + "Average of " + accumulatorDesktopSuccessCount + "pages  with recognised size issues</td>" +
+      "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
+      "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
+      "<td>" + mobileMBInDocComplete + "MB</td>" +
+      "<td>$(US)" + mobileEstUSPrePaidCost + "</td>" +
+      "<td>S(US)" + mobileEstUSPostPaidCost + "</td>" +
+      "<td>" + mobileSuccessCount + " urls Tested Successfully</td></tr>"
     )}
   else{
     if (accumulatorMobileSuccessCount == 1) {
-      accumulatorString = accumulatorString.concat("<td> Results from 1 page with recognised size issues/td>" +
-        "<td>" + mobileTimeFirstPaintInSeconds + "s/td>" +
-        "<td>" + mobileAboveTheFoldCompleteInSec + "/td>" +
-        "<td>" + mobileMBInDocComplete + "MB/td>" +
-        "<td>$(US)" + mobileEstUSPrePaidCost + "/td>" +
-        "<td>S(US)" + mobileEstUSPostPaidCost + "/td>" +
-        "<td>" + mobileSuccessCount + " urls Tested Successfully/td>/tr>"
+      accumulatorString = accumulatorString.concat("<td> Results from 1 page with recognised size issues</td>" +
+        "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
+        "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
+        "<td>" + mobileMBInDocComplete + "MB</td>" +
+        "<td>$(US)" + mobileEstUSPrePaidCost + "</td>" +
+        "<td>S(US)" + mobileEstUSPostPaidCost + "</td>" +
+        "<td>" + mobileSuccessCount + " urls Tested Successfully</td></tr>"
       )
     }
     else {
-      accumulatorString = accumulatorString.concat("<td> Standard values to be used for judging page size/td>" +
-        "<td>" + mobileTimeFirstPaintInSeconds + "s/td>" +
-        "<td>" + mobileAboveTheFoldCompleteInSec + "/td>" +
-        "<td>" + mobileMBInDocComplete + "MB/td>" +
-        "<td>$(US)" + mobileEstUSPrePaidCost + "/td>" +
-        "<td>S(US)" + mobileEstUSPostPaidCost + "/td>" +
-        "<td>" + mobileSuccessCount + " urls Tested Successfully/td>/tr>"
+      accumulatorString = accumulatorString.concat("<td> Standard values to be used for judging page size</td>" +
+        "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
+        "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
+        "<td>" + mobileMBInDocComplete + "MB</td>" +
+        "<td>$(US)" + mobileEstUSPrePaidCost + "</td>" +
+        "<td>S(US)" + mobileEstUSPostPaidCost + "</td>" +
+        "<td>" + mobileSuccessCount + " urls Tested Successfully</td></tr>"
       )
     }
   }
@@ -383,59 +383,59 @@ class GeneratedInteractiveAverages(resultsList: List[Array[PerformanceResultsObj
   override val mobileSpeedIndex: Int = if (accumulatorMobileSuccessCount > 0) {roundAt(0)(accumulatorMobileSpeedIndex.toDouble/accumulatorMobileSuccessCount).toInt} else {5000}
   override val mobileSuccessCount: Int = accumulatorMobileSuccessCount
 
-  accumulatorString = accumulatorString.concat("<tr style=\"background-color:" + averageColor + ";\"><td>" + DateTime.now + "/td><td>Desktop/td>")
+  accumulatorString = accumulatorString.concat("<tr style=\"background-color:" + averageColor + ";\"><td>" + DateTime.now + "</td><td>Desktop</td>")
 
   //add desktop averaages to return string
   if(accumulatorDesktopSuccessCount > 1){
-    accumulatorString = accumulatorString.concat("<td>" + "Average of " + accumulatorDesktopSuccessCount + "pages  with recognised size issues/td>" +
-      "<td>" + desktopTimeFirstPaintInSeconds + "s/td>" +
-      "<td>" + desktopAboveTheFoldCompleteInSec + "s/td>" +
-      "<td>" + desktopMBInDocComplete + "MB/td>" +
-      "<td>" + desktopSuccessCount + " urls Tested Successfully/td>/tr>"
+    accumulatorString = accumulatorString.concat("<td>" + "Average of " + accumulatorDesktopSuccessCount + "pages  with recognised size issues</td>" +
+      "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
+      "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
+      "<td>" + desktopMBInDocComplete + "MB</td>" +
+      "<td>" + desktopSuccessCount + " urls Tested Successfully</td></tr>"
     )}
   else{
     if (accumulatorDesktopSuccessCount == 1) {
-      accumulatorString = accumulatorString.concat("<td> Results from 1 page with recognised size issues/td>" +
-        "<td>" + desktopTimeFirstPaintInSeconds + "s/td>" +
-        "<td>" + desktopAboveTheFoldCompleteInSec + "s/td>" +
-        "<td>" + desktopMBInDocComplete + "MB/td>" +
-        "<td>" + desktopSuccessCount + " urls Tested Successfully/td>/tr>"
+      accumulatorString = accumulatorString.concat("<td> Results from 1 page with recognised size issues</td>" +
+        "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
+        "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
+        "<td>" + desktopMBInDocComplete + "MB</td>" +
+        "<td>" + desktopSuccessCount + " urls Tested Successfully</td></tr>"
       )
     }
     else {
-      accumulatorString = accumulatorString.concat("<td> Standard values to be used for judging page size/td>" +
-        "<td>" + desktopTimeFirstPaintInSeconds + "s/td>" +
-        "<td>" + desktopAboveTheFoldCompleteInSec + "s/td>" +
-        "<td>" + desktopMBInDocComplete + "MB/td>" +
-        "<td>" + desktopSuccessCount + " urls Tested Successfully/td>/tr>"
+      accumulatorString = accumulatorString.concat("<td> Standard values to be used for judging page size</td>" +
+        "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
+        "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
+        "<td>" + desktopMBInDocComplete + "MB</td>" +
+        "<td>" + desktopSuccessCount + " urls Tested Successfully</td></tr>"
       )
     }
   }
 
   //add mobile averages to return string
-  accumulatorString = accumulatorString.concat("<tr style=\"background-color:" + averageColor + ";\"><td>" + DateTime.now + "/td><td>Android.toDouble/3G/td>")
+  accumulatorString = accumulatorString.concat("<tr style=\"background-color:" + averageColor + ";\"><td>" + DateTime.now + "</td><td>Android.toDouble/3G</td>")
   if(accumulatorMobileSuccessCount > 1){
-    accumulatorString = accumulatorString.concat("<td>" + "Average of " + accumulatorDesktopSuccessCount + "pages  with recognised size issues/td>" +
-      "<td>" + mobileTimeFirstPaintInSeconds + "s/td>" +
-      "<td>" + mobileAboveTheFoldCompleteInSec + "/td>" +
-      "<td>" + mobileMBInDocComplete + "MB/td>" +
-      "<td>" + mobileSuccessCount + " urls Tested Successfully/td>/tr>"
+    accumulatorString = accumulatorString.concat("<td>" + "Average of " + accumulatorDesktopSuccessCount + "pages  with recognised size issues</td>" +
+      "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
+      "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
+      "<td>" + mobileMBInDocComplete + "MB</td>" +
+      "<td>" + mobileSuccessCount + " urls Tested Successfully</td></tr>"
     )}
   else{
     if (accumulatorMobileSuccessCount == 1) {
-      accumulatorString = accumulatorString.concat("<td> Results from 1 page with recognised size issues/td>" +
-        "<td>" + mobileTimeFirstPaintInSeconds + "s/td>" +
-        "<td>" + mobileAboveTheFoldCompleteInSec + "/td>" +
-        "<td>" + mobileMBInDocComplete + "MB/td>" +
-        "<td>" + mobileSuccessCount + " urls Tested Successfully/td>/tr>"
+      accumulatorString = accumulatorString.concat("<td> Results from 1 page with recognised size issues</td>" +
+        "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
+        "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
+        "<td>" + mobileMBInDocComplete + "MB</td>" +
+        "<td>" + mobileSuccessCount + " urls Tested Successfully</td></tr>"
       )
     }
     else {
-      accumulatorString = accumulatorString.concat("<td> Standard values to be used for judging page size/td>" +
-        "<td>" + mobileTimeFirstPaintInSeconds + "s/td>" +
-        "<td>" + mobileAboveTheFoldCompleteInSec + "/td>" +
-        "<td>" + mobileMBInDocComplete + "MB/td>" +
-        "<td>" + mobileSuccessCount + " urls Tested Successfully/td>/tr>"
+      accumulatorString = accumulatorString.concat("<td> Standard values to be used for judging page size</td>" +
+        "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
+        "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
+        "<td>" + mobileMBInDocComplete + "MB</td>" +
+        "<td>" + mobileSuccessCount + " urls Tested Successfully</td></tr>"
       )
     }
   }
