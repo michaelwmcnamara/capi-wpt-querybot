@@ -16,8 +16,8 @@ abstract  class PageElement {
   val bytesDownloaded: Int
   val errorStatusCode: Int
   val iP: String
-  lazy val sizeInKB: Double = roundAt(2)(bytesDownloaded/1024)
-  lazy val sizeInMB: Double = roundAt(2)(bytesDownloaded/(1024 * 1024))
+  lazy val sizeInKB: Double = roundAt(2)(bytesDownloaded.toDouble/1024)
+  lazy val sizeInMB: Double = roundAt(2)(bytesDownloaded.toDouble/(1024 * 1024))
 
   def toHTMLTableRow(): String = {
     "<tr>" +
