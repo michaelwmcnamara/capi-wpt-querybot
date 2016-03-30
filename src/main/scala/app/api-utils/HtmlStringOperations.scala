@@ -19,13 +19,16 @@ class HtmlStringOperations(average: String, warning: String, alert: String, live
   //HTML
   //HTML Page elements
   val hTMLPageHeader: String = "<!DOCTYPE html>\n<html>\n<head>\n  <link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\" integrity=\"sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7\" crossorigin=\"anonymous\">\n</head>\n<body>\n"
+  val hTMLTitleArticle: String = "<h1>Currrent Performance of today's Articles</h1>"
   val hTMLTitleLiveblog: String = "<h1>Currrent Performance of today's Liveblogs</h1>"
   val hTMLTitleInteractive: String = "<h1>Currrent Performance of today's Interactives</h1>"
   val hTMLTitleFronts: String = "<h1>Currrent Performance of today's Fronts</h1>"
+  val hTMLTitleAudio: String = "<h1>Currrent Performance of today's Audio Pages</h1>"
+  val hTMLTitleVideo: String = "<h1>Currrent Performance of today's Video Pages</h1>"
   val hTMLJobStarted: String = "<p>Job started at: " + DateTime.now + "\n</p>"
-  val hTMLFullTableHeaders: String = "<table class=\"table table-striped\">\n<tr>\n<th>Time Last Tested</th>\n<th>Test Type</th>\n<th>Article Url</th>\n<th>Time to First Paint</th>\n<th>Time to Document Complete</th>\n<th>MB transferred at Document Complete</th>\n<th>Time to Fully Loaded</th>\n<th>MB transferred at Fully Loaded</th>\n<th>US Prepaid Cost $US0.097 per MB</th>\n<th>US Postpaid Cost $US0.065 per MB</th>\n<th>Speed Index</th>\n<th>Status</th>\n</tr>\n"
-  val hTMLSimpleTableHeaders: String = "<table class=\"table table-striped\">\n<tr>\n<th>Time Last Tested</th>\n<th>Test Type</th>\n<th>Article Url</th>\n<th>Time to Page Scrollable</th>\n<th>Time to rendering above the fold complete </th>\n<th>MB transferred</th>\n<th>US Prepaid Cost $US0.097 per MB</th>\n<th>US Postpaid Cost $US0.065 per MB</th>\n<th>Status</th>\n</tr>\n"
-  val hTMLInteractiveTableHeaders: String = "<table class=\"table table-striped\">\n<tr>\n<th>Time Last Tested</th>\n<th>Test Type</th>\n<th>Article Url</th>\n<th>Time to Page Scrollable</th>\n<th>Time to rendering above the fold complete </th>\n<th>MB transferred</th>\n<th>Status</th>\n<th>Full Results Here</th></tr>\n"
+  val hTMLFullTableHeaders: String = "<table class=\"table table-striped\">\n<tr>\n<th>Time Last Tested</th>\n<th>Test Type</th>\n<th>Page Url</th>\n<th>Time to First Paint</th>\n<th>Time to Document Complete</th>\n<th>MB transferred at Document Complete</th>\n<th>Time to Fully Loaded</th>\n<th>MB transferred at Fully Loaded</th>\n<th>US Prepaid Cost $US0.097 per MB</th>\n<th>US Postpaid Cost $US0.065 per MB</th>\n<th>Speed Index</th>\n<th>Status</th>\n</tr>\n"
+  val hTMLSimpleTableHeaders: String = "<table class=\"table table-striped\">\n<tr>\n<th>Time Last Tested</th>\n<th>Test Type</th>\n<th>Page Url</th>\n<th>Time to Page Scrollable</th>\n<th>Time to rendering above the fold complete </th>\n<th>MB transferred</th>\n<th>US Prepaid Cost $US0.097 per MB</th>\n<th>US Postpaid Cost $US0.065 per MB</th>\n<th>Status</th>\n</tr>\n"
+  val hTMLInteractiveTableHeaders: String = "<table class=\"table table-striped\">\n<tr>\n<th>Time Last Tested</th>\n<th>Test Type</th>\n<th>Page Url</th>\n<th>Time to Page Scrollable</th>\n<th>Time to rendering above the fold complete </th>\n<th>MB transferred</th>\n<th>Status</th>\n<th>Full Results Here</th></tr>\n"
   val hTMLTableFooters: String = "</table>"
   val hTMLPageFooterStart: String = "\n<p><i>Job completed at: "
   val hTMLPageFooterEnd: String = "</i></p>\n</body>\n</html>"
@@ -48,11 +51,12 @@ class HtmlStringOperations(average: String, warning: String, alert: String, live
 
   //email elements
   val emailPageHeader: String = "<!DOCTYPE html>\n<html style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;font-family: sans-serif;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%;font-size: 10px;-webkit-tap-highlight-color: rgba(0,0,0,0);\">\n<head style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;\">\n  <link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\" integrity=\"sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7\" crossorigin=\"anonymous\" style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;\">\n</head>\n<body style=\"-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;margin: 0;font-family: &quot;Helvetica Neue&quot;,Helvetica,Arial,sans-serif;font-size: 14px;line-height: 1.42857143;color: #333;background-color: #fff;\">"
-  val htmlTitleEmailLiveBlog: String = h1EmailTag + "Current Performance of today's Liveblogs</h1>"
-  val htmlTitleEmailInteractive: String = h1EmailTag + "Current Performance of today's Interactives</h1>"
-  val htmlTitleEmailFronts: String = h1EmailTag + "Current Performance of today's Fronts</h1>"
+  val htmlTitleEmailArticle: String = h1EmailTag + "Current Performance of today's article pages</h1>"
+  val htmlTitleEmailLiveBlog: String = h1EmailTag + "Current Performance of today's liveblog pages</h1>"
+  val htmlTitleEmailInteractive: String = h1EmailTag + "Current Performance of today's interactive pages</h1>"
+  val htmlTitleEmailFronts: String = h1EmailTag + "Current Performance of today's fronts</h1>"
   val hTMLEmailJobStarted: String =  pEmailTag + "Job started at: " + DateTime.now + "\n</p>"
-  val hTMLAlertEmailTableHeaders: String = tableEmailTag + "\n" + tableHeaderRowEmailTag + "\n" + tableHeaderCellEmailTag + "Article Url</th>\n" + tableHeaderCellEmailTag + "Test Type</th>\n" + tableHeaderCellEmailTag + "Status</th>\n</tr>\n"
+  val hTMLAlertEmailTableHeaders: String = tableEmailTag + "\n" + tableHeaderRowEmailTag + "\n" + tableHeaderCellEmailTag + "Page Url</th>\n" + tableHeaderCellEmailTag + "Test Type</th>\n" + tableHeaderCellEmailTag + "Status</th>\n" + tableHeaderCellEmailTag + "Full results here</th>\n" + "</tr>\n"
   val hTMLEmailTableFooters: String = "</table>"
   val hTMLEmailPageFooterStart: String = "\n"+ pEmailTag +"<i>Job completed at: "
   val hTMLEmailPageFooterEnd: String = "</i></p>\n</body>\n</html>"
@@ -108,6 +112,10 @@ class HtmlStringOperations(average: String, warning: String, alert: String, live
   }
 
 
+  def initialisePageForArticle: String = {
+    hTMLPageHeader + hTMLTitleArticle + hTMLJobStarted
+  }
+
   def initialisePageForLiveblog: String = {
     hTMLPageHeader + hTMLTitleLiveblog + hTMLJobStarted
   }
@@ -144,35 +152,45 @@ class HtmlStringOperations(average: String, warning: String, alert: String, live
 
   def interactiveAlertEmailHeadings(): String = {
     val messageString: String = emailPageHeader +
-      h1EmailTag + "Interactive performance alerts" + "</h1>\n"
+      h1EmailTag + "Interactive page performance alerts" + "</h1>\n"
     messageString
   }
 
+  def generateArticleAlertHeadings(): String = {
+    h2EmailTag + "Article page performance alerts" + "</h2>\n"
+  }
+
+  def generateArticleAlertFooter(): String = {
+    pEmailTag + "All alerts have been confirmed by retesting multiple times. Tests were run without ads so all page weight is due to content" +"</p>\n" +
+      pEmailTag + "Full results for article pages can be viewed <a href=" + liveBlogResultsPage + ">here</a></p>\n"
+  }
+
+
   def generateLiveBlogAlertHeadings(): String = {
-    h2EmailTag + "Live Blog Performance Alerts" + "</h2>\n"
+    h2EmailTag + "Liveblog performance alerts" + "</h2>\n"
   }
 
   def generateLiveBlogAlertFooter(): String = {
     pEmailTag + "All alerts have been confirmed by retesting multiple times. Tests were run without ads so all page weight is due to content" +"</p>\n" +
-    pEmailTag + "Full results for LiveBlogs can be viewed <a href=" + liveBlogResultsPage + ">here</a></p>\n"
+    pEmailTag + "Full results for liveblog pages can be viewed <a href=" + liveBlogResultsPage + ">here</a></p>\n"
   }
 
   def generateInteractiveAlertHeadings(): String = {
-    h2EmailTag + "Interactive Performance Alerts" + "</h2>\n"
+    h2EmailTag + "Interactive page performance alerts" + "</h2>\n"
   }
 
   def generateInteractiveAlertFooter(): String = {
     pEmailTag + "All alerts have been confirmed by retesting multiple times. Tests were run without ads so all page weight is due to content"+"</p>\n" +
-    pEmailTag + "Full results for Interactives can be viewed <a href=" + interactiveResultsPage + ">here</a></p>\n"
+    pEmailTag + "Full results for interactive pages can be viewed <a href=" + interactiveResultsPage + ">here</a></p>\n"
   }
 
   def generateFrontsAlertHeadings(): String = {
-    h2EmailTag + "Fronts Performance Alerts" + "</h2>\n"
+    h2EmailTag + "Fronts performance alerts" + "</h2>\n"
   }
 
   def generateFrontsAlertFooter(): String = {
     pEmailTag + "All alerts have been confirmed by retesting multiple times. Tests were run without ads so all page weight is due to content</p>\n" +
-      pEmailTag + "Full results for Fronts can be viewed <a href=" + frontsResultsPage + ">here</a></p>\n"
+      pEmailTag + "Full results for fronts can be viewed <a href=" + frontsResultsPage + ">here</a></p>\n"
   }
 
 
@@ -245,7 +263,17 @@ class HtmlStringOperations(average: String, warning: String, alert: String, live
   }
 
 
-  def generalAlertFullEmailBody(liveBlogReport: String, interactiveReport: String, frontsReport: String): String = {
+  def generalAlertFullEmailBody(articleReport: String, liveBlogReport: String, interactiveReport: String, frontsReport: String): String = {
+
+    val articleElement: String = {
+      if(articleReport.contains("<tr")){
+        generateLiveBlogAlertHeadings() +
+          liveBlogReport+
+          generateLiveBlogAlertFooter()}
+      else {
+        ""
+      }
+    }
 
     val liveBlogElement: String = {
       if(liveBlogReport.contains("<tr")){
@@ -270,6 +298,7 @@ class HtmlStringOperations(average: String, warning: String, alert: String, live
 
     val fullEmailBody: String = {
       generalAlertEmailHeadings +
+      articleElement +
       liveBlogElement +
       frontsElement +
       closePage

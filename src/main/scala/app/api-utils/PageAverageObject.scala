@@ -113,7 +113,7 @@ class LiveBlogDefaultAverages(averageColor: String) extends PageAverageObject {
     "<td>Predefined standards</td></tr>"
 }
 
-class FrontsDefaultAverages extends PageAverageObject() {
+class FrontsDefaultAverages(averageColor: String) extends PageAverageObject() {
   override val desktopTimeFirstPaintInMs: Int = 2 * 1000
   override val desktopTimeDocCompleteInMs: Int = 15 * 1000
   override val desktopKBInDocComplete: Double = 10 * 1024
@@ -134,20 +134,20 @@ class FrontsDefaultAverages extends PageAverageObject() {
   override val mobileSpeedIndex: Int = 5000
   override val mobileSuccessCount = 1
 
-  override val formattedHTMLResultString: String = "<tr bgcolor=\"A9BCF5\">" +
+  override val formattedHTMLResultString: String = "<tr style=\"background-color:" + averageColor + ";\">" +
     "<td>" + DateTime.now + "/td>" +
     "<td>Desktop/td>" +
-    "<td> Alerting thresholds determined by chosen values</td>" +
+    "<td> Alerting thresholds for desktop browser tests</td>" +
     "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
     "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
     "<td>" + desktopMBInDocComplete + "MB</td>" +
     "<td>$(US)" + desktopEstUSPrePaidCost + "</td>" +
     "<td>$(US)" + desktopEstUSPostPaidCost + "</td>" +
     "<td>Predefined standards</td></tr>" +
-    "<tr bgcolor=\"A9BCF5\">" +
+    "<tr style=\"background-color:" + averageColor + ";\">" +
     "<td>" + DateTime.now + "</td>" +
     "<td>Mobile</td>" +
-    "<td> Yellow indicates within danger zone of threshold. Red indicates threshold has been crossed </td>" +
+    "<td> Alerting thresholds for mobile 3G browser tests </td>" +
     "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
     "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
     "<td>" + mobileMBInDocComplete + "MB</td>" +
