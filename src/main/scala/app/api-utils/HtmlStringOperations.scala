@@ -6,12 +6,13 @@ import org.joda.time.DateTime
 /**
  * Created by mmcnamara on 10/02/16.
  */
-class HtmlStringOperations(average: String, warning: String, alert: String, liveBlogResultsUrl: String, interactiveResultsUrl: String, frontsResultsUrl: String) {
+class HtmlStringOperations(average: String, warning: String, alert: String, articleResultsUrl: String, liveBlogResultsUrl: String, interactiveResultsUrl: String, frontsResultsUrl: String) {
 
   val averageColor = average
   val warningColor = warning
   val alertColor = alert
 
+  val articleResultsPage: String = articleResultsUrl
   val liveBlogResultsPage: String = liveBlogResultsUrl
   val interactiveResultsPage: String = interactiveResultsUrl
   val frontsResultsPage: String = frontsResultsUrl
@@ -162,7 +163,7 @@ class HtmlStringOperations(average: String, warning: String, alert: String, live
 
   def generateArticleAlertFooter(): String = {
     pEmailTag + "All alerts have been confirmed by retesting multiple times. Tests were run without ads so all page weight is due to content" +"</p>\n" +
-      pEmailTag + "Full results for article pages can be viewed <a href=" + liveBlogResultsPage + ">here</a></p>\n"
+      pEmailTag + "Full results for article pages can be viewed <a href=" + articleResultsPage + ">here</a></p>\n"
   }
 
 
