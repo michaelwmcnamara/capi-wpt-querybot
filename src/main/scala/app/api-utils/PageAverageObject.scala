@@ -101,7 +101,7 @@ class LiveBlogDefaultAverages(averageColor: String) extends PageAverageObject {
     "<td>$(US)" + desktopEstUSPrePaidCost + "</td>" +
     "<td>$(US)" + desktopEstUSPostPaidCost + "</td>" +
     "<td>Predefined standards</td>"+
-    "<td> </td>"+ </tr>" +
+    "<td> </td>"+ "</tr>" +
     "<tr style=\"background-color:" + averageColor + ";\">" +
     "<td>" + DateTime.now + "</td>" +
     "<td>Mobile</td>" +

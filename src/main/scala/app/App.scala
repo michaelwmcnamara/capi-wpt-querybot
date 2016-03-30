@@ -38,6 +38,7 @@ object App {
     val audioOutputFilename = "audioperformancedata.html"
     val frontsOutputFilename = "frontsData.html"
 
+    val articleResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + articleOutputFilename
     val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + liveBlogOutputFilename
     val interactiveResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + interactiveOutputFilename
     val frontsResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + frontsOutputFilename
@@ -58,7 +59,7 @@ object App {
     val alertColor: String = "#f2dede"
 
     //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
-    val htmlString = new HtmlStringOperations(averageColor, warningColor, alertColor, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
+    val htmlString = new HtmlStringOperations(averageColor, warningColor, alertColor, articleResultsUrl, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
     var articleResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
     var liveBlogResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
     var interactiveResults: String = htmlString.initialisePageForInteractive + htmlString.interactiveTable
