@@ -100,7 +100,8 @@ class LiveBlogDefaultAverages(averageColor: String) extends PageAverageObject {
     "<td>" + desktopMBInDocComplete + "MB</td>" +
     "<td>$(US)" + desktopEstUSPrePaidCost + "</td>" +
     "<td>$(US)" + desktopEstUSPostPaidCost + "</td>" +
-    "<td>Predefined standards</td></tr>" +
+    "<td>Predefined standards</td>"+
+    "<td> </td>"+ </tr>" +
     "<tr style=\"background-color:" + averageColor + ";\">" +
     "<td>" + DateTime.now + "</td>" +
     "<td>Mobile</td>" +
@@ -110,7 +111,8 @@ class LiveBlogDefaultAverages(averageColor: String) extends PageAverageObject {
     "<td>" + mobileMBInDocComplete + "MB</td>" +
     "<td>$(US)" + mobileEstUSPrePaidCost + "</td>" +
     "<td>S(US)" + mobileEstUSPostPaidCost + "</td>" +
-    "<td>Predefined standards</td></tr>"
+    "<td>Predefined standards</td>"+
+    "<td> </td></tr>"
 }
 
 class FrontsDefaultAverages(averageColor: String) extends PageAverageObject() {
@@ -143,7 +145,8 @@ class FrontsDefaultAverages(averageColor: String) extends PageAverageObject() {
     "<td>" + desktopMBInDocComplete + "MB</td>" +
     "<td>$(US)" + desktopEstUSPrePaidCost + "</td>" +
     "<td>$(US)" + desktopEstUSPostPaidCost + "</td>" +
-    "<td>Predefined standards</td></tr>" +
+    "<td>Predefined standards</td>" +
+    "<td> </td></tr>" +
     "<tr style=\"background-color:" + averageColor + ";\">" +
     "<td>" + DateTime.now + "</td>" +
     "<td>Mobile</td>" +
@@ -153,7 +156,8 @@ class FrontsDefaultAverages(averageColor: String) extends PageAverageObject() {
     "<td>" + mobileMBInDocComplete + "MB</td>" +
     "<td>$(US)" + mobileEstUSPrePaidCost + "</td>" +
     "<td>S(US)" + mobileEstUSPostPaidCost + "</td>" +
-    "<td>Predefined standards</td></tr>"
+    "<td>Predefined standards</td>" +
+    "<td> </td></tr>"
 }
 
 class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], averageColor: String) extends PageAverageObject{
@@ -243,7 +247,8 @@ class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], 
       "<td>" + desktopMBInDocComplete + "MB</td>" +
       "<td>$(US)" + desktopEstUSPrePaidCost + "</td>" +
       "<td>$(US)" + desktopEstUSPostPaidCost + "</td>" +
-      "<td>" + desktopSuccessCount + " urls Tested Successfully</td></tr>"
+      "<td>" + desktopSuccessCount + " urls Tested Successfully</td>" +
+      "<td> </td></tr>"
     )}
   else{
     if (accumulatorDesktopSuccessCount == 1) {
@@ -253,7 +258,8 @@ class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], 
         "<td>" + desktopMBInDocComplete + "MB</td>" +
         "<td>$(US)" + desktopEstUSPrePaidCost + "</td>" +
         "<td>$(US)" + desktopEstUSPostPaidCost + "</td>" +
-        "<td>" + desktopSuccessCount + " urls Tested Successfully</td></tr>"
+        "<td>" + desktopSuccessCount + " urls Tested Successfully</td>" +
+        "<td> </td></tr>"
       )
     }
     else {
@@ -263,7 +269,9 @@ class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], 
         "<td>" + desktopMBInDocComplete + "MB</td>" +
         "<td>$(US)" + desktopEstUSPrePaidCost + "</td>" +
         "<td>$(US)" + desktopEstUSPostPaidCost + "</td>" +
-        "<td>" + desktopSuccessCount + " urls Tested Successfully</td></tr>"
+        "<td>" + desktopSuccessCount + " urls Tested Successfully</td>" +
+        "<td> </td></tr>"
+
       )
     }
   }
@@ -277,7 +285,8 @@ class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], 
       "<td>" + mobileMBInDocComplete + "MB</td>" +
       "<td>$(US)" + mobileEstUSPrePaidCost + "</td>" +
       "<td>S(US)" + mobileEstUSPostPaidCost + "</td>" +
-      "<td>" + mobileSuccessCount + " urls Tested Successfully</td></tr>"
+      "<td>" + mobileSuccessCount + " urls Tested Successfully</td>" +
+      "<td> </td></tr>"
     )}
   else{
     if (accumulatorMobileSuccessCount == 1) {
@@ -287,7 +296,8 @@ class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], 
         "<td>" + mobileMBInDocComplete + "MB</td>" +
         "<td>$(US)" + mobileEstUSPrePaidCost + "</td>" +
         "<td>S(US)" + mobileEstUSPostPaidCost + "</td>" +
-        "<td>" + mobileSuccessCount + " urls Tested Successfully</td></tr>"
+        "<td>" + mobileSuccessCount + " urls Tested Successfully</td>" +
+        "<td> </td></tr>"
       )
     }
     else {
@@ -297,7 +307,8 @@ class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], 
         "<td>" + mobileMBInDocComplete + "MB</td>" +
         "<td>$(US)" + mobileEstUSPrePaidCost + "</td>" +
         "<td>S(US)" + mobileEstUSPostPaidCost + "</td>" +
-        "<td>" + mobileSuccessCount + " urls Tested Successfully</td></tr>"
+        "<td>" + mobileSuccessCount + " urls Tested Successfully</td>" +
+        "<td> </td></tr>"
       )
     }
   }
@@ -391,7 +402,8 @@ class GeneratedInteractiveAverages(resultsList: List[Array[PerformanceResultsObj
       "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
       "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
       "<td>" + desktopMBInDocComplete + "MB</td>" +
-      "<td>" + desktopSuccessCount + " urls Tested Successfully</td></tr>"
+      "<td>" + desktopSuccessCount + " urls Tested Successfully</td>" +
+      "<td> </td></tr>"
     )}
   else{
     if (accumulatorDesktopSuccessCount == 1) {
@@ -399,7 +411,8 @@ class GeneratedInteractiveAverages(resultsList: List[Array[PerformanceResultsObj
         "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
         "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
         "<td>" + desktopMBInDocComplete + "MB</td>" +
-        "<td>" + desktopSuccessCount + " urls Tested Successfully</td></tr>"
+        "<td>" + desktopSuccessCount + " urls Tested Successfully</td>" +
+        "<td> </td></tr>"
       )
     }
     else {
@@ -407,7 +420,8 @@ class GeneratedInteractiveAverages(resultsList: List[Array[PerformanceResultsObj
         "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
         "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
         "<td>" + desktopMBInDocComplete + "MB</td>" +
-        "<td>" + desktopSuccessCount + " urls Tested Successfully</td></tr>"
+        "<td>" + desktopSuccessCount + " urls Tested Successfully</td>" +
+        "<td> </td></tr>"
       )
     }
   }
@@ -419,7 +433,8 @@ class GeneratedInteractiveAverages(resultsList: List[Array[PerformanceResultsObj
       "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
       "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
       "<td>" + mobileMBInDocComplete + "MB</td>" +
-      "<td>" + mobileSuccessCount + " urls Tested Successfully</td></tr>"
+      "<td>" + mobileSuccessCount + " urls Tested Successfully</td>" +
+      "<td> </td></tr>"
     )}
   else{
     if (accumulatorMobileSuccessCount == 1) {
@@ -427,7 +442,8 @@ class GeneratedInteractiveAverages(resultsList: List[Array[PerformanceResultsObj
         "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
         "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
         "<td>" + mobileMBInDocComplete + "MB</td>" +
-        "<td>" + mobileSuccessCount + " urls Tested Successfully</td></tr>"
+        "<td>" + mobileSuccessCount + " urls Tested Successfully</td>" +
+        "<td> </td></tr>"
       )
     }
     else {
@@ -435,7 +451,8 @@ class GeneratedInteractiveAverages(resultsList: List[Array[PerformanceResultsObj
         "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
         "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
         "<td>" + mobileMBInDocComplete + "MB</td>" +
-        "<td>" + mobileSuccessCount + " urls Tested Successfully</td></tr>"
+        "<td>" + mobileSuccessCount + " urls Tested Successfully</td>" +
+        "<td> </td></tr>"
       )
     }
   }
