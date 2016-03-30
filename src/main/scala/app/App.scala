@@ -31,14 +31,14 @@ object App {
     val emailFileName = "addresses.conf"
     val interactiveSampleFileName = "interactivesamples.conf"
 
-    val outputFileName = "liveBlogPerformanceData.html"
-    val simpleOutputFileName = "liveBlogPerformanceDataExpurgated.html"
-    val interactiveOutputFilename = "interactivePerformanceData.html"
-    val videoOutputFilename =  "videoPerformanceData.html"
-    val audioOutputFilename = "audioPerformanceData.html"
+    val articleOutputFilename = "articleperformancedata.html"
+    val liveBlogOutputFilename = "liveblogperformancedata.html"
+    val interactiveOutputFilename = "interactiveperformancedata.html"
+    val videoOutputFilename =  "videoperformancedata.html"
+    val audioOutputFilename = "audioperformancedata.html"
     val frontsOutputFilename = "frontsData.html"
 
-    val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + simpleOutputFileName
+    val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + liveBlogOutputFilename
     val interactiveResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + interactiveOutputFilename
     val frontsResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + frontsOutputFilename
 
@@ -59,20 +59,28 @@ object App {
 
     //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
     val htmlString = new HtmlStringOperations(averageColor, warningColor, alertColor, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
+    var articleResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
     var liveBlogResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
     var interactiveResults: String = htmlString.initialisePageForInteractive + htmlString.interactiveTable
     var frontsResults: String = htmlString.initialisePageForFronts + htmlString.initialiseTable
+    var audioResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
+    var videoResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
 
     //Initialize email alerts string - this will be used to generate emails
+    var articleAlertList: List[PerformanceResultsObject] = List()
     var liveBlogAlertList: List[PerformanceResultsObject] = List()
     var interactiveAlertList: List[PerformanceResultsObject] = List()
     var frontsAlertList: List[PerformanceResultsObject] = List()
+    var audioAlertList: List[PerformanceResultsObject] = List()
+    var videoAlertList: List[PerformanceResultsObject] = List()
 
-
+    var articleAlertMessageBody: String = ""
     var liveBlogAlertMessageBody: String = ""
     var interactiveAlertMessageBody: String = ""
     var frontsAlertMessageBody: String = ""
-    
+    var audioAlertMessageBody: String = ""
+    var videoAlertMessageBody: String = ""
+
     val interactiveItemLabel: String = "Interactive"
 
 
@@ -133,17 +141,54 @@ object App {
     //  Define new CAPI Query object
     val capiQuery = new ArticleUrls(contentApiKey)
     //get all content-type-lists
+    val articleUrls: List[String] = capiQuery.getArticleUrls
     val liveBlogUrls: List[String] = capiQuery.getMinByMinUrls
     val interactiveUrls: List[String] = capiQuery.getInteractiveUrls
-    val listofFronts: List[String] = capiQuery.getFrontsUrls
+    val frontsUrls: List[String] = capiQuery.getFrontsUrls
+    val videoUrls: List[String] = capiQuery.getVideoUrls
+    val audioUrls: List[String] = capiQuery.getAudioUrls
     println(DateTime.now + " Closing Content API query connection")
     capiQuery.shutDown
 
 
     // send all urls to webpagetest at once to enable parallel testing by test agents
-    val urlsToSend: List[String] = (liveBlogUrls ::: interactiveUrls ::: listofFronts).distinct
+//    val urlsToSend: List[String] = (articleUrls:::liveBlogUrls ::: interactiveUrls ::: frontsUrls ::: videoUrls ::: audioUrls).distinct
+    val urlsToSend: List[String] = (articleUrls:::liveBlogUrls ::: interactiveUrls ::: frontsUrls).distinct
     println("Combined list of urls: \n" + urlsToSend)
     val resultUrlList: List[(String, String)] = getResultPages(urlsToSend, wptBaseUrl, wptApiKey, wptLocation)
+
+
+    if (articleUrls.nonEmpty) {
+      println("Generating average values for articles")
+      val articleAverages: PageAverageObject = new LiveBlogDefaultAverages(averageColor)
+      articleResults = articleResults.concat(articleAverages.toHTMLString)
+      val articleResultsList = listenForResultPages(articleUrls, resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation)
+      val articleHTMLResults: List[String] = articleResultsList.map(x => htmlString.generateHTMLRow(x))
+      // write article results to string
+      //Create a list of alerting pages and write to string
+      articleAlertList = for (result <- articleResultsList if result.alertStatus) yield result
+      articleAlertMessageBody = htmlString.generateAlertEmailBodyElement(articleAlertList, articleAverages)
+
+      articleResults = articleResults.concat(articleHTMLResults.mkString)
+      articleResults = articleResults + htmlString.closeTable + htmlString.closePage
+      //write article results to file
+      if (!iamTestingLocally) {
+        println(DateTime.now + " Writing liveblog results to S3")
+        s3Interface.writeFileToS3(articleOutputFilename, articleResults)
+      }
+      else {
+        val outputWriter = new LocalFileOperations
+        val writeSuccess: Int = outputWriter.writeLocalResultFile(articleOutputFilename, articleResults)
+        if (writeSuccess != 0) {
+          println("problem writing local outputfile")
+          System exit 1
+        }
+      }
+      println("Article Performance Test Complete")
+
+    } else {
+      println("CAPI query found no article pages")
+    }
 
 
     if (liveBlogUrls.nonEmpty) {
@@ -162,11 +207,11 @@ object App {
       //write liveblog results to file
       if (!iamTestingLocally) {
         println(DateTime.now + " Writing liveblog results to S3")
-        s3Interface.writeFileToS3(simpleOutputFileName, liveBlogResults)
+        s3Interface.writeFileToS3(liveBlogOutputFilename, liveBlogResults)
       }
       else {
         val outputWriter = new LocalFileOperations
-        val writeSuccess: Int = outputWriter.writeLocalResultFile(simpleOutputFileName, liveBlogResults)
+        val writeSuccess: Int = outputWriter.writeLocalResultFile(liveBlogOutputFilename, liveBlogResults)
         if (writeSuccess != 0) {
           println("problem writing local outputfile")
           System exit 1
@@ -210,12 +255,12 @@ object App {
       println("CAPI query found no interactives")
     }
 
-    if (listofFronts.nonEmpty) {
+    if (frontsUrls.nonEmpty) {
       println("Generating average values for fronts")
-      val frontsAverages: PageAverageObject = new FrontsDefaultAverages
+      val frontsAverages: PageAverageObject = new FrontsDefaultAverages(averageColor)
       frontsResults = frontsResults.concat(frontsAverages.toHTMLString)
 
-      val frontsResultsList = listenForResultPages(listofFronts, resultUrlList, frontsAverages, wptBaseUrl, wptApiKey, wptLocation)
+      val frontsResultsList = listenForResultPages(frontsUrls, resultUrlList, frontsAverages, wptBaseUrl, wptApiKey, wptLocation)
       val frontsHTMLResults: List[String] = frontsResultsList.map(x => htmlString.generateHTMLRow(x))
       //Create a list of alerting pages and write to string
       frontsAlertList = for (result <- frontsResultsList if result.alertStatus) yield result
@@ -242,14 +287,16 @@ object App {
       println("CAPI query found no Fronts")
     }
 
-    if (liveBlogAlertList.nonEmpty || frontsAlertList.nonEmpty) {
+    if (articleAlertList.nonEmpty || liveBlogAlertList.nonEmpty || frontsAlertList.nonEmpty) {
+      println("\n\n articleAlertList contains: " + articleAlertList.length + " pages")
       println("\n\n liveBlogAlertList contains: " + liveBlogAlertList.length + " pages")
       println("\n\n frontsAlertList contains: " + frontsAlertList.length + " pages")
+      println("\n\n ***** \n\n" + "article Alert body:\n" + liveBlogAlertMessageBody)
       println("\n\n ***** \n\n" + "liveblog Alert body:\n" + liveBlogAlertMessageBody)
        println("\n\n ***** \n\n" + "fronts Alert Body:\n" + frontsAlertMessageBody)
-      println("\n\n ***** \n\n" + "Full email Body:\n" + htmlString.generalAlertFullEmailBody(liveBlogAlertMessageBody, interactiveAlertMessageBody, frontsAlertMessageBody))
+      println("\n\n ***** \n\n" + "Full email Body:\n" + htmlString.generalAlertFullEmailBody(articleAlertMessageBody, liveBlogAlertMessageBody, interactiveAlertMessageBody, frontsAlertMessageBody))
       println("compiling and sending email")
-      val emailSuccess = emailer.send(generalAlertsAddressList, htmlString.generalAlertFullEmailBody(liveBlogAlertMessageBody, interactiveAlertMessageBody,  frontsAlertMessageBody))
+      val emailSuccess = emailer.send(generalAlertsAddressList, htmlString.generalAlertFullEmailBody(articleAlertMessageBody, liveBlogAlertMessageBody, interactiveAlertMessageBody,  frontsAlertMessageBody))
       if (emailSuccess)
         println(DateTime.now + " General Alert Emails sent successfully. ")
       else
@@ -364,7 +411,7 @@ object App {
           (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded)){
           println("warning and alert statuses set to true")
           if(resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) {resultObject.alertDescription = "<p>Page takes " + resultObject.timeFirstPaintInSec + "s" + " for text to load and page to become scrollable. Should only take " + averages.mobileTimeFirstPaintInSeconds + "s.</p>"}
-          if(resultObject.speedIndex >= averages.mobileSpeedIndex) {resultObject.alertDescription = "<p>Page takes " + resultObject.aboveTheFoldCompleteInSec + "To render visible images etc. It should take " + averages.mobileAboveTheFoldCompleteInSec + "s or less.</p>"}
+          if(resultObject.speedIndex >= averages.mobileSpeedIndex) {resultObject.alertDescription = "<p>Page takes " + resultObject.aboveTheFoldCompleteInSec + "s " + "To render visible images etc. It should take " + averages.mobileAboveTheFoldCompleteInSec + "s or less.</p>"}
           if(resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded) {resultObject.alertDescription = resultObject.alertDescription +  "<p>Page is too heavy. Size is: " + resultObject.kBInFullyLoaded + "KB. It should be less than: " + averages.mobileKBInFullyLoaded + "KB.</p>"}
           resultObject.warningStatus = true
           resultObject.alertStatus = true
