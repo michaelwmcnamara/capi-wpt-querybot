@@ -116,7 +116,9 @@ object App {
         "wptApiKey length: " + configArray(2).length + "\n" +
         "wptLocation length: " + configArray(3).length + "\n" +
         "emailUsername length: " + configArray(4).length + "\n" +
-        "emailPassword length: " + configArray(5).length)
+        "emailPassword length: " + configArray(5).length) + "\n" +
+        "visuals URL length: " + configArray(6).length
+
       System exit 1
     }
     println("config values ok")
@@ -126,6 +128,7 @@ object App {
     val wptLocation: String = configArray(3)
     val emailUsername: String = configArray(4)
     val emailPassword: String = configArray(5)
+    val visualsApiUrl: String = configArray(6)
 
     //obtain list of email addresses for alerting
     val emailAddresses: Array[List[String]] = s3Interface.getEmailAddresses
@@ -150,6 +153,8 @@ object App {
     val audioUrls: List[String] = capiQuery.getAudioUrls
     println(DateTime.now + " Closing Content API query connection")
     capiQuery.shutDown
+
+    //get all pages from the visuals team api
 
 
     // send all urls to webpagetest at once to enable parallel testing by test agents
@@ -295,9 +300,9 @@ object App {
       println("\n\n ***** \n\n" + "article Alert body:\n" + liveBlogAlertMessageBody)
       println("\n\n ***** \n\n" + "liveblog Alert body:\n" + liveBlogAlertMessageBody)
        println("\n\n ***** \n\n" + "fronts Alert Body:\n" + frontsAlertMessageBody)
-      println("\n\n ***** \n\n" + "Full email Body:\n" + htmlString.generalAlertFullEmailBody(articleAlertMessageBody, liveBlogAlertMessageBody, interactiveAlertMessageBody, frontsAlertMessageBody))
+      println("\n\n ***** \n\n" + "Full email Body:\n" + htmlString.generalAlertFullEmailBody(articleAlertMessageBody, liveBlogAlertMessageBody, frontsAlertMessageBody))
       println("compiling and sending email")
-      val emailSuccess = emailer.send(generalAlertsAddressList, htmlString.generalAlertFullEmailBody(articleAlertMessageBody, liveBlogAlertMessageBody, interactiveAlertMessageBody,  frontsAlertMessageBody))
+      val emailSuccess = emailer.send(generalAlertsAddressList, htmlString.generalAlertFullEmailBody(articleAlertMessageBody, liveBlogAlertMessageBody, frontsAlertMessageBody))
       if (emailSuccess)
         println(DateTime.now + " General Alert Emails sent successfully. ")
       else

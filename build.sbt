@@ -37,7 +37,8 @@ libraryDependencies ++= Seq(
   // gmail api dependencies
   "com.google.apis" % "google-api-services-gmail" % "v1-rev37-1.21.0",
   // javax
-  "javax.mail" % "mail" % "1.5.0-b01"
+  "javax.mail" % "mail" % "1.5.0-b01",
+  "io.argonaut" %% "argonaut" % "6.1"
   // courier (email library) dependencies
   //"me.lessis" %% "courier" % "0.1.3",
   //mock java mail - for testing emails
