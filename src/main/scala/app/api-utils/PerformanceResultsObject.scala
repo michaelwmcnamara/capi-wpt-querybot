@@ -74,11 +74,15 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def toFullHTMLTableCells(): String = {
-    "<td>" + "<a href=" + testUrl + ">" + testUrl + "</a>" + " </td>" + "<td>" + timeFirstPaintInMs.toString + "ms </td><td>" +  timeDocCompleteInSec.toString + "s </td><td>" + mBInDocComplete + "MB </td><td>" + timeFullyLoadedInSec.toString + "s </td><td>" + mBInFullyLoaded + "MB </td><td> $(US)" + estUSPrePaidCost + "</td><td> $(US)" + estUSPrePaidCost + "</td><td>" + speedIndex.toString + " </td><td> " + genTestResultString() + "</td>"
+    "<td>" + "<a href=" + testUrl + ">" + testUrl + "</a>" + " </td>" + "<td>" + timeFirstPaintInMs.toString + "ms </td><td>" +  timeDocCompleteInSec.toString + "s </td><td>" + mBInDocComplete + "MB </td><td>" + timeFullyLoadedInSec.toString + "s </td><td>" + mBInFullyLoaded + "MB </td><td> $(US)" + estUSPrePaidCost + "</td><td> $(US)" + estUSPostPaidCost + "</td><td>" + speedIndex.toString + " </td><td> " + genTestResultString() + "</td>"
   }
 
   def toHTMLSimpleTableCells(): String = {
-   "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTest+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + testUrl + "</a>" + " </td>" +" <td>" + timeFirstPaintInMs.toString + "ms </td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>" + "<td> $(US)" + estUSPrePaidCost + "</td>" + "<td> $(US)" + estUSPrePaidCost + "</td>" + "<td> " + genTestResultString() + "</td>"
+   "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTest+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + testUrl + "</a>" + " </td>" +" <td>" + timeFirstPaintInMs.toString + "ms </td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>" + "<td> $(US)" + estUSPrePaidCost + "</td>" + "<td> $(US)" + estUSPostPaidCost + "</td>" + "<td> " + genTestResultString() + "</td>"
+  }
+
+  def toHTMLBasicTableCells(): String = {
+    "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTest+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + testUrl + "</a>" + " </td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>"
   }
 
   def toHTMLInteractiveTableCells(): String = {

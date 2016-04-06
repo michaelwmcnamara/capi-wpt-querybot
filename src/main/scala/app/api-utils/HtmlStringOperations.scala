@@ -20,6 +20,7 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
   //HTML
   //HTML Page elements
   val hTMLPageHeader: String = "<!DOCTYPE html>\n<html>\n<head>\n  <link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\" integrity=\"sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7\" crossorigin=\"anonymous\">\n</head>\n<body>\n"
+  val hTMLTitleCombined: String = "<h1>Currrent Performance of today's Content</h1>"
   val hTMLTitleArticle: String = "<h1>Currrent Performance of today's Articles</h1>"
   val hTMLTitleLiveblog: String = "<h1>Currrent Performance of today's Liveblogs</h1>"
   val hTMLTitleInteractive: String = "<h1>Currrent Performance of today's Interactives</h1>"
@@ -28,6 +29,7 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
   val hTMLTitleVideo: String = "<h1>Currrent Performance of today's Video Pages</h1>"
   val hTMLJobStarted: String = "<p>Job started at: " + DateTime.now + "\n</p>"
   val hTMLFullTableHeaders: String = "<table class=\"table table-striped\">\n<tr>\n<th>Time Last Tested</th>\n<th>Test Type</th>\n<th>Page Url</th>\n<th>Time to First Paint</th>\n<th>Time to Document Complete</th>\n<th>MB transferred at Document Complete</th>\n<th>Time to Fully Loaded</th>\n<th>MB transferred at Fully Loaded</th>\n<th>US Prepaid Cost $US0.097 per MB</th>\n<th>US Postpaid Cost $US0.065 per MB</th>\n<th>Speed Index</th>\n<th>Status</th>\n</tr>\n"
+  val hTMLPageWeightDashboardHeaders: String = "<table class=\"table table-striped\">\n<tr>\n<th>Time Last Tested</th>\n<th>Test Type</th>\n<th>Page Url</th>\n<th>Time till page looks loaded</th>\n<th>Page weight (MB)</th>\n</tr>\n"
   val hTMLSimpleTableHeaders: String = "<table class=\"table table-striped\">\n<tr>\n<th>Time Last Tested</th>\n<th>Test Type</th>\n<th>Page Url</th>\n<th>Time to Page Scrollable</th>\n<th>Time to rendering above the fold complete </th>\n<th>MB transferred</th>\n<th>US Prepaid Cost $US0.097 per MB</th>\n<th>US Postpaid Cost $US0.065 per MB</th>\n<th>Status</th>\n</tr>\n"
   val hTMLInteractiveTableHeaders: String = "<table class=\"table table-striped\">\n<tr>\n<th>Time Last Tested</th>\n<th>Test Type</th>\n<th>Page Url</th>\n<th>Time to Page Scrollable</th>\n<th>Time to rendering above the fold complete </th>\n<th>MB transferred</th>\n<th>Status</th>\n<th>Full Results Here</th></tr>\n"
   val hTMLTableFooters: String = "</table>"
@@ -87,6 +89,32 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
 
   }
 
+  def generatePageWeightDashboardHTMLRow(resultsObject: PerformanceResultsObject): String = {
+    var returnString: String = ""
+    //  Define new web-page-test API request and send it the url to test
+    //  Add results to string which will eventually become the content of our results file
+
+    if (resultsObject.warningStatus) {
+      if (resultsObject.alertStatus) {
+        println("row should be red one of the items qualifies")
+        returnString = "<tr style=\"background-color:" + alertColor + ";\">" + resultsObject.toHTMLBasicTableCells() + "</tr>"
+      }
+      else {
+        println("row should be yellow one of the items qualifies")
+        returnString = "<tr style=\"background-color:" + warningColor + ";\">" + resultsObject.toHTMLBasicTableCells() + "</tr>"
+      }
+    }
+    else {
+      println("all fields within size limits")
+      returnString = "<tr>" + resultsObject.toHTMLBasicTableCells() + "</tr>"
+    }
+    println(DateTime.now + " returning results string to main thread")
+    println(returnString)
+    returnString
+
+  }
+
+
   def interactiveHTMLRow(resultsObject: PerformanceResultsObject): String = {
     var returnString: String = ""
     //  Define new web-page-test API request and send it the url to test
@@ -112,6 +140,9 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
 
   }
 
+  def initialisePageForCombined: String = {
+    hTMLPageHeader + hTMLTitleCombined + hTMLJobStarted
+  }
 
   def initialisePageForArticle: String = {
     hTMLPageHeader + hTMLTitleArticle + hTMLJobStarted
@@ -131,6 +162,10 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
 
   def initialiseTable: String = {
     hTMLSimpleTableHeaders
+  }
+
+  def initialisePageWeightDashboardTable: String = {
+    hTMLPageWeightDashboardHeaders
   }
 
   def interactiveTable: String = {
