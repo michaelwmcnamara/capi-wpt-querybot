@@ -34,9 +34,12 @@ object App {
     val articleOutputFilename = "articleperformancedata.html"
     val liveBlogOutputFilename = "liveblogperformancedata.html"
     val interactiveOutputFilename = "interactiveperformancedata.html"
-    val videoOutputFilename =  "videoperformancedata.html"
+    val videoOutputFilename = "videoperformancedata.html"
     val audioOutputFilename = "audioperformancedata.html"
-    val frontsOutputFilename = "frontsData.html"
+    val frontsOutputFilename = "frontsperformancedata.html"
+    val combinedOutputFilename = "combinedperformancedata.html"
+    val combinedDesktopFilename = "combineddesktopperformancedata.html"
+    val combinedMobileFilename = "combinedmobileperformancedata.html"
 
     val articleResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + articleOutputFilename
     val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + liveBlogOutputFilename
@@ -54,9 +57,12 @@ object App {
 
     //Define colors to be used for average values, warnings and alerts
     val averageColor: String = "#d9edf7"
-//    val warningColor: String = "#fcf8e3"
+    //    val warningColor: String = "#fcf8e3"
     val warningColor: String = "rgba(227, 251, 29, 0.32)"
     val alertColor: String = "#f2dede"
+
+    //initialize combinedResultsList - this will be accumulate test results for the combined page
+    var combinedResultsList: List[PerformanceResultsObject] = List()
 
     //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
     val htmlString = new HtmlStringOperations(averageColor, warningColor, alertColor, articleResultsUrl, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
@@ -158,8 +164,8 @@ object App {
 
 
     // send all urls to webpagetest at once to enable parallel testing by test agents
-//    val urlsToSend: List[String] = (articleUrls:::liveBlogUrls ::: interactiveUrls ::: frontsUrls ::: videoUrls ::: audioUrls).distinct
-    val urlsToSend: List[String] = (articleUrls:::liveBlogUrls ::: interactiveUrls ::: frontsUrls).distinct
+    //    val urlsToSend: List[String] = (articleUrls:::liveBlogUrls ::: interactiveUrls ::: frontsUrls ::: videoUrls ::: audioUrls).distinct
+    val urlsToSend: List[String] = (articleUrls ::: liveBlogUrls ::: interactiveUrls ::: frontsUrls).distinct
     println("Combined list of urls: \n" + urlsToSend)
     val resultUrlList: List[(String, String)] = getResultPages(urlsToSend, wptBaseUrl, wptApiKey, wptLocation)
 
@@ -168,18 +174,27 @@ object App {
       println("Generating average values for articles")
       val articleAverages: PageAverageObject = new LiveBlogDefaultAverages(averageColor)
       articleResults = articleResults.concat(articleAverages.toHTMLString)
+
       val articleResultsList = listenForResultPages(articleUrls, resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation)
-      val articleHTMLResults: List[String] = articleResultsList.map(x => htmlString.generateHTMLRow(x))
+      combinedResultsList = combinedResultsList ::: articleResultsList
+      println("About to sort article results list. Length of list is: " + articleResultsList.length)
+      val sortedArticleResultsList = orderList(articleResultsList)
+      if(sortedArticleResultsList.isEmpty) {
+        println("Sorting algorithm for articles has returned empty list. Aborting")
+        System exit 1
+      }
+
+      val articleHTMLResults: List[String] = sortedArticleResultsList.map(x => htmlString.generateHTMLRow(x))
       // write article results to string
       //Create a list of alerting pages and write to string
-      articleAlertList = for (result <- articleResultsList if result.alertStatus) yield result
+      articleAlertList = for (result <- sortedArticleResultsList if result.alertStatus) yield result
       articleAlertMessageBody = htmlString.generateAlertEmailBodyElement(articleAlertList, articleAverages)
 
       articleResults = articleResults.concat(articleHTMLResults.mkString)
       articleResults = articleResults + htmlString.closeTable + htmlString.closePage
       //write article results to file
       if (!iamTestingLocally) {
-        println(DateTime.now + " Writing liveblog results to S3")
+        println(DateTime.now + " Writing article results to S3")
         s3Interface.writeFileToS3(articleOutputFilename, articleResults)
       }
       else {
@@ -201,11 +216,18 @@ object App {
       println("Generating average values for liveblogs")
       val liveBlogAverages: PageAverageObject = new LiveBlogDefaultAverages(averageColor)
       liveBlogResults = liveBlogResults.concat(liveBlogAverages.toHTMLString)
+
       val liveBlogResultsList = listenForResultPages(liveBlogUrls, resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation)
-      val liveBlogHTMLResults: List[String] = liveBlogResultsList.map(x => htmlString.generateHTMLRow(x))
+      combinedResultsList = combinedResultsList ::: liveBlogResultsList
+      val sortedLiveBlogResultsList = orderList(liveBlogResultsList)
+      if(sortedLiveBlogResultsList.isEmpty) {
+        println("Sorting algorithm for Liveblogs has returned empty list. Aborting")
+        System exit 1
+      }
+      val liveBlogHTMLResults: List[String] = sortedLiveBlogResultsList.map(x => htmlString.generateHTMLRow(x))
       // write liveblog results to string
       //Create a list of alerting pages and write to string
-      liveBlogAlertList = for (result <- liveBlogResultsList if result.alertStatus) yield result
+      liveBlogAlertList = for (result <- sortedLiveBlogResultsList if result.alertStatus) yield result
       liveBlogAlertMessageBody = htmlString.generateAlertEmailBodyElement(liveBlogAlertList, liveBlogAverages)
 
       liveBlogResults = liveBlogResults.concat(liveBlogHTMLResults.mkString)
@@ -235,16 +257,23 @@ object App {
       interactiveResults = interactiveResults.concat(interactiveAverages.toHTMLString)
 
       val interactiveResultsList = listenForResultPages(interactiveUrls, resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation)
-      val interactiveHTMLResults: List[String] = interactiveResultsList.map(x => htmlString.interactiveHTMLRow(x))
+      combinedResultsList = combinedResultsList ::: interactiveResultsList
+      val sortedInteractiveResultsList = orderList(interactiveResultsList)
+      if(sortedInteractiveResultsList.isEmpty) {
+        println("Sorting algorithm has returned empty list. Aborting")
+        System exit 1
+      }
+
+      val interactiveHTMLResults: List[String] = sortedInteractiveResultsList.map(x => htmlString.interactiveHTMLRow(x))
       //generate interactive alert message body
-      interactiveAlertList = for (result <- interactiveResultsList if result.alertStatus) yield result
+      interactiveAlertList = for (result <- sortedInteractiveResultsList if result.alertStatus) yield result
       interactiveAlertMessageBody = htmlString.generateInteractiveAlertBodyElement(interactiveAlertList, interactiveAverages)
       // write interactive results to string
       interactiveResults = interactiveResults.concat(interactiveHTMLResults.mkString)
       interactiveResults = interactiveResults + htmlString.closeTable + htmlString.closePage
       //write interactive results to file
       if (!iamTestingLocally) {
-        println(DateTime.now + " Writing liveblog results to S3")
+        println(DateTime.now + " Writing interactive results to S3")
         s3Interface.writeFileToS3(interactiveOutputFilename, interactiveResults)
       }
       else {
@@ -267,16 +296,22 @@ object App {
       frontsResults = frontsResults.concat(frontsAverages.toHTMLString)
 
       val frontsResultsList = listenForResultPages(frontsUrls, resultUrlList, frontsAverages, wptBaseUrl, wptApiKey, wptLocation)
-      val frontsHTMLResults: List[String] = frontsResultsList.map(x => htmlString.generateHTMLRow(x))
+      combinedResultsList = combinedResultsList ::: frontsResultsList
+      val sortedFrontsResultsList = orderList(frontsResultsList)
+      if(sortedFrontsResultsList.isEmpty) {
+        println("Sorting algorithm for fronts has returned empty list. Aborting")
+        System exit 1
+      }
+      val frontsHTMLResults: List[String] = sortedFrontsResultsList.map(x => htmlString.generateHTMLRow(x))
       //Create a list of alerting pages and write to string
-      frontsAlertList = for (result <- frontsResultsList if result.alertStatus) yield result
+      frontsAlertList = for (result <- sortedFrontsResultsList if result.alertStatus) yield result
       frontsAlertMessageBody = htmlString.generateAlertEmailBodyElement(frontsAlertList, frontsAverages)
       // write fronts results to string
       frontsResults = frontsResults.concat(frontsHTMLResults.mkString)
       frontsResults = frontsResults + htmlString.closeTable + htmlString.closePage
       //write fronts results to file
       if (!iamTestingLocally) {
-        println(DateTime.now + " Writing liveblog results to S3")
+        println(DateTime.now + " Writing fronts results to S3")
         s3Interface.writeFileToS3(frontsOutputFilename, frontsResults)
       }
       else {
@@ -292,6 +327,48 @@ object App {
     } else {
       println("CAPI query found no Fronts")
     }
+
+    if(combinedResultsList.nonEmpty) {
+      val sortedCombinedResults: List[PerformanceResultsObject] = orderList(combinedResultsList)
+      val sortedCombinedDesktopresults: List[PerformanceResultsObject] = for (result <- sortedCombinedResults if result.typeOfTest.contains("Desktop")) yield result
+      val sortedCombinedMobileresults: List[PerformanceResultsObject] = for (result <- sortedCombinedResults if result.typeOfTest.contains("Android/3G")) yield result
+
+      val combinedHTMLResults: List[String] = sortedCombinedResults.map(x => htmlString.generateHTMLRow(x))
+      val combinedDesktopHTMLResults: List[String] = sortedCombinedDesktopresults.map(x => htmlString.generateHTMLRow(x))
+      val combinedAndroidHTMLResults: List[String] = sortedCombinedMobileresults.map(x => htmlString.generateHTMLRow(x))
+
+      val combinedResults: String = htmlString.initialisePageForLiveblog +
+        htmlString.initialiseTable +
+        combinedHTMLResults.mkString +
+        htmlString.closeTable + htmlString.closePage
+
+      val combinedDesktopResults: String = htmlString.initialisePageForLiveblog +
+        htmlString.initialiseTable +
+        combinedDesktopHTMLResults.mkString +
+        htmlString.closeTable + htmlString.closePage
+
+      val combinedMobileResults: String = htmlString.initialisePageForLiveblog +
+        htmlString.initialiseTable +
+        combinedAndroidHTMLResults.mkString +
+        htmlString.closeTable + htmlString.closePage
+
+      //write fronts results to file
+      if (!iamTestingLocally) {
+        println(DateTime.now + " Writing liveblog results to S3")
+        s3Interface.writeFileToS3(combinedOutputFilename, combinedResults)
+        s3Interface.writeFileToS3(combinedDesktopFilename, combinedDesktopResults)
+        s3Interface.writeFileToS3(combinedMobileFilename, combinedMobileResults)
+      }
+      else {
+        val outputWriter = new LocalFileOperations
+        val writeSuccess: Int = outputWriter.writeLocalResultFile(frontsOutputFilename, frontsResults)
+        if (writeSuccess != 0) {
+          println("problem writing local outputfile")
+          System exit 1
+        }
+      }
+    }
+
 
     if (articleAlertList.nonEmpty || liveBlogAlertList.nonEmpty || frontsAlertList.nonEmpty) {
       println("\n\n articleAlertList contains: " + articleAlertList.length + " pages")
@@ -328,10 +405,14 @@ object App {
   }
 
 
-  def getResultPages(urlList: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String,String)] = {
+  def getResultPages(urlList: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
     val wpt: WebPageTest = new WebPageTest(wptBaseUrl, wptApiKey)
-    val desktopResults: List[(String, String)] = urlList.map(page => { (page, wpt.sendPage(page)) })
-    val mobileResults: List[(String, String)] = urlList.map(page => { (page, wpt.sendMobile3GPage(page, wptLocation)) })
+    val desktopResults: List[(String, String)] = urlList.map(page => {
+      (page, wpt.sendPage(page))
+    })
+    val mobileResults: List[(String, String)] = urlList.map(page => {
+      (page, wpt.sendMobile3GPage(page, wptLocation))
+    })
     desktopResults ::: mobileResults
   }
 
@@ -345,7 +426,7 @@ object App {
       for (element <- resultUrlList if element._1 == url) yield new WptResultPageListener(element._1, "LiveBlog", element._2)
     })
 
-    println("Listener List created: \n" + listenerList.map(element => "list element: \n"+ "url: " + element.pageUrl + "\n" + "resulturl" + element.wptResultUrl + "\n"))
+    println("Listener List created: \n" + listenerList.map(element => "list element: \n" + "url: " + element.pageUrl + "\n" + "resulturl" + element.wptResultUrl + "\n"))
 
     val liveBlogResultsList: ParSeq[WptResultPageListener] = listenerList.par.map(element => {
       val wpt = new WebPageTest(wptBaseUrl, wptApiKey)
@@ -359,7 +440,7 @@ object App {
     //Confirm alert status by retesting alerting urls
     println("Confirming any items that have an alert")
     val confirmedTestResults = resultsWithAlerts.map(x => {
-      if(x.alertStatus)
+      if (x.alertStatus)
         confirmAlert(x, averages, wptBaseUrl, wptApiKey, wptLocation)
       else
         x
@@ -367,17 +448,21 @@ object App {
     confirmedTestResults
   }
 
-  def confirmAlert(initialResult: PerformanceResultsObject, averages: PageAverageObject,wptBaseUrl: String, wptApiKey: String, wptLocation: String): PerformanceResultsObject ={
+  def confirmAlert(initialResult: PerformanceResultsObject, averages: PageAverageObject, wptBaseUrl: String, wptApiKey: String, wptLocation: String): PerformanceResultsObject = {
     val webPageTest = new WebPageTest(wptBaseUrl, wptApiKey)
-    val testCount: Int = if(initialResult.timeToFirstByte > 1000) {5} else {3}
+    val testCount: Int = if (initialResult.timeToFirstByte > 1000) {
+      5
+    } else {
+      3
+    }
     println("TTFB for " + initialResult.testUrl + "\n therefore setting test count of: " + testCount)
     val AlertConfirmationTestResult: PerformanceResultsObject = setAlertStatus(webPageTest.testMultipleTimes(initialResult.testUrl, initialResult.typeOfTest, wptLocation, testCount), averages)
     AlertConfirmationTestResult
   }
 
-  def setAlertStatus(resultObject: PerformanceResultsObject, averages: PageAverageObject): PerformanceResultsObject ={
+  def setAlertStatus(resultObject: PerformanceResultsObject, averages: PageAverageObject): PerformanceResultsObject = {
     //  Add results to string which will eventually become the content of our results file
-    if(resultObject.typeOfTest == "Desktop") {
+    if (resultObject.typeOfTest == "Desktop") {
       if ((resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs80thPercentile) ||
         (resultObject.speedIndex >= averages.desktopSpeedIndex80thPercentile) ||
         (resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded80thPercentile) ||
@@ -387,9 +472,15 @@ object App {
           (resultObject.speedIndex >= averages.desktopSpeedIndex) ||
           (resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded)) {
           println("row should be red one of the items qualifies")
-          if(resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) {resultObject.alertDescription = "<p>Page takes " + resultObject.timeFirstPaintInSec + "s" + " for text to load and page to become scrollable. Should only take " + averages.desktopTimeFirstPaintInSeconds + "s.</p>"}
-          if(resultObject.speedIndex >= averages.desktopSpeedIndex) {resultObject.alertDescription = "<p>Page takes " + resultObject.aboveTheFoldCompleteInSec + "To render visible images etc. It should take " + averages.desktopAboveTheFoldCompleteInSec + "s.</P>"}
-          if(resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded) {resultObject.alertDescription = resultObject.alertDescription +  "<p>Page is too heavy. Size is: " + resultObject.kBInFullyLoaded + "KB. It should be less than: " + averages.desktopKBInFullyLoaded + "KB.</p>"}
+          if (resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) {
+            resultObject.alertDescription = "<p>Page takes " + resultObject.timeFirstPaintInSec + "s" + " for text to load and page to become scrollable. Should only take " + averages.desktopTimeFirstPaintInSeconds + "s.</p>"
+          }
+          if (resultObject.speedIndex >= averages.desktopSpeedIndex) {
+            resultObject.alertDescription = "<p>Page takes " + resultObject.aboveTheFoldCompleteInSec + "To render visible images etc. It should take " + averages.desktopAboveTheFoldCompleteInSec + "s.</P>"
+          }
+          if (resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded) {
+            resultObject.alertDescription = resultObject.alertDescription + "<p>Page is too heavy. Size is: " + resultObject.kBInFullyLoaded + "KB. It should be less than: " + averages.desktopKBInFullyLoaded + "KB.</p>"
+          }
           println(resultObject.alertDescription)
           resultObject.warningStatus = true
           resultObject.alertStatus = true
@@ -414,11 +505,17 @@ object App {
         (resultObject.estUSPostPaidCost >= averages.mobileEstUSPostPaidCost80thPercentile)) {
         if ((resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) ||
           (resultObject.speedIndex >= averages.mobileSpeedIndex) ||
-          (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded)){
+          (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded)) {
           println("warning and alert statuses set to true")
-          if(resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) {resultObject.alertDescription = "<p>Page takes " + resultObject.timeFirstPaintInSec + "s" + " for text to load and page to become scrollable. Should only take " + averages.mobileTimeFirstPaintInSeconds + "s.</p>"}
-          if(resultObject.speedIndex >= averages.mobileSpeedIndex) {resultObject.alertDescription = "<p>Page takes " + resultObject.aboveTheFoldCompleteInSec + "s " + "To render visible images etc. It should take " + averages.mobileAboveTheFoldCompleteInSec + "s or less.</p>"}
-          if(resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded) {resultObject.alertDescription = resultObject.alertDescription +  "<p>Page is too heavy. Size is: " + resultObject.kBInFullyLoaded + "KB. It should be less than: " + averages.mobileKBInFullyLoaded + "KB.</p>"}
+          if (resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) {
+            resultObject.alertDescription = "<p>Page takes " + resultObject.timeFirstPaintInSec + "s" + " for text to load and page to become scrollable. Should only take " + averages.mobileTimeFirstPaintInSeconds + "s.</p>"
+          }
+          if (resultObject.speedIndex >= averages.mobileSpeedIndex) {
+            resultObject.alertDescription = "<p>Page takes " + resultObject.aboveTheFoldCompleteInSec + "s " + "To render visible images etc. It should take " + averages.mobileAboveTheFoldCompleteInSec + "s or less.</p>"
+          }
+          if (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded) {
+            resultObject.alertDescription = resultObject.alertDescription + "<p>Page is too heavy. Size is: " + resultObject.kBInFullyLoaded + "KB. It should be less than: " + averages.mobileKBInFullyLoaded + "KB.</p>"
+          }
           resultObject.warningStatus = true
           resultObject.alertStatus = true
         }
@@ -452,16 +549,88 @@ object App {
     val pageAverages: PageAverageObject = new GeneratedInteractiveAverages(resultsList, averageColor)
     pageAverages
   }
-  
 
-  def retestUrl(initialResult: PerformanceResultsObject,wptBaseUrl: String, wptApiKey: String, wptLocation: String): PerformanceResultsObject ={
+
+  def retestUrl(initialResult: PerformanceResultsObject, wptBaseUrl: String, wptApiKey: String, wptLocation: String): PerformanceResultsObject = {
     val webPageTest = new WebPageTest(wptBaseUrl, wptApiKey)
-    val testCount: Int = if(initialResult.timeToFirstByte > 1000) {5} else {3}
+    val testCount: Int = if (initialResult.timeToFirstByte > 1000) {
+      5
+    } else {
+      3
+    }
     println("TTFB for " + initialResult.testUrl + "\n therefore setting test count of: " + testCount)
- //   val AlertConfirmationTestResult: PerformanceResultsObject = setAlertStatus(webPageTest.testMultipleTimes(initialResult.testUrl, initialResult.typeOfTest, wptLocation, testCount), averages)
+    //   val AlertConfirmationTestResult: PerformanceResultsObject = setAlertStatus(webPageTest.testMultipleTimes(initialResult.testUrl, initialResult.typeOfTest, wptLocation, testCount), averages)
     webPageTest.testMultipleTimes(initialResult.testUrl, initialResult.typeOfTest, wptLocation, testCount)
   }
 
+
+  def orderList(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    if(list.length % 2 == 0) {
+      println("orderList called. \n It has " + list.length + " elements.")
+      val tupleList = listSinglesToPairs(list)
+      println("listSinglesToPairs returned a list of " + tupleList.length + " pairs.")
+      val alertsList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if element._1.alertStatus || element._2.alertStatus) yield element
+      val warningList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if element._1.warningStatus || element._2.warningStatus) yield element
+      val okList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if !element._1.alertStatus && !element._1.warningStatus && !element._2.alertStatus && !element._2.warningStatus) yield element
+
+      sortByWeight(alertsList) ::: sortByWeight(warningList) ::: sortByWeight(okList)
+    }
+    else{
+      println("orderList has odd number of elements. List length is: " + list.length)
+      List()
+    }
+  }
+
+  def sortByWeight(list: List[(PerformanceResultsObject,PerformanceResultsObject)]): List[PerformanceResultsObject] = {
+    if(list.nonEmpty){
+      val sortedTupleList = sortTupleList(list)
+      makeList(sortedTupleList)
+    }
+    else {
+        println("sortByWeight has noElements in list. Passing back empty list")
+        List()
+    }
+  }
+
+
+  def listSinglesToPairs(list: List[PerformanceResultsObject]): List[(PerformanceResultsObject, PerformanceResultsObject)] = {
+    if (list.nonEmpty && list.length % 2 == 0) {
+      println("list Singles to pairs has " + list.length + " perf results objects.")
+      val tupleList = makeTuple(List((list.head, list.tail.head)), list.tail.tail)
+      println("makeTuple called - returned a list of " + tupleList.length + "pairs")
+      tupleList
+    }
+    else {
+      println("listSinglesToPairs has been passed an empty or odd number of elements: list has " + list.length + "elements" )
+      makeTuple(List((list.head, list.tail.head)), list.tail.tail)
+    }
+  }
+
+  def makeTuple(tupleList: List[(PerformanceResultsObject, PerformanceResultsObject)], restOfList: List[PerformanceResultsObject]): List[(PerformanceResultsObject, PerformanceResultsObject)] = {
+    println("maketuple function here: tuple list has: " + tupleList.length + " elements.\n" + "               and the rest of list has: " + restOfList.length + " elements remaining.")
+    if (restOfList.isEmpty) {
+      tupleList
+    }
+    else {
+      if (restOfList.length < 2) {
+        println("make tuple has odd number of items in list"); tupleList
+      }
+      else {
+        makeTuple(tupleList ::: List((restOfList.head, restOfList.tail.head)), restOfList.tail.tail)
+      }
+    }
+  }
+
+
+  def makeList(tupleList: List[(PerformanceResultsObject,PerformanceResultsObject)]): List[PerformanceResultsObject] = {
+    val fullList: List[PerformanceResultsObject] = tupleList.flatMap(a => List(a._1,a._2))
+    fullList
+  }
+
+  def sortTupleList(list: List[(PerformanceResultsObject,PerformanceResultsObject)]): List[(PerformanceResultsObject,PerformanceResultsObject)] = {
+    list.sortWith{(leftE:(PerformanceResultsObject, PerformanceResultsObject),rightE:(PerformanceResultsObject, PerformanceResultsObject)) =>
+      leftE._1.bytesInFullyLoaded + leftE._2.bytesInFullyLoaded > rightE._1.bytesInFullyLoaded + rightE._2.bytesInFullyLoaded}
+  }
 
 }
 

@@ -11,7 +11,7 @@ import argonaut._, Argonaut._
  * Created by mmcnamara on 30/03/16.
  */
 class VisualsApiInterface(url: String) {
-
+/*
   val apiUrl: String = url
   implicit val httpClient = new OkHttpClient()
 
@@ -27,7 +27,7 @@ class VisualsApiInterface(url: String) {
 
 
 
-  }
+  }*/
 
 
 }
