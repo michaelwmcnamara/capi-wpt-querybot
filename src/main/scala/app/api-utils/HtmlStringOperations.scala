@@ -264,7 +264,7 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
   }
 
 
-  def generalAlertFullEmailBody(articleReport: String, liveBlogReport: String, interactiveReport: String, frontsReport: String): String = {
+  def generalAlertFullEmailBody(articleReport: String, liveBlogReport: String, frontsReport: String): String = {
 
     val articleElement: String = {
       if(articleReport.contains("<tr")){

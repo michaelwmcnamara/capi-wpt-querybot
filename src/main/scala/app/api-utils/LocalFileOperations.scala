@@ -19,6 +19,7 @@ class LocalFileOperations {
     var wptLocation: String = ""
     var emailUsername: String = ""
     var emailPassword: String = ""
+    var visualsApiUrl: String = ""
 
     println(DateTime.now + " retrieving local config file: " + fileName)
     for (line <- Source.fromFile(fileName).getLines()) {
@@ -46,8 +47,12 @@ class LocalFileOperations {
         println("email password found")
         emailPassword = line.takeRight((line.length - line.indexOf("=")) - 1)
       }
+      if (line.contains("visuals.page.list")) {
+        println("visuals api url found")
+        visualsApiUrl = line.takeRight((line.length - line.indexOf("=")) - 1)
+      }
     }
-    Array(contentApiKey, wptBaseUrl, wptApiKey, wptLocation, emailUsername, emailPassword)
+    Array(contentApiKey, wptBaseUrl, wptApiKey, wptLocation, emailUsername, emailPassword, visualsApiUrl)
   }
 
 

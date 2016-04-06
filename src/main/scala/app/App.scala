@@ -38,6 +38,8 @@ object App {
     val audioOutputFilename = "audioperformancedata.html"
     val frontsOutputFilename = "frontsperformancedata.html"
     val combinedOutputFilename = "combinedperformancedata.html"
+    val combinedDesktopFilename = "combineddesktopperformancedata.html"
+    val combinedMobileFilename = "combinedmobileperformancedata.html"
 
     val articleResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + articleOutputFilename
     val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + liveBlogOutputFilename
@@ -120,7 +122,9 @@ object App {
         "wptApiKey length: " + configArray(2).length + "\n" +
         "wptLocation length: " + configArray(3).length + "\n" +
         "emailUsername length: " + configArray(4).length + "\n" +
-        "emailPassword length: " + configArray(5).length)
+        "emailPassword length: " + configArray(5).length) + "\n" +
+        "visuals URL length: " + configArray(6).length
+
       System exit 1
     }
     println("config values ok")
@@ -130,6 +134,7 @@ object App {
     val wptLocation: String = configArray(3)
     val emailUsername: String = configArray(4)
     val emailPassword: String = configArray(5)
+    val visualsApiUrl: String = configArray(6)
 
     //obtain list of email addresses for alerting
     val emailAddresses: Array[List[String]] = s3Interface.getEmailAddresses
@@ -154,6 +159,8 @@ object App {
     val audioUrls: List[String] = capiQuery.getAudioUrls
     println(DateTime.now + " Closing Content API query connection")
     capiQuery.shutDown
+
+    //get all pages from the visuals team api
 
 
     // send all urls to webpagetest at once to enable parallel testing by test agents
@@ -323,15 +330,34 @@ object App {
 
     if(combinedResultsList.nonEmpty) {
       val sortedCombinedResults: List[PerformanceResultsObject] = orderList(combinedResultsList)
+      val sortedCombinedDesktopresults: List[PerformanceResultsObject] = for (result <- sortedCombinedResults if result.typeOfTest.contains("Desktop")) yield result
+      val sortedCombinedMobileresults: List[PerformanceResultsObject] = for (result <- sortedCombinedResults if result.typeOfTest.contains("Android/3G")) yield result
+
       val combinedHTMLResults: List[String] = sortedCombinedResults.map(x => htmlString.generateHTMLRow(x))
+      val combinedDesktopHTMLResults: List[String] = sortedCombinedDesktopresults.map(x => htmlString.generateHTMLRow(x))
+      val combinedAndroidHTMLResults: List[String] = sortedCombinedMobileresults.map(x => htmlString.generateHTMLRow(x))
+
       val combinedResults: String = htmlString.initialisePageForLiveblog +
         htmlString.initialiseTable +
         combinedHTMLResults.mkString +
         htmlString.closeTable + htmlString.closePage
+
+      val combinedDesktopResults: String = htmlString.initialisePageForLiveblog +
+        htmlString.initialiseTable +
+        combinedDesktopHTMLResults.mkString +
+        htmlString.closeTable + htmlString.closePage
+
+      val combinedMobileResults: String = htmlString.initialisePageForLiveblog +
+        htmlString.initialiseTable +
+        combinedAndroidHTMLResults.mkString +
+        htmlString.closeTable + htmlString.closePage
+
       //write fronts results to file
       if (!iamTestingLocally) {
         println(DateTime.now + " Writing liveblog results to S3")
         s3Interface.writeFileToS3(combinedOutputFilename, combinedResults)
+        s3Interface.writeFileToS3(combinedDesktopFilename, combinedDesktopResults)
+        s3Interface.writeFileToS3(combinedMobileFilename, combinedMobileResults)
       }
       else {
         val outputWriter = new LocalFileOperations
@@ -350,10 +376,10 @@ object App {
       println("\n\n frontsAlertList contains: " + frontsAlertList.length + " pages")
       println("\n\n ***** \n\n" + "article Alert body:\n" + liveBlogAlertMessageBody)
       println("\n\n ***** \n\n" + "liveblog Alert body:\n" + liveBlogAlertMessageBody)
-      println("\n\n ***** \n\n" + "fronts Alert Body:\n" + frontsAlertMessageBody)
-      println("\n\n ***** \n\n" + "Full email Body:\n" + htmlString.generalAlertFullEmailBody(articleAlertMessageBody, liveBlogAlertMessageBody, interactiveAlertMessageBody, frontsAlertMessageBody))
+       println("\n\n ***** \n\n" + "fronts Alert Body:\n" + frontsAlertMessageBody)
+      println("\n\n ***** \n\n" + "Full email Body:\n" + htmlString.generalAlertFullEmailBody(articleAlertMessageBody, liveBlogAlertMessageBody, frontsAlertMessageBody))
       println("compiling and sending email")
-      val emailSuccess = emailer.send(generalAlertsAddressList, htmlString.generalAlertFullEmailBody(articleAlertMessageBody, liveBlogAlertMessageBody, interactiveAlertMessageBody, frontsAlertMessageBody))
+      val emailSuccess = emailer.send(generalAlertsAddressList, htmlString.generalAlertFullEmailBody(articleAlertMessageBody, liveBlogAlertMessageBody, frontsAlertMessageBody))
       if (emailSuccess)
         println(DateTime.now + " General Alert Emails sent successfully. ")
       else
@@ -556,17 +582,13 @@ object App {
   }
 
   def sortByWeight(list: List[(PerformanceResultsObject,PerformanceResultsObject)]): List[PerformanceResultsObject] = {
-    if(list.nonEmpty && list.length % 2 == 0){
+    if(list.nonEmpty){
       val sortedTupleList = sortTupleList(list)
       makeList(sortedTupleList)
     }
     else {
-      if (list.isEmpty) {
         println("sortByWeight has noElements in list. Passing back empty list")
         List()
-      } else
-        println("sortByWeight has odd number of elements: " + list.length + " in fact.")
-      List()
     }
   }
 
@@ -575,7 +597,7 @@ object App {
     if (list.nonEmpty && list.length % 2 == 0) {
       println("list Singles to pairs has " + list.length + " perf results objects.")
       val tupleList = makeTuple(List((list.head, list.tail.head)), list.tail.tail)
-      println("makeTuple called - returned a list of " + list.length + "pairs")
+      println("makeTuple called - returned a list of " + tupleList.length + "pairs")
       tupleList
     }
     else {
@@ -585,7 +607,7 @@ object App {
   }
 
   def makeTuple(tupleList: List[(PerformanceResultsObject, PerformanceResultsObject)], restOfList: List[PerformanceResultsObject]): List[(PerformanceResultsObject, PerformanceResultsObject)] = {
-    println("maketuple function here: tuple list has: " + tupleList.length + "elements.\n" + "rest of list has: " + restOfList.length + " elements remaining.")
+    println("maketuple function here: tuple list has: " + tupleList.length + " elements.\n" + "               and the rest of list has: " + restOfList.length + " elements remaining.")
     if (restOfList.isEmpty) {
       tupleList
     }
