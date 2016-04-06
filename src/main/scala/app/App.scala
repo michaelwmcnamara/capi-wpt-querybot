@@ -383,7 +383,7 @@ object App {
 
         s3Interface.writeFileToS3(editorialPageweightFilename, editorialPageWeightDashboard)
         s3Interface.writeFileToS3(editorialDesktopPageweightFilename, editorialPageWeightDashboardDesktop)
-        s3Interface.writeFileToS3(editorialPageweightFilename, editorialPageWeightDashboardMobile)
+        s3Interface.writeFileToS3(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile)
       }
       else {
         val outputWriter = new LocalFileOperations
@@ -412,7 +412,7 @@ object App {
           println("problem writing local outputfile")
           System exit 1
         }
-        val writeSuccessPWDM: Int = outputWriter.writeLocalResultFile(editorialPageweightFilename, editorialPageWeightDashboardMobile)
+        val writeSuccessPWDM: Int = outputWriter.writeLocalResultFile(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile)
         if (writeSuccessPWDM != 0) {
           println("problem writing local outputfile")
           System exit 1
