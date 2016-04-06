@@ -40,6 +40,9 @@ object App {
     val combinedOutputFilename = "combinedperformancedata.html"
     val combinedDesktopFilename = "combineddesktopperformancedata.html"
     val combinedMobileFilename = "combinedmobileperformancedata.html"
+    val editorialPageweightFilename = "editorialpageweightdashboardcombined.html"
+    val editorialDesktopPageweightFilename = "editorialpageweightdashboarddesktop.html"
+    val editorialMobilePageweightFilename = "editorialpageweightdashboarddesktop.html"
 
     val articleResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + articleOutputFilename
     val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + liveBlogOutputFilename
@@ -335,21 +338,40 @@ object App {
 
       val combinedHTMLResults: List[String] = sortedCombinedResults.map(x => htmlString.generateHTMLRow(x))
       val combinedDesktopHTMLResults: List[String] = sortedCombinedDesktopresults.map(x => htmlString.generateHTMLRow(x))
-      val combinedAndroidHTMLResults: List[String] = sortedCombinedMobileresults.map(x => htmlString.generateHTMLRow(x))
+      val combinedMobileHTMLResults: List[String] = sortedCombinedMobileresults.map(x => htmlString.generateHTMLRow(x))
 
-      val combinedResults: String = htmlString.initialisePageForLiveblog +
+      val combinedBasicHTMLResults: List[String] = sortedCombinedResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
+      val combinedBasicDesktopHTMLResults: List[String] = sortedCombinedDesktopresults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
+      val combinedBasicMobileHTMLResults: List[String] = sortedCombinedMobileresults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
+
+      val combinedResults: String = htmlString.initialisePageForCombined +
         htmlString.initialiseTable +
         combinedHTMLResults.mkString +
         htmlString.closeTable + htmlString.closePage
 
-      val combinedDesktopResults: String = htmlString.initialisePageForLiveblog +
+      val combinedDesktopResults: String = htmlString.initialisePageForCombined +
         htmlString.initialiseTable +
         combinedDesktopHTMLResults.mkString +
         htmlString.closeTable + htmlString.closePage
 
-      val combinedMobileResults: String = htmlString.initialisePageForLiveblog +
+      val combinedMobileResults: String = htmlString.initialisePageForCombined +
         htmlString.initialiseTable +
-        combinedAndroidHTMLResults.mkString +
+        combinedMobileHTMLResults.mkString +
+        htmlString.closeTable + htmlString.closePage
+
+      val editorialPageWeightDashboard: String = htmlString.initialisePageForCombined +
+        htmlString.initialisePageWeightDashboardTable +
+        combinedBasicHTMLResults.mkString +
+        htmlString.closeTable + htmlString.closePage
+
+      val editorialPageWeightDashboardDesktop: String = htmlString.initialisePageForCombined +
+        htmlString.initialisePageWeightDashboardTable +
+        combinedBasicDesktopHTMLResults.mkString +
+        htmlString.closeTable + htmlString.closePage
+
+      val editorialPageWeightDashboardMobile: String = htmlString.initialisePageForCombined +
+        htmlString.initialisePageWeightDashboardTable +
+        combinedBasicMobileHTMLResults.mkString +
         htmlString.closeTable + htmlString.closePage
 
       //write fronts results to file
@@ -358,14 +380,44 @@ object App {
         s3Interface.writeFileToS3(combinedOutputFilename, combinedResults)
         s3Interface.writeFileToS3(combinedDesktopFilename, combinedDesktopResults)
         s3Interface.writeFileToS3(combinedMobileFilename, combinedMobileResults)
+
+        s3Interface.writeFileToS3(editorialPageweightFilename, editorialPageWeightDashboard)
+        s3Interface.writeFileToS3(editorialDesktopPageweightFilename, editorialPageWeightDashboardDesktop)
+        s3Interface.writeFileToS3(editorialPageweightFilename, editorialPageWeightDashboardMobile)
       }
       else {
         val outputWriter = new LocalFileOperations
-        val writeSuccess: Int = outputWriter.writeLocalResultFile(frontsOutputFilename, frontsResults)
-        if (writeSuccess != 0) {
+        val writeSuccessCombined: Int = outputWriter.writeLocalResultFile(combinedOutputFilename, combinedResults)
+        if (writeSuccessCombined != 0) {
           println("problem writing local outputfile")
           System exit 1
         }
+        val writeSuccessCMobile: Int = outputWriter.writeLocalResultFile(combinedDesktopFilename, combinedDesktopResults)
+        if (writeSuccessCMobile != 0) {
+          println("problem writing local outputfile")
+          System exit 1
+        }
+        val writeSuccessCDesktop: Int = outputWriter.writeLocalResultFile(combinedMobileFilename, combinedMobileResults)
+        if (writeSuccessCDesktop != 0) {
+          println("problem writing local outputfile")
+          System exit 1
+        }
+        val writeSuccessPWDC: Int = outputWriter.writeLocalResultFile(editorialPageweightFilename, editorialPageWeightDashboard)
+        if (writeSuccessPWDC != 0) {
+          println("problem writing local outputfile")
+          System exit 1
+        }
+        val writeSuccessPWDD: Int = outputWriter.writeLocalResultFile(editorialDesktopPageweightFilename, editorialPageWeightDashboardDesktop)
+        if (writeSuccessPWDD != 0) {
+          println("problem writing local outputfile")
+          System exit 1
+        }
+        val writeSuccessPWDM: Int = outputWriter.writeLocalResultFile(editorialPageweightFilename, editorialPageWeightDashboardMobile)
+        if (writeSuccessPWDM != 0) {
+          println("problem writing local outputfile")
+          System exit 1
+        }
+
       }
     }
 
