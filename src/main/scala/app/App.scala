@@ -333,16 +333,18 @@ object App {
 
     if(combinedResultsList.nonEmpty) {
       val sortedCombinedResults: List[PerformanceResultsObject] = orderList(combinedResultsList)
-      val sortedCombinedDesktopresults: List[PerformanceResultsObject] = for (result <- sortedCombinedResults if result.typeOfTest.contains("Desktop")) yield result
-      val sortedCombinedMobileresults: List[PerformanceResultsObject] = for (result <- sortedCombinedResults if result.typeOfTest.contains("Android/3G")) yield result
+      val combinedDesktopResultsList: List[PerformanceResultsObject] = for (result <- combinedResultsList if result.typeOfTest.contains("Desktop")) yield result
+      val sortedCombinedDesktopResults: List[PerformanceResultsObject] = sortHomogenousResults(combinedDesktopResultsList)
+      val combinedMobileResultsList: List[PerformanceResultsObject] = for (result <- combinedResultsList if result.typeOfTest.contains("Android/3G")) yield result
+      val sortedCombinedMobileResults: List[PerformanceResultsObject] = sortHomogenousResults(combinedMobileResultsList)
 
       val combinedHTMLResults: List[String] = sortedCombinedResults.map(x => htmlString.generateHTMLRow(x))
-      val combinedDesktopHTMLResults: List[String] = sortedCombinedDesktopresults.map(x => htmlString.generateHTMLRow(x))
-      val combinedMobileHTMLResults: List[String] = sortedCombinedMobileresults.map(x => htmlString.generateHTMLRow(x))
+      val combinedDesktopHTMLResults: List[String] = sortedCombinedDesktopResults.map(x => htmlString.generateHTMLRow(x))
+      val combinedMobileHTMLResults: List[String] = sortedCombinedMobileResults.map(x => htmlString.generateHTMLRow(x))
 
       val combinedBasicHTMLResults: List[String] = sortedCombinedResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
-      val combinedBasicDesktopHTMLResults: List[String] = sortedCombinedDesktopresults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
-      val combinedBasicMobileHTMLResults: List[String] = sortedCombinedMobileresults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
+      val combinedBasicDesktopHTMLResults: List[String] = sortedCombinedDesktopResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
+      val combinedBasicMobileHTMLResults: List[String] = sortedCombinedMobileResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
 
       val combinedResults: String = htmlString.initialisePageForCombined +
         htmlString.initialiseTable +
@@ -631,6 +633,16 @@ object App {
       println("orderList has odd number of elements. List length is: " + list.length)
       List()
     }
+  }
+
+  def sortHomogenousResults(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    val alertsResultsList: List[PerformanceResultsObject] = for (result <- list if result.alertStatus) yield result
+    val warningResultsList: List[PerformanceResultsObject] = for (result <- list if result.warningStatus) yield result
+    val okResultsList: List[PerformanceResultsObject] = for (result <- list if !result.alertStatus && !result.warningStatus) yield result
+    val sortedAlertList: List[PerformanceResultsObject] = alertsResultsList.sortWith(_.bytesInFullyLoaded > _.bytesInFullyLoaded)
+    val sortedWarningList: List[PerformanceResultsObject] = warningResultsList.sortWith(_.bytesInFullyLoaded > _.bytesInFullyLoaded)
+    val sortedOkList: List[PerformanceResultsObject] = okResultsList.sortWith(_.bytesInFullyLoaded > _.bytesInFullyLoaded)
+    sortedAlertList ::: sortedWarningList ::: sortedOkList
   }
 
   def sortByWeight(list: List[(PerformanceResultsObject,PerformanceResultsObject)]): List[PerformanceResultsObject] = {
