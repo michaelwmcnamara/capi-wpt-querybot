@@ -7,6 +7,7 @@ import java.util
 
 import app.api.{WptResultPageListener, S3Operations}
 import app.apiutils._
+import com.gu.contentapi.client.model.v1.ContentFields
 import com.typesafe.config.{Config, ConfigFactory}
 import org.joda.time.DateTime
 import sbt.complete.Completion
@@ -154,14 +155,25 @@ object App {
     //  Define new CAPI Query object
     val capiQuery = new ArticleUrls(contentApiKey)
     //get all content-type-lists
-    val articleUrls: List[String] = capiQuery.getArticleUrls
-    val liveBlogUrls: List[String] = capiQuery.getMinByMinUrls
-    val interactiveUrls: List[String] = capiQuery.getInteractiveUrls
-    val frontsUrls: List[String] = capiQuery.getFrontsUrls
-    val videoUrls: List[String] = capiQuery.getVideoUrls
-    val audioUrls: List[String] = capiQuery.getAudioUrls
+    val articles: List[(Option[ContentFields],String)] = capiQuery.getArticles
+    val liveBlogs: List[(Option[ContentFields],String)] = capiQuery.getMinByMins
+    val interactives: List[(Option[ContentFields],String)] = capiQuery.getInteractives
+    val fronts: List[String] = capiQuery.getFronts
+    val videoPages: List[(Option[ContentFields],String)] = capiQuery.getVideoPages
+    val audioPages: List[(Option[ContentFields],String)] = capiQuery.getAudioPages
     println(DateTime.now + " Closing Content API query connection")
     capiQuery.shutDown
+
+    val articleUrls: List[String] = for (page <- articles) yield page._2
+    val liveBlogUrls: List[String] = for (page <- liveBlogs) yield page._2
+    val interactiveUrls: List[String] = for (page <- interactives) yield page._2
+    val frontsUrls: List[String] = fronts
+    val videoUrls: List[String] = for (page <- videoPages) yield page._2
+    val audioUrls: List[String] = for (page <- audioPages) yield page._2
+
+    val articleContent = articles.head._1
+    val myheadline = articleContent.get.headline
+    println("headline I think: " + myheadline)
 
     //get all pages from the visuals team api
 
@@ -455,7 +467,6 @@ object App {
     }
 
   }
-
 
   def getResultPages(urlList: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
     val wpt: WebPageTest = new WebPageTest(wptBaseUrl, wptApiKey)
