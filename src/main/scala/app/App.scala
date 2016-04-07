@@ -637,7 +637,7 @@ object App {
 
   def sortHomogenousResults(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
     val alertsResultsList: List[PerformanceResultsObject] = for (result <- list if result.alertStatus) yield result
-    val warningResultsList: List[PerformanceResultsObject] = for (result <- list if result.warningStatus) yield result
+    val warningResultsList: List[PerformanceResultsObject] = for (result <- list if result.warningStatus && !result.alertStatus) yield result
     val okResultsList: List[PerformanceResultsObject] = for (result <- list if !result.alertStatus && !result.warningStatus) yield result
     val sortedAlertList: List[PerformanceResultsObject] = alertsResultsList.sortWith(_.bytesInFullyLoaded > _.bytesInFullyLoaded)
     val sortedWarningList: List[PerformanceResultsObject] = warningResultsList.sortWith(_.bytesInFullyLoaded > _.bytesInFullyLoaded)
