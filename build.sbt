@@ -39,6 +39,7 @@ libraryDependencies ++= Seq(
   // javax
   "javax.mail" % "mail" % "1.5.0-b01",
   "io.argonaut" %% "argonaut" % "6.1"
+
   // courier (email library) dependencies
   //"me.lessis" %% "courier" % "0.1.3",
   //mock java mail - for testing emails
