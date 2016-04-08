@@ -42,7 +42,7 @@ object App {
     val combinedMobileFilename = "combinedmobileperformancedata.html"
     val editorialPageweightFilename = "editorialpageweightdashboardcombined.html"
     val editorialDesktopPageweightFilename = "editorialpageweightdashboarddesktop.html"
-    val editorialMobilePageweightFilename = "editorialpageweightdashboarddesktop.html"
+    val editorialMobilePageweightFilename = "editorialpageweightdashboardmobile.html"
 
     val articleResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + articleOutputFilename
     val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + liveBlogOutputFilename
