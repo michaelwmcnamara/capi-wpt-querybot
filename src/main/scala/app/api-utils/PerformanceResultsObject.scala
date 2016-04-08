@@ -42,7 +42,16 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   var heavyElementList: List[PageElementFromHTMLTableRow] = List()
   var elementListMaxSize: Int = 5
 
-  def setHeadline(text: Option[String]):Unit = {headline = text}
+  def setHeadline(text: Option[String]):Unit = {
+    headline = text
+    if(headline.isDefined){
+      if (headline.contains("â€“")){
+        headline.map(text => text.replace("â€“", "-"))
+      }
+    } else {
+      headline.map(text => testUrl)
+    }
+  }
 
   def addtoElementList(element: PageElementFromHTMLTableRow): Boolean = {
     if (heavyElementList.length < elementListMaxSize){
