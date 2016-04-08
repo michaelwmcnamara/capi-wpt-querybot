@@ -171,10 +171,6 @@ object App {
     val videoUrls: List[String] = for (page <- videoPages) yield page._2
     val audioUrls: List[String] = for (page <- audioPages) yield page._2
 
-    val articleContent = articles.head._1
-    val myheadline = articleContent.get.headline
-    println("headline I think: " + myheadline)
-
     //get all pages from the visuals team api
 
 
