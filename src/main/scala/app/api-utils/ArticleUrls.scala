@@ -46,7 +46,7 @@ class ArticleUrls(key: String) {
       .showFields("all")
       .showTags("all")
       .page(1)
-      .pageSize(1)
+      .pageSize(20)
       .orderBy("newest")
       .contentType("article")
     println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
@@ -112,7 +112,7 @@ class ArticleUrls(key: String) {
     interactiveContentAndUrl
   }
 
-  def getFronts: List[String] = {
+  def getFronts: List[(Option[ContentFields],String)] = {
     val listofFronts: List[String] = List("http://www.theguardian.com/uk",
       "http://www.theguardian.com/us",
       "http://www.theguardian.com/au",
@@ -129,7 +129,9 @@ class ArticleUrls(key: String) {
       "http://www.theguardian.com/uk/environment",
       "http://www.theguardian.com/uk/technology",
       "http://www.theguardian.com/travel")
-    listofFronts
+    val emptyContentFields: Option[ContentFields] = None
+    val returnList:List[(Option[ContentFields],String)] = listofFronts.map(url => (emptyContentFields, url))
+    returnList
   }
 
 

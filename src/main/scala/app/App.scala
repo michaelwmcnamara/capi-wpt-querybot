@@ -43,7 +43,7 @@ object App {
     val combinedMobileFilename = "combinedmobileperformancedata.html"
     val editorialPageweightFilename = "editorialpageweightdashboardcombined.html"
     val editorialDesktopPageweightFilename = "editorialpageweightdashboarddesktop.html"
-    val editorialMobilePageweightFilename = "editorialpageweightdashboarddesktop.html"
+    val editorialMobilePageweightFilename = "editorialpageweightdashboardmobile.html"
 
     val articleResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + articleOutputFilename
     val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + liveBlogOutputFilename
@@ -158,7 +158,7 @@ object App {
     val articles: List[(Option[ContentFields],String)] = capiQuery.getArticles
     val liveBlogs: List[(Option[ContentFields],String)] = capiQuery.getMinByMins
     val interactives: List[(Option[ContentFields],String)] = capiQuery.getInteractives
-    val fronts: List[String] = capiQuery.getFronts
+    val fronts:  List[(Option[ContentFields],String)] = capiQuery.getFronts
     val videoPages: List[(Option[ContentFields],String)] = capiQuery.getVideoPages
     val audioPages: List[(Option[ContentFields],String)] = capiQuery.getAudioPages
     println(DateTime.now + " Closing Content API query connection")
@@ -167,7 +167,7 @@ object App {
     val articleUrls: List[String] = for (page <- articles) yield page._2
     val liveBlogUrls: List[String] = for (page <- liveBlogs) yield page._2
     val interactiveUrls: List[String] = for (page <- interactives) yield page._2
-    val frontsUrls: List[String] = fronts
+    val frontsUrls: List[String] = for (page <- fronts) yield page._2
     val videoUrls: List[String] = for (page <- videoPages) yield page._2
     val audioUrls: List[String] = for (page <- audioPages) yield page._2
 
@@ -190,7 +190,7 @@ object App {
       val articleAverages: PageAverageObject = new LiveBlogDefaultAverages(averageColor)
       articleResults = articleResults.concat(articleAverages.toHTMLString)
 
-      val articleResultsList = listenForResultPages(articleUrls, resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation)
+      val articleResultsList = listenForResultPages(articles, "article", resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation)
       combinedResultsList = combinedResultsList ::: articleResultsList
       println("About to sort article results list. Length of list is: " + articleResultsList.length)
       val sortedArticleResultsList = orderList(articleResultsList)
@@ -232,7 +232,7 @@ object App {
       val liveBlogAverages: PageAverageObject = new LiveBlogDefaultAverages(averageColor)
       liveBlogResults = liveBlogResults.concat(liveBlogAverages.toHTMLString)
 
-      val liveBlogResultsList = listenForResultPages(liveBlogUrls, resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation)
+      val liveBlogResultsList = listenForResultPages(liveBlogs, "liveBlog", resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation)
       combinedResultsList = combinedResultsList ::: liveBlogResultsList
       val sortedLiveBlogResultsList = orderList(liveBlogResultsList)
       if(sortedLiveBlogResultsList.isEmpty) {
@@ -271,7 +271,7 @@ object App {
       val interactiveAverages: PageAverageObject = generatePageAverages(listofLargeInteractives, wptBaseUrl, wptApiKey, wptLocation, interactiveItemLabel, averageColor)
       interactiveResults = interactiveResults.concat(interactiveAverages.toHTMLString)
 
-      val interactiveResultsList = listenForResultPages(interactiveUrls, resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation)
+      val interactiveResultsList = listenForResultPages(interactives, "interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation)
       combinedResultsList = combinedResultsList ::: interactiveResultsList
       val sortedInteractiveResultsList = orderList(interactiveResultsList)
       if(sortedInteractiveResultsList.isEmpty) {
@@ -310,7 +310,7 @@ object App {
       val frontsAverages: PageAverageObject = new FrontsDefaultAverages(averageColor)
       frontsResults = frontsResults.concat(frontsAverages.toHTMLString)
 
-      val frontsResultsList = listenForResultPages(frontsUrls, resultUrlList, frontsAverages, wptBaseUrl, wptApiKey, wptLocation)
+      val frontsResultsList = listenForResultPages(fronts, "front", resultUrlList, frontsAverages, wptBaseUrl, wptApiKey, wptLocation)
       combinedResultsList = combinedResultsList ::: frontsResultsList
       val sortedFrontsResultsList = orderList(frontsResultsList)
       if(sortedFrontsResultsList.isEmpty) {
@@ -481,25 +481,26 @@ object App {
     desktopResults ::: mobileResults
   }
 
-  def listenForResultPages(capiUrls: List[String], resultUrlList: List[(String, String)], averages: PageAverageObject, wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[PerformanceResultsObject] = {
+  def listenForResultPages(capiPages: List[(Option[ContentFields],String)], contentType: String, resultUrlList: List[(String, String)], averages: PageAverageObject, wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[PerformanceResultsObject] = {
     println("ListenForResultPages called with: \n\n" +
-      " List of Urls: \n" + capiUrls.mkString +
+      " List of Urls: \n" + capiPages.map(page => page._2).mkString +
       "\n\nList of WebPage Test results: \n" + resultUrlList.mkString +
       "\n\nList of averages: \n" + averages.toHTMLString + "\n")
 
-    val listenerList: List[WptResultPageListener] = capiUrls.flatMap(url => {
-      for (element <- resultUrlList if element._1 == url) yield new WptResultPageListener(element._1, "LiveBlog", element._2)
+    val listenerList: List[WptResultPageListener] = capiPages.flatMap(page => {
+      for (element <- resultUrlList if element._1 == page._2) yield new WptResultPageListener(element._1, contentType, page._1, element._2)
     })
 
     println("Listener List created: \n" + listenerList.map(element => "list element: \n" + "url: " + element.pageUrl + "\n" + "resulturl" + element.wptResultUrl + "\n"))
 
-    val liveBlogResultsList: ParSeq[WptResultPageListener] = listenerList.par.map(element => {
+    val resultsList: ParSeq[WptResultPageListener] = listenerList.par.map(element => {
       val wpt = new WebPageTest(wptBaseUrl, wptApiKey)
-      val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.wptResultUrl)
+      val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.pageFields,element.wptResultUrl)
       newElement.testResults = wpt.getResults(newElement.wptResultUrl)
+      newElement.testResults.setHeadline(newElement.headline)
       newElement
     })
-    val testResults = liveBlogResultsList.map(element => element.testResults).toList
+    val testResults = resultsList.map(element => element.testResults).toList
     val resultsWithAlerts: List[PerformanceResultsObject] = testResults.map(element => setAlertStatus(element, averages))
 
     //Confirm alert status by retesting alerting urls
