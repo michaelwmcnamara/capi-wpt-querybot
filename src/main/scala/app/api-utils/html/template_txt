@@ -1,0 +1,57 @@
+
+
+
+
+
+<table id="perf-results" class="table table-condensed" style="border-collapse:collapse;">
+            <thead>
+            <tr>
+                <th>Time Last Tested</th>
+                <th>Test Type</th>
+                <th>Article Url</th>
+                <th>Time to Page Scrollable</th>
+                <th>Time to rendering above the fold complete</th>
+                <th>MB transferred</th>
+                <th>Status</th>
+                <th>Full Results Here</th>
+            </tr>
+            </thead>
+            <tbody>
+			* for each row:
+
+            <tr class="???" data-toggle="collapse" data-target="varxxx">
+                <td><data1</td>
+                <td>data2</td>
+                <td>data3</td>
+                <td>data4</td>
+                <td>data5</td>
+                <td>data6</td>
+                <td>data7</td>
+            </tr>
+            <tr>
+                <td class="hiddenRow" colspan="8">
+                    <div class="collapse varxxx">
+                        <table>  <!-- table of alert data -->
+                            <caption>List of 5 heaviest elements on page - Recommend reviewing these items.
+                            </caption>
+                            <thead>
+                            <tr>
+                                <th>Resource</th>
+                                <th>Content Type</th>
+                                <th>Bytes Transferred</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+				* for each row:
+                              <tr>
+                                <td>data1</td>
+                                <td>data2</td>
+                                <td>dat3a</td>
+                            </tr>
+                             </tbody>
+                        </table>
+                     </div>
+                </td>
+			</tr>
+		</tbody>
+</table>

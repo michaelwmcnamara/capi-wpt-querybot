@@ -1,0 +1,56 @@
+/**
+ * Created by glockett on 31/03/2016.
+ */
+
+.hiddenRow {
+    padding: 0 30px !important;
+}
+
+body {
+    margin-left: 10px;
+    padding:20px;
+}
+
+h1 {
+    color: gray;
+    font-size: 30px;
+}
+
+h2 {
+    color: darkblue;
+    font-size: 25px;
+}
+
+table {
+    margin-left: 10px;
+}
+
+tr {
+    border-bottom: solid 1px gray;
+}
+
+td {
+    padding: 10px;
+}
+th {padding: 10px;}
+
+h1 {
+    font-size: 40px;
+    color: gray;
+}
+
+.red {
+    background-color:#f2dede;
+}
+
+.amber {
+    background-color:#fff9ba;
+}
+
+.green {
+    background-color:#def2de;
+}
+
+
+
+
