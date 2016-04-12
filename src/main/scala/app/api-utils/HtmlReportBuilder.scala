@@ -47,6 +47,7 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
 
 
 
+
   //Functions
   def generateHTMLRow(resultsObject: PerformanceResultsObject): String = {
     var returnString: String = ""
