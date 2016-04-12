@@ -2,14 +2,7 @@
  * Created by glockett on 31/03/2016.
  */
 
-$('.collapse').on('show.bs.collapse', function () {
-    $('.collapse.in').collapse('hide');
-});
-
-
-
 $(document).ready(function(){
-
 
     $("#report tr:odd").addClass("odd");
     $("#report tr:not(.odd)").hide();
@@ -21,11 +14,8 @@ $(document).ready(function(){
     });
     //$("#report").jExpand();
 
-
-    $(".data tr:odd").addClass("odd");
-    $(".data tr:not(.odd)").show();
-    $(".data tr:first-child").show();
-
+    $(".data tr:odd").show();
+    $(".data tr:even").show();
 
 });
 
