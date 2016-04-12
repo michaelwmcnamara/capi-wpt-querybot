@@ -35,6 +35,9 @@ This is the new body of content
         <p>The following items have been found to either take too long to load or cost too much to
             view on a desktop browser</p>
 
+
+
+
 <table id="perf-results" class="table table-condensed" style="border-collapse:collapse;">
             <thead>
             <tr>
@@ -49,8 +52,7 @@ This is the new body of content
             </tr>
             </thead>
             <tbody>
-
-* for each row:
+			* for each row:
 
             <tr class="???" data-toggle="collapse" data-target="varxxx">
                 <td><data1</td>
@@ -75,7 +77,7 @@ This is the new body of content
                             </tr>
                             </thead>
                             <tbody>
-		    * for each row:
+				* for each row:
                               <tr>
                                 <td>data1</td>
                                 <td>data2</td>
@@ -88,21 +90,3 @@ This is the new body of content
 			</tr>
 		</tbody>
 </table>
-
-
-****************************
-
-
-This is the new Footer
-****************************
-
-  <div id="footer">
-        <p>Job completed at: [DATA]</p>
-    </div>
-</div>
-
-</body>
-</html>
-
-
-
