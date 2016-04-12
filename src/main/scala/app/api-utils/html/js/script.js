@@ -9,6 +9,8 @@ $('.collapse').on('show.bs.collapse', function () {
 
 
 $(document).ready(function(){
+
+
     $("#report tr:odd").addClass("odd");
     $("#report tr:not(.odd)").hide();
     $("#report tr:first-child").show();
@@ -18,6 +20,13 @@ $(document).ready(function(){
         $(this).find(".arrow").toggleClass("up");
     });
     //$("#report").jExpand();
+
+
+    $(".data tr:odd").addClass("odd");
+    $(".data tr:not(.odd)").show();
+    $(".data tr:first-child").show();
+
+
 });
 
 
