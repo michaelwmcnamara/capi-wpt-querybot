@@ -35,7 +35,8 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
 
   val HTML_REPORT_TABLE_ROWS: String = " <tr class=\"[DATA]\"> <td>2016-03-30T13:56:48.114+01:00</td><td>Desktop</td><td>Average of 5pages with recognised size issues</td><td>0.511s</td><td>3.389s</td><td>7.011MB</td><td>5 urls Tested Successfully</td><td> <div class=\"arrow\"></div></td></tr>"
 
-  val HTML_DATA_TABLE_HEADERS: String = "<tr> <td colspan=\"8\"> <table id=\"data\"> <caption>List of 5 heaviest elements on page - Recommend reviewing these items </caption> <thead> <tr> <th>Resource</th> <th>Content Type</th> <th>Bytes Transferred</th> </tr></thead> <tbody>"
+  val HTML_DATA_TABLE_HEADERS: String = "<tr> <td colspan=\"8\"> <table class=\"data\"> <caption>List of 5 heaviest " +
+    "elements on page - Recommend reviewing these items </caption> <thead> <tr> <th>Resource</th> <th>Content Type</th> <th>Bytes Transferred</th> </tr></thead> <tbody>"
 
   val HTML_DATA_TABLE_ROWS: String = " <tr> <td> <a href=http://www.theguardian.com/lifeandstyle/ng-interactive/2016/mar/30/how-to-get-through-to-an-smartphone-addict-cartoon>http://www.theguardian.com/lifeandstyle/ng-interactive/2016/mar/30/how-to-get-through-to-an-smartphone-addict-cartoon</a> </td><td>text/html</td><td>70.4KB</td></tr>"
 
