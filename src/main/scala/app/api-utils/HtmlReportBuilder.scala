@@ -12,50 +12,84 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
 
   //HTML Page elements
   //Page Header
-  val HTML_PAGE_HEAD: String = "<!DOCTYPE html><html lang=\"en\"><head> <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/> <title>Daily REPORT - [Performance Interactives]</title> <link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\"/> <link rel=\"stylesheet\" href=\"css/style.css\"/> <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js\"></script> <script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js\"></script> <link href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css\" rel=\"stylesheet\"/> <link rel=\"stylesheet\" href=\"css/style.css\"/> <script src=\"js/script.js\"></script></head>"
+  val HTML_PAGE_HEAD: String = "<!DOCTYPE html><html lang=\"en\">" + "\n" +
+    "<head> <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>" + "\n" +
+    "<title>Daily REPORT - [Performance Interactives]</title>" + "\n" +
+    "<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\"/>" + "\n" +
+    "<link rel=\"stylesheet\" href=\"/capi-wpt-querybot/assets/css/style.css\"/>" + "\n" +
+    "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js\"></script>" + "\n" +
+    "<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js\"></script>" + "\n" +
+    "<link href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css\" rel=\"stylesheet\"/>" + "\n" +
+    "<link rel=\"stylesheet\" href=\"/capi-wpt-querybot/assets/css/style.css\"/>"+ "\n" +
+    "<script src=\"/capi-wpt-querybot/assets/js/script.js\"></script>" + "\n" +
+    "</head>"
 
   //Page Container
-  val HTML_PAGE_CONTAINER: String = "<body><div id=\"container\"> <div id=\"head\"> <h1>Current performance of " +
-    "today's Interactives</h1> <p>Job started at: " + DateTime.now + "</p><p><a href=http://wpt.gu-web.net/result/160330_Q9_17W/>Click here to see full results.</a></p> </div>"
+  val HTML_PAGE_CONTAINER: String = "<body>" + "\n" +
+    "<div id=\"container\">" + "\n" +
+    "<div id=\"head\">" + "\n" +
+    "<h1>Current performance of today's Interactives</h1>" + "\n" +
+    "<p>Job started at: " + DateTime.now + "</p>" + "\n" +
+    "</div>"
 
   //Page Content
-  val HTML_PAGE_CONTENT: String = "<div id=\"content\"> <h2>Desktop Alerts</h2> <p>The following items have been found to either take too long to load or cost too much to view on a desktop browser</p>"
+  val HTML_PAGE_CONTENT: String = "<div id=\"content\">" + "\n" +
+    "<h2>Desktop Alerts</h2>" + "\n" +
+    "<p>The following items have been found to either take too long to load or cost too much to view on a desktop browser</p>"
 
   //Page Tables
-  val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"report\"> <thead> <tr> <th>Time Last Tested</th> <th>Test Type</th> <th>Article Url</th> <th>Time to Page Scrollable</th> <th>Time to rendering above the fold complete</th> <th>MB transferred</th> <th>Status</th> <th>Full Results Here</th> </tr></thead> <tbody>"
+  val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"report\">"+ "\n" +
+    "<thead>" + "\n" +
+    "<tr> <th>Time Last Tested</th>" + "<th>Test Type</th>" + "<th>Headline</th>" + "<th>Time till page looks loaded</th>" + "<th>Page weight (MB)</th>" +  "</tr>"+ "\n" +
+    "</thead>" +"\n" +
+    "<tbody>"
 
   //  //For each 'report table' row build this string:
   //  val HTML_REPORT_TABLE_ROWS: String = " <tr class=\"[DATA]\"> <td>[DATA]</td><td>[DATA]</td><td>[DATA]</td><td>[DATA]</td><td>[DATA]</td><td>[DATA]</td><td>[DATA]</td><td> <div class=\"arrow\"></div></td></tr>"
 
-  val HTML_DATA_TABLE_HEADERS: String = "<tr> <td colspan=\"8\"> <table class=\"data\"> <caption>List of 5 heaviest " +
-    "elements on page - Recommend reviewing these items </caption> <thead> <tr> <th>Resource</th> <th>Content Type</th> <th>Bytes Transferred</th> </tr></thead> <tbody>"
+  val HTML_PAGE_ELEMENT_TABLE_HEADERS: String = "<tr>" + "\n" +
+    "<td colspan=\"8\">" + "<table class=\"data\">" + "\n" +
+    "<caption>List of 5 heaviest elements on page - Recommend reviewing these items </caption>" + "\n" +
+    "<thead>" + "\n" +
+    "<tr>" + "<th>Resource</th>" + "<th>Content Type</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
+    "</thead>" +"\n" +
+    "<tbody>"
 
-  //For each 'data table' row build this string:
-  val HTML_DATA_TABLE_ROWS: String = " <tr> <td> <a href=[DATA]n>[DATA]</a> </td><td>[DATA]</td><td>[DATA]</td></tr>"
-
-  val HTML_TABLE_END: String = " </tbody> </table>"
+  val HTML_TABLE_END: String = "</tbody>" + "\n" + "</table>"+ "\n"
 
   //Page Footer
-  val HTML_FOOTER: String = "</div><div id=\"footer\"> <p>Job completed at: [DATA]</p></div></div></body></html>"
+  val HTML_FOOTER: String = "</div>" + "\n" +
+    "<div id=\"footer\">" + "<p>Job completed at: [DATA]</p>" + "</div>" + "\n" +
+    "</div>" + "\n" +
+    "</body>" + "\n" +
+    "</html>"
 
 
   //HTML_PAGE_Builder
-  var HTML_Results_PAGE: String = HTML_PAGE_HEAD + HTML_PAGE_CONTAINER + HTML_PAGE_CONTENT +
-    HTML_REPORT_TABLE_HEADERS + generateTableData() + HTML_TABLE_END + HTML_FOOTER
+  //var HTML_Results_PAGE: String = HTML_PAGE_HEAD + HTML_PAGE_CONTAINER + HTML_PAGE_CONTENT + generateTableData() + HTML_FOOTER
 
-  def generateTableData(resultsObject: PerformanceResultsObject): String = {
-   "table Data"
+  def generateHTMLPage(resultsList: List[PerformanceResultsObject]): String = {
+    val returnString = HTML_PAGE_HEAD + HTML_PAGE_CONTAINER + HTML_PAGE_CONTENT +
+       generateHTMLTable(resultsList) + HTML_FOOTER
+    returnString
   }
 
-  def reportTableRow(resultsObject: PerformanceResultsObject): String = {
-    "<tr class=\"" + getAlertClass(resultsObject) + "\">" + resultsObject.toHTMLInteractiveTableCells() + "</tr>"
+  def generateHTMLTable(resultsList: List[PerformanceResultsObject]): String = {
+    HTML_REPORT_TABLE_HEADERS + "\n" + generateHTMLDataRows(resultsList) + "\n" + HTML_TABLE_END
   }
 
-  def dataTableRow(resultsObject: PerformanceResultsObject): String = {
-    " <tr>" +  "</tr>"
+  def generateHTMLDataRows(resultsList: List[PerformanceResultsObject]): String = {
+    (for (result <- resultsList) yield {
+      "<tr class=\"" + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<div class=\"arrow\"></div></td></tr>" + "\n" +
+        generatePageElementTable(result)
+    }).mkString
 
-    "<tr class=\"" + getAlertClass(resultsObject) + "\">" + resultsObject.toHTMLInteractiveTableCells() + "</tr>"
   }
+
+  def generatePageElementTable(resultsObject: PerformanceResultsObject): String = {
+    HTML_PAGE_ELEMENT_TABLE_HEADERS + "\n"  + resultsObject.returnHTMLTopPageElementRows() + HTML_TABLE_END
+  }
+
 
   //Functions
   def getAlertClass(resultsObject: PerformanceResultsObject): String = {
@@ -70,20 +104,6 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
     }
   }
 
-  def generateHTMLPage(resultsList: List[PerformanceResultsObject]): String = {
-    val returnString = HTML_PAGE_HEAD + HTML_PAGE_CONTAINER + HTML_PAGE_CONTENT +
-        HTML_REPORT_TABLE_HEADERS + generateHTMLRows() + HTML_TABLE_END + HTML_DATA_TABLE_HEADERS + HTML_TABLE_END +
-        HTML_DATA_TABLE_ROWS + HTML_FOOTER
-    returnString
-  }
-
-  def generateHTMLRows(resultsObject: PerformanceResultsObject): String = {
-    (for (element <- resultsList) yield {
-      "<tr class=\"" + getAlertClass(resultsObject) + "\">" + resultsObject.toHTMLSimpleTableCells() + "<div class=\"arrow\"></div></td></tr>"
-    }).mkString
-
-
-  }
 
 
   //  def initialisePageForArticle: String = {

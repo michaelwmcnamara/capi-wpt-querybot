@@ -70,6 +70,7 @@ object App {
 
     //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
     val htmlString = new HtmlStringOperations(averageColor, warningColor, alertColor, articleResultsUrl, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
+    val newhtmlString = new HtmlReportBuilder(averageColor, warningColor, alertColor, articleResultsUrl, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
     var articleResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
     var liveBlogResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
     var interactiveResults: String = htmlString.initialisePageForInteractive + htmlString.interactiveTable
@@ -369,20 +370,26 @@ object App {
         combinedMobileHTMLResults.mkString +
         htmlString.closeTable + htmlString.closePage
 
-      val editorialPageWeightDashboard: String = htmlString.initialisePageForCombined +
+      val editorialPageWeightDashboard: String = newhtmlString.generateHTMLPage(sortedCombinedResults)
+  /*
+        htmlString.initialisePageForCombined +
         htmlString.initialisePageWeightDashboardTable +
         combinedBasicHTMLResults.mkString +
-        htmlString.closeTable + htmlString.closePage
+        htmlString.closeTable + htmlString.closePage*/
 
-      val editorialPageWeightDashboardDesktop: String = htmlString.initialisePageForCombined +
+      val editorialPageWeightDashboardDesktop: String = newhtmlString.generateHTMLPage(sortedCombinedDesktopResults)
+        /*
+        htmlString.initialisePageForCombined +
         htmlString.initialisePageWeightDashboardTable +
         combinedBasicDesktopHTMLResults.mkString +
-        htmlString.closeTable + htmlString.closePage
+        htmlString.closeTable + htmlString.closePage*/
 
-      val editorialPageWeightDashboardMobile: String = htmlString.initialisePageForCombined +
+      val editorialPageWeightDashboardMobile: String = newhtmlString.generateHTMLPage(sortedCombinedMobileResults)
+
+        /*htmlString.initialisePageForCombined +
         htmlString.initialisePageWeightDashboardTable +
         combinedBasicMobileHTMLResults.mkString +
-        htmlString.closeTable + htmlString.closePage
+        htmlString.closeTable + htmlString.closePage*/
 
       //write fronts results to file
       if (!iamTestingLocally) {

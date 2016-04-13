@@ -182,6 +182,15 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
     println("IP Address: " + this.iP)
   }
 
+  def toHTMLRowString():String = {
+    val returnString: String = "<tr>" +
+      "<td><a href = \"" + resource + "\">" + resource + "</a></td>" +
+      "<td>" + contentType + "</td>" +
+      "<td>" + sizeInKB + "KB</td>" +
+      "</tr>" + "\n"
+    returnString
+  }
+
   def alertHTMLString():String = {
     val returnString: String = "<tr>" +
       "<td><a href = \"" + resource + "\">" + resource + "</a></td>" +

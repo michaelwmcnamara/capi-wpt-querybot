@@ -94,6 +94,11 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTest+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" +" <td>" + timeFirstPaintInSec.toString + "s </td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>" + "</td>" + "<td> " + genTestResultString() + "</td>" + "<td>" + "<a href=" + friendlyResultUrl + ">" + "Click here to see full results." + "</a>" + "</td>"
   }
 
+  def returnHTMLTopPageElementRows(): String = {
+    val firstFive:List[PageElementFromHTMLTableRow] = fullElementList.take(5)
+    (for (element <- firstFive) yield element.toHTMLRowString()).mkString
+  }
+
   def returnElementTableRows(): String = {
 
            heavyElementList.map(element => element.emailHTMLString()).mkString

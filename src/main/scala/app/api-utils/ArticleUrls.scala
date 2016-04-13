@@ -41,7 +41,6 @@ class ArticleUrls(key: String) {
     val liveBlogSearchQuery = new SearchQuery()
       .fromDate(from)
       .toDate(until)
-      .showBlocks("none")
       .showElements("all")
       .showFields("all")
       .showTags("all")
@@ -56,6 +55,7 @@ class ArticleUrls(key: String) {
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
     val articleContentAndUrl: List[(Option[ContentFields],String)] = for (result <- returnedResponse.results) yield {
       (result.fields, result.webUrl) }
+    println("CAPI Query Success - Article: \n" + articleContentAndUrl.map(element => element._2).mkString)
     articleContentAndUrl
 
   }
@@ -67,7 +67,6 @@ class ArticleUrls(key: String) {
     val liveBlogSearchQuery = new SearchQuery()
       .fromDate(from)
       .toDate(until)
-      .showBlocks("none")
       .showElements("all")
       .showFields("all")
       .showTags("all")
@@ -82,6 +81,7 @@ class ArticleUrls(key: String) {
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
     val liveBlogContentAndUrl: List[(Option[ContentFields],String)] = for (result <- returnedResponse.results) yield {
       (result.fields, result.webUrl) }
+    println("CAPI Query Success - LiveBlog: \n" + liveBlogContentAndUrl.map(element => element._2).mkString)
     liveBlogContentAndUrl
   }
 
@@ -93,7 +93,6 @@ class ArticleUrls(key: String) {
     val liveBlogSearchQuery = new SearchQuery()
       .fromDate(from)
       .toDate(until)
-      .showBlocks("none")
       .showElements("all")
       .showFields("all")
       .showTags("all")
@@ -109,6 +108,7 @@ class ArticleUrls(key: String) {
 
     val interactiveContentAndUrl: List[(Option[ContentFields],String)] = for (result <- returnedResponse.results) yield {
       (result.fields, result.webUrl) }
+    println("CAPI Query Success - Interactives: \n" + interactiveContentAndUrl.map(element => element._2).mkString)
     interactiveContentAndUrl
   }
 
@@ -131,6 +131,7 @@ class ArticleUrls(key: String) {
       "http://www.theguardian.com/travel")
     val emptyContentFields: Option[ContentFields] = None
     val returnList:List[(Option[ContentFields],String)] = listofFronts.map(url => (emptyContentFields, url))
+    println("CAPI Query Success - Fronts: \n" + returnList.map(element => element._2).mkString)
     returnList
   }
 
@@ -142,7 +143,6 @@ class ArticleUrls(key: String) {
     val liveBlogSearchQuery = new SearchQuery()
       .fromDate(from)
       .toDate(until)
-      .showBlocks("none")
       .showElements("all")
       .showFields("all")
       .showTags("all")
@@ -167,7 +167,6 @@ class ArticleUrls(key: String) {
     val liveBlogSearchQuery = new SearchQuery()
       .fromDate(from)
       .toDate(until)
-      .showBlocks("none")
       .showElements("all")
       .showFields("all")
       .showTags("all")
