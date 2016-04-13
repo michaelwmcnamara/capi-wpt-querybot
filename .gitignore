@@ -19,6 +19,7 @@ rundesktoptest.php
 runmobtest.php
 test.html
 workbench.sc
+testpage.html
 
 #********************************************************************************************************
 #stock intellij gitignore from https://www.gitignore.io/api/playframework,sbt,eclipse,intellij,scala,osx
