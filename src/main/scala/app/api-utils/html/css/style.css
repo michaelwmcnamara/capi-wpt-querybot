@@ -48,16 +48,20 @@ h1 {
     color: gray;
 }
 
-.red {
+.alert {
     background-color: #f2dede;
 }
 
-.amber {
+.warning {
     background-color: #fff9ba;
 }
 
 .green {
     background-color: #def2de;
+}
+
+.default {
+    background-color: #ffffff;
 }
 
 
@@ -99,6 +103,12 @@ h1 {
     cursor: pointer;
 }
 
+#report tr.even td {
+    background: #C7DDEE none repeat-x scroll center left;
+    cursor: pointer;
+}
+
+
 #report div.arrow {
     background: transparent url(../arrows.png) no-repeat scroll 0px -16px;
     width: 16px;
@@ -109,3 +119,5 @@ h1 {
 #report div.up {
     background-position: 0px 0px;
 }
+
+.data tr {width: 100%;}
