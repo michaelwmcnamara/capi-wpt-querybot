@@ -40,9 +40,10 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
     val wptLocation = conf.getString("wpt.location")
     val emailUsername = conf.getString("email.username")
     val emailPassword = conf.getString("email.password")
-    if ((contentApiKey.length > 0) && (wptBaseUrl.length > 0) && (wptApiKey.length > 0)){
+    val visualsFeedUrl = conf.getString("visuals.page.list")
+    if ((contentApiKey.length > 0) && (wptBaseUrl.length > 0) && (wptApiKey.length > 0) && (wptLocation.length > 0) && (emailUsername.length > 0) && (emailPassword.length > 0) && (visualsFeedUrl.length > 0)){
       println(DateTime.now + " Config retrieval successful. \n You are using the following webpagetest instance: " + wptBaseUrl)
-      val returnArray = Array(contentApiKey, wptBaseUrl, wptApiKey, wptLocation, emailUsername, emailPassword)
+      val returnArray = Array(contentApiKey, wptBaseUrl, wptApiKey, wptLocation, emailUsername, emailPassword, visualsFeedUrl)
       returnArray
     }
     else {
