@@ -41,9 +41,21 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
 
   //HTML_PAGE_Builder
   var HTML_Results_PAGE: String = HTML_PAGE_HEAD + HTML_PAGE_CONTAINER + HTML_PAGE_CONTENT +
-    HTML_REPORT_TABLE_HEADERS + generateHTMLRow() + HTML_TABLE_END + HTML_DATA_TABLE_HEADERS + HTML_TABLE_END +
-    HTML_DATA_TABLE_ROWS + HTML_FOOTER
+    HTML_REPORT_TABLE_HEADERS + generateTableData() + HTML_TABLE_END + HTML_FOOTER
 
+  def generateTableData(resultsObject: PerformanceResultsObject): String = {
+   "table Data"
+  }
+
+  def reportTableRow(resultsObject: PerformanceResultsObject): String = {
+    "<tr class=\"" + getAlertClass(resultsObject) + "\">" + resultsObject.toHTMLInteractiveTableCells() + "</tr>"
+  }
+
+  def dataTableRow(resultsObject: PerformanceResultsObject): String = {
+    " <tr>" +  "</tr>"
+
+    "<tr class=\"" + getAlertClass(resultsObject) + "\">" + resultsObject.toHTMLInteractiveTableCells() + "</tr>"
+  }
 
   //Functions
   def getAlertClass(resultsObject: PerformanceResultsObject): String = {
@@ -58,31 +70,19 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
     }
   }
 
+  def generateHTMLPage(resultsList: List[PerformanceResultsObject]): String = {
+    val returnString = HTML_PAGE_HEAD + HTML_PAGE_CONTAINER + HTML_PAGE_CONTENT +
+        HTML_REPORT_TABLE_HEADERS + generateHTMLRows() + HTML_TABLE_END + HTML_DATA_TABLE_HEADERS + HTML_TABLE_END +
+        HTML_DATA_TABLE_ROWS + HTML_FOOTER
+    returnString
+  }
+
   def generateHTMLRows(resultsObject: PerformanceResultsObject): String = {
     (for (element <- resultsList) yield {
       "<tr class=\"" + getAlertClass(resultsObject) + "\">" + resultsObject.toHTMLSimpleTableCells() + "<div class=\"arrow\"></div></td></tr>"
     }).mkString
 
 
-  }
-
-  def reportTableRow(resultsObject: PerformanceResultsObject): String = {
-    "<tr class=\"" + getAlertClass(resultsObject) + "\">" + resultsObject.toHTMLInteractiveTableCells() + "</tr>"
-  }
-
-  def dataTableRow(resultsObject: PerformanceResultsObject): String = {
-    " <tr>" +  "</tr>"
-
-    "<tr class=\"" + getAlertClass(resultsObject) + "\">" + resultsObject.toHTMLInteractiveTableCells() + "</tr>"
-  }
-
-
-
-  def generateHTMLPage(resultsList: List[PerformanceResultsObject]): String = {
-    val returnString = HTML_PAGE_HEAD + HTML_PAGE_CONTAINER + HTML_PAGE_CONTENT +
-        HTML_REPORT_TABLE_HEADERS + generateHTMLRows() + HTML_TABLE_END + HTML_DATA_TABLE_HEADERS + HTML_TABLE_END +
-        HTML_DATA_TABLE_ROWS + HTML_FOOTER
-    returnString
   }
 
 
