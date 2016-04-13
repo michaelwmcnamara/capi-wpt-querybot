@@ -52,6 +52,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     else{false}
   }
 
+
   def returnFullElementListByWeight(): List[PageElementFromHTMLTableRow] = {fullElementList.sortWith(_.bytesDownloaded > _.bytesDownloaded)}
 
   def populateHeavyElementList(elementList: List[PageElementFromHTMLTableRow]): Boolean = {
@@ -91,6 +92,11 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   def toHTMLInteractiveTableCells(): String = {
     "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTest+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" +" <td>" + timeFirstPaintInSec.toString + "s </td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>" + "</td>" + "<td> " + genTestResultString() + "</td>" + "<td>" + "<a href=" + friendlyResultUrl + ">" + "Click here to see full results." + "</a>" + "</td>"
+  }
+
+  def returnElementTableRows(): String = {
+
+           heavyElementList.map(element => element.emailHTMLString()).mkString
   }
 
   def toHTMLAlertMessageCells(): String = {
