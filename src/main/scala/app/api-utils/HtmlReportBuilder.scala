@@ -109,7 +109,7 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
     returnString
 
   }
-  
+
 
 
 //  def initialisePageForArticle: String = {
