@@ -4,16 +4,16 @@
 
 $(document).ready(function(){
 
-    $("#report tr:odd").addClass("odd");
-    $("#report tr:not(.odd)").hide();
+ //   $("#report tr:contains(pageclass)").addClass("odd");
+    $("#report tr:not(.pageclass)").hide();
     $("#report tr:first-child").show();
 
-    $("#report tr.odd").click(function(){
+    $("#report tr.pageclass").click(function(){
         $(this).next("tr").toggle();
         $(this).find(".arrow").toggleClass("up");
     });
-    //$("#report").jExpand();
 
+//    $("#report").jExpand();
     $(".data tr:odd").show();
     $(".data tr:even").show();
 

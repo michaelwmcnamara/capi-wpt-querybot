@@ -263,7 +263,7 @@ object App {
       println("CAPI query found no liveblogs")
     }
 
-    if (interactiveUrls.nonEmpty) {
+/*    if (interactiveUrls.nonEmpty) {
       println("Generating average values for interactives")
       val interactiveAverages: PageAverageObject = generatePageAverages(listofLargeInteractives, wptBaseUrl, wptApiKey, wptLocation, interactiveItemLabel, averageColor)
       interactiveResults = interactiveResults.concat(interactiveAverages.toHTMLString)
@@ -301,7 +301,7 @@ object App {
     } else {
       println("CAPI query found no interactives")
     }
-
+*/
     if (frontsUrls.nonEmpty) {
       println("Generating average values for fronts")
       val frontsAverages: PageAverageObject = new FrontsDefaultAverages(averageColor)

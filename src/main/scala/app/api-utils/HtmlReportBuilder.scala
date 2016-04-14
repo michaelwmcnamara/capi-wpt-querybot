@@ -57,6 +57,8 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
 
   val HTML_TABLE_END: String = "</tbody>" + "\n" + "</table>"+ "\n"
 
+  val HTML_PAGE_ELEMENT_TABLE_END: String = "</tbody>" + "\n" + "</table>"+ "\n" + "</td>" + "\n" + "</tr>" + "\n"
+
   //Page Footer
   val HTML_FOOTER: String = "</div>" + "\n" +
     "<div id=\"footer\">" + "<p>Job completed at: [DATA]</p>" + "</div>" + "\n" +
@@ -80,14 +82,14 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
 
   def generateHTMLDataRows(resultsList: List[PerformanceResultsObject]): String = {
     (for (result <- resultsList) yield {
-      "<tr class=\"" + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<div class=\"arrow\"></div></td></tr>" + "\n" +
+      "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<div class=\"arrow\"></div></td></tr>" + "\n" +
         generatePageElementTable(result)
     }).mkString
 
   }
 
   def generatePageElementTable(resultsObject: PerformanceResultsObject): String = {
-    HTML_PAGE_ELEMENT_TABLE_HEADERS + "\n"  + resultsObject.returnHTMLTopPageElementRows() + HTML_TABLE_END
+    HTML_PAGE_ELEMENT_TABLE_HEADERS + "\n"  + resultsObject.returnHTMLTopPageElementRows() + HTML_PAGE_ELEMENT_TABLE_END
   }
 
 
