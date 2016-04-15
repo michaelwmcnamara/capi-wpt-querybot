@@ -263,7 +263,7 @@ object App {
       println("CAPI query found no liveblogs")
     }
 
-/*    if (interactiveUrls.nonEmpty) {
+    if (interactiveUrls.nonEmpty) {
       println("Generating average values for interactives")
       val interactiveAverages: PageAverageObject = generatePageAverages(listofLargeInteractives, wptBaseUrl, wptApiKey, wptLocation, interactiveItemLabel, averageColor)
       interactiveResults = interactiveResults.concat(interactiveAverages.toHTMLString)
@@ -301,7 +301,7 @@ object App {
     } else {
       println("CAPI query found no interactives")
     }
-*/
+
     if (frontsUrls.nonEmpty) {
       println("Generating average values for fronts")
       val frontsAverages: PageAverageObject = new FrontsDefaultAverages(averageColor)
@@ -555,8 +555,9 @@ object App {
           resultObject.alertStatus = true
         }
         else {
-          println("row should be yellow one of the items qualifies")
-          resultObject.warningStatus = true
+          println("Qualifies for result status but this status has been removed for a trial period")
+          // println("row should be yellow one of the items qualifies")
+          resultObject.warningStatus = false
           resultObject.alertStatus = false
         }
       }
@@ -589,8 +590,9 @@ object App {
           resultObject.alertStatus = true
         }
         else {
-          println("warning status set to true")
-          resultObject.warningStatus = true
+          println("Qualifies for result status but this status has been removed for a trial period")
+          //          println("warning status set to true")
+          resultObject.warningStatus = false
           resultObject.alertStatus = false
         }
       }
