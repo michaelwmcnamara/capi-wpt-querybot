@@ -1,20 +1,18 @@
-package app
-
+package app.api
 
 import app.apiutils.PerformanceResultsObject
 import org.joda.time.DateTime
 
 /**
-  * Created by Gwyn Lockett on 12/04/16.
-  */
-
-class HtmlReportBuilder(average: String, warning: String, alert: String, articleResultsUrl: String, liveBlogResultsUrl: String, interactiveResultsUrl: String, frontsResultsUrl: String) {
+ * Created by mmcnamara on 15/04/16.
+ */
+class PageWeightDashboardCombined (resultsList: List[PerformanceResultsObject]) {
 
   //HTML Page elements
   //Page Header
   val HTML_PAGE_HEAD: String = "<!DOCTYPE html><html lang=\"en\">" + "\n" +
     "<head> <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>" + "\n" +
-    "<title>Daily REPORT - [Performance Interactives]</title>" + "\n" +
+    "<title>Daily REPORT - [Pageweight Dashboard - Combined]</title>" + "\n" +
     "<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\"/>" + "\n" +
     "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js\"></script>" + "\n" +
     "<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js\"></script>" + "\n" +
@@ -27,19 +25,18 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
   val HTML_PAGE_CONTAINER: String = "<body>" + "\n" +
     "<div id=\"container\">" + "\n" +
     "<div id=\"head\">" + "\n" +
-    "<h1>Current performance of today's Interactives</h1>" + "\n" +
+    "<h1>Current performance of today's Pages</h1>" + "\n" +
     "<p>Job started at: " + DateTime.now + "</p>" + "\n" +
     "</div>"
 
   //Page Content
   val HTML_PAGE_CONTENT: String = "<div id=\"content\">" + "\n" +
-    "<h2>Desktop Alerts</h2>" + "\n" +
-    "<p>The following items have been found to either take too long to load or cost too much to view on a desktop browser</p>"
+    "<h2>Combined Mobile and Desktop view</h2>" + "\n"
 
   //Page Tables
   val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"report\">"+ "\n" +
     "<thead>" + "\n" +
-    "<tr> <th>Time Last Tested</th>" + "<th>Test Type</th>" + "<th>Headline</th>" + "<th>Time till page looks loaded</th>" + "<th>Page weight (MB)</th>" + "<th>Click for more details</th>" +  "</tr>"+ "\n" +
+    "<tr> <th>Time Last Tested</th>" + "<th>Test Type</th>" + "<th>Headline</th>" + "<th>Time till page looks loaded</th>" + "<th>Page weight (MB)</th>" + "<th>Click for more details</th>" + "</tr>"+ "\n" +
     "</thead>" +"\n" +
     "<tbody>"
 
@@ -63,15 +60,11 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
     "</html>"
 
 
-  //HTML_PAGE_Builder
-  //var HTML_Results_PAGE: String = HTML_PAGE_HEAD + HTML_PAGE_CONTAINER + HTML_PAGE_CONTENT + generateTableData() + HTML_FOOTER
+  //HTML_PAGE
+  val HTML_PAGE: String = HTML_PAGE_HEAD + HTML_PAGE_CONTAINER + HTML_PAGE_CONTENT + generateHTMLTable(resultsList) + HTML_FOOTER
 
-  def generateHTMLPage(resultsList: List[PerformanceResultsObject]): String = {
-    val returnString = HTML_PAGE_HEAD + HTML_PAGE_CONTAINER + HTML_PAGE_CONTENT +
-       generateHTMLTable(resultsList) + HTML_FOOTER
-    returnString
-  }
 
+  //page generation methods
   def generateHTMLTable(resultsList: List[PerformanceResultsObject]): String = {
     HTML_REPORT_TABLE_HEADERS + "\n" + generateHTMLDataRows(resultsList) + "\n" + HTML_TABLE_END
   }
@@ -85,15 +78,13 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
   }
 
   def generatePageElementTable(resultsObject: PerformanceResultsObject): String = {
-   if (resultsObject.alertStatus){
-     HTML_PAGE_ELEMENT_TABLE_HEADERS + "\n"  + resultsObject.returnHTMLTopPageElementRows() + HTML_PAGE_ELEMENT_TABLE_END
-   } else {
-    ""
-   }
+    if (resultsObject.alertStatus){
+      HTML_PAGE_ELEMENT_TABLE_HEADERS + "\n"  + resultsObject.returnHTMLTopPageElementRows() + HTML_PAGE_ELEMENT_TABLE_END
+    } else {
+      ""
+    }
   }
 
-
-  //Functions
   def getAlertClass(resultsObject: PerformanceResultsObject): String = {
     if (resultsObject.alertStatus) {
       "alert"
@@ -106,6 +97,11 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
     }
   }
 
+  // Access Methods
+
+  override def toString(): String = {
+    HTML_PAGE
+  }
 
 
   //  def initialisePageForArticle: String = {
@@ -134,3 +130,4 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
 
 
 }
+
