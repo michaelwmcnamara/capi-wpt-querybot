@@ -18,12 +18,12 @@ body {
 }
 
 h1 {
-    color: gray;
+    color: #333;
     font-size: 30px;
 }
 
 h2 {
-    color: darkblue;
+    color: #333;
     font-size: 25px;
 }
 
@@ -32,8 +32,13 @@ table {
 }
 
 tr {
-    border-top: solid 1px gray;
+    border-top: solid 1px rgb(221, 221, 221);
 }
+
+tr {
+    border-bottom: solid 1px rgb(221, 221, 221);
+}
+
 
 td {
     padding: 10px;
@@ -45,7 +50,11 @@ th {
 
 h1 {
     font-size: 40px;
-    color: gray;
+    color: #333;
+}
+
+.average {
+    background-color: #d9edf7;
 }
 
 .alert {
@@ -53,12 +62,17 @@ h1 {
 }
 
 .warning {
-    background-color: #fff9ba;
+    background-color: rgba(227, 251, 29, 0.32);
 }
 
 .default {
     background-color: #ffffff;
 }
+
+.data-alert {
+    background-color: #f2dede;
+}
+
 
 
 
@@ -82,20 +96,32 @@ h1 {
 }
 
 #report th {
-    background: #7CB8E2 url(/../header_bkg.png) repeat-x scroll center left;
-    color: #fff;
+    background: #f9f9f9 repeat-x scroll center left;
+    color: #333;
     padding: 7px 15px;
     text-align: left;
 }
 
-#report td {
-    background: #C7DDEE none repeat-x scroll center left;
+#report table.data{
+    background: #f2dede;
     color: #000;
     padding: 7px 15px;
 }
 
+
+#report caption {
+    padding: 7px 15px;
+    color: #333;
+}
+
+
+#report tr.pageclass td {
+    background: repeat-x scroll center left;
+    cursor: pointer;
+}
+
 #report tr.odd td {
-    background: #fff url(/../row_bkg.png) repeat-x scroll center left;
+    background: #C7DDEE none repeat-x scroll center left;
     cursor: pointer;
 }
 
@@ -106,7 +132,7 @@ h1 {
 
 
 #report div.arrow {
-    background: transparent url(../arrows.png) no-repeat scroll 0px -16px;
+    background: url(/capi-wpt-querybot/assets/arrows.png) no-repeat scroll 0px -16px;
     width: 16px;
     height: 16px;
     display: block;
@@ -117,3 +143,7 @@ h1 {
 }
 
 .data tr {width: 100%;}
+
+.data.alert {
+    background-color: #f2dede;
+}

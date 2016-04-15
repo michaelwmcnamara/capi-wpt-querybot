@@ -8,14 +8,14 @@ $(document).ready(function(){
     $("#report tr:not(.pageclass)").hide();
     $("#report tr:first-child").show();
 
-    $("#report tr.pageclass").click(function(){
+    $("#report tr.alert").click(function(){
         $(this).next("tr").toggle();
         $(this).find(".arrow").toggleClass("up");
     });
 
 //    $("#report").jExpand();
-    $(".data tr:odd").show();
-    $(".data tr:even").show();
+//    $(".data tr:odd").show();
+//    $(".data tr:even").show();
 
 });
 
