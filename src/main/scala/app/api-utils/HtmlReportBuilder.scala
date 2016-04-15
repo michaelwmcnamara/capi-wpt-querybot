@@ -47,7 +47,7 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
   //  val HTML_REPORT_TABLE_ROWS: String = " <tr class=\"[DATA]\"> <td>[DATA]</td><td>[DATA]</td><td>[DATA]</td><td>[DATA]</td><td>[DATA]</td><td>[DATA]</td><td>[DATA]</td><td> <div class=\"arrow\"></div></td></tr>"
 
   val HTML_PAGE_ELEMENT_TABLE_HEADERS: String = "<tr>" + "\n" +
-    "<td colspan=\"8\">" + "<table class=\"data\">" + "\n" +
+    "<td colspan=\"8\">" + "<table id=\"data\" class=\"data\">" + "\n" +
     "<caption>List of 5 heaviest elements on page - Recommend reviewing these items </caption>" + "\n" +
     "<thead>" + "\n" +
     "<tr>" + "<th>Resource</th>" + "<th>Content Type</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
