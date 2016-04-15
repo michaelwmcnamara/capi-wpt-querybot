@@ -7,6 +7,7 @@ $(document).ready(function(){
  //   $("#report tr:contains(pageclass)").addClass("odd");
     $("#report tr:not(.pageclass)").hide();
     $("#report tr:first-child").show();
+    $("#report tr.datarow").show();
 
     $("#report tr.alert").click(function(){
         $(this).next("tr").toggle();
