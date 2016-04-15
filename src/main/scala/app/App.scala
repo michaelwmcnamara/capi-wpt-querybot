@@ -5,7 +5,7 @@ package app
 import java.io._
 import java.util
 
-import app.api.{WptResultPageListener, S3Operations}
+import app.api._
 import app.apiutils._
 import com.gu.contentapi.client.model.v1.ContentFields
 import com.typesafe.config.{Config, ConfigFactory}
@@ -41,7 +41,8 @@ object App {
     val combinedOutputFilename = "combinedperformancedata.html"
     val combinedDesktopFilename = "combineddesktopperformancedata.html"
     val combinedMobileFilename = "combinedmobileperformancedata.html"
-    val editorialPageweightFilename = "editorialpageweightdashboardcombined.html"
+    val editorialPageweightFilename = "editorialpageweightdashboard.html"
+    val editorialCombinedPageweightFilename = "editorialpageweightdashboardcombined.html"
     val editorialDesktopPageweightFilename = "editorialpageweightdashboarddesktop.html"
     val editorialMobilePageweightFilename = "editorialpageweightdashboardmobile.html"
 
@@ -370,27 +371,14 @@ object App {
         combinedMobileHTMLResults.mkString +
         htmlString.closeTable + htmlString.closePage
 
-      val editorialPageWeightDashboard: String = newhtmlString.generateHTMLPage(sortedCombinedResults)
-  /*
-        htmlString.initialisePageForCombined +
-        htmlString.initialisePageWeightDashboardTable +
-        combinedBasicHTMLResults.mkString +
-        htmlString.closeTable + htmlString.closePage*/
+//      val editorialPageWeightDashboard: String = newhtmlString.generateHTMLPage(sortedCombinedResults)
+      val editorialPageWeightDashboardCombined = new PageWeightDashboardCombined(sortedCombinedResults)
+//      val editorialPageWeightDashboardDesktop: String = newhtmlString.generateHTMLPage(sortedCombinedDesktopResults)
+      val editorialPageWeightDashboardDesktop = new PageWeightDashboardDesktop(sortedCombinedDesktopResults)
+//      val editorialPageWeightDashboardMobile: String = newhtmlString.generateHTMLPage(sortedCombinedMobileResults)
+      val editorialPageWeightDashboardMobile = new PageWeightDashboardMobile(sortedCombinedMobileResults)
 
-      val editorialPageWeightDashboardDesktop: String = newhtmlString.generateHTMLPage(sortedCombinedDesktopResults)
-        /*
-        htmlString.initialisePageForCombined +
-        htmlString.initialisePageWeightDashboardTable +
-        combinedBasicDesktopHTMLResults.mkString +
-        htmlString.closeTable + htmlString.closePage*/
-
-      val editorialPageWeightDashboardMobile: String = newhtmlString.generateHTMLPage(sortedCombinedMobileResults)
-
-        /*htmlString.initialisePageForCombined +
-        htmlString.initialisePageWeightDashboardTable +
-        combinedBasicMobileHTMLResults.mkString +
-        htmlString.closeTable + htmlString.closePage*/
-
+      val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedCombinedDesktopResults, sortedCombinedDesktopResults, sortedCombinedMobileResults)
       //write fronts results to file
       if (!iamTestingLocally) {
         println(DateTime.now + " Writing liveblog results to S3")
@@ -398,9 +386,10 @@ object App {
         s3Interface.writeFileToS3(combinedDesktopFilename, combinedDesktopResults)
         s3Interface.writeFileToS3(combinedMobileFilename, combinedMobileResults)
 
-        s3Interface.writeFileToS3(editorialPageweightFilename, editorialPageWeightDashboard)
-        s3Interface.writeFileToS3(editorialDesktopPageweightFilename, editorialPageWeightDashboardDesktop)
-        s3Interface.writeFileToS3(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile)
+        s3Interface.writeFileToS3(editorialCombinedPageweightFilename, editorialPageWeightDashboardCombined.toString())
+        s3Interface.writeFileToS3(editorialDesktopPageweightFilename, editorialPageWeightDashboardDesktop.toString())
+        s3Interface.writeFileToS3(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile.toString())
+        s3Interface.writeFileToS3(editorialPageweightFilename, editorialPageWeightDashboard.toString())
       }
       else {
         val outputWriter = new LocalFileOperations
@@ -419,17 +408,17 @@ object App {
           println("problem writing local outputfile")
           System exit 1
         }
-        val writeSuccessPWDC: Int = outputWriter.writeLocalResultFile(editorialPageweightFilename, editorialPageWeightDashboard)
+        val writeSuccessPWDC: Int = outputWriter.writeLocalResultFile(editorialPageweightFilename, editorialPageWeightDashboard.toString())
         if (writeSuccessPWDC != 0) {
           println("problem writing local outputfile")
           System exit 1
         }
-        val writeSuccessPWDD: Int = outputWriter.writeLocalResultFile(editorialDesktopPageweightFilename, editorialPageWeightDashboardDesktop)
+        val writeSuccessPWDD: Int = outputWriter.writeLocalResultFile(editorialDesktopPageweightFilename, editorialPageWeightDashboardDesktop.toString())
         if (writeSuccessPWDD != 0) {
           println("problem writing local outputfile")
           System exit 1
         }
-        val writeSuccessPWDM: Int = outputWriter.writeLocalResultFile(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile)
+        val writeSuccessPWDM: Int = outputWriter.writeLocalResultFile(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile.toString())
         if (writeSuccessPWDM != 0) {
           println("problem writing local outputfile")
           System exit 1

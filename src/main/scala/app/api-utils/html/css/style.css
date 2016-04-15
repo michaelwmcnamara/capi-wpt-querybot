@@ -59,14 +59,17 @@ h1 {
 
 .alert {
     background-color: #f2dede;
+    border-bottom: solid 1px rgb(221, 221, 221);
 }
 
 .warning {
     background-color: rgba(227, 251, 29, 0.32);
+    border-bottom: solid 1px rgb(221, 221, 221);
 }
 
 .default {
     background-color: #ffffff;
+    border-bottom: solid 1px rgb(221, 221, 221);
 }
 
 .data-alert {
