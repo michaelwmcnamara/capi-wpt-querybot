@@ -16,7 +16,6 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
     "<head> <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>" + "\n" +
     "<title>Daily REPORT - [Performance Interactives]</title>" + "\n" +
     "<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\"/>" + "\n" +
-    "<link rel=\"stylesheet\" href=\"/capi-wpt-querybot/assets/css/style.css\"/>" + "\n" +
     "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js\"></script>" + "\n" +
     "<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js\"></script>" + "\n" +
     "<link href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css\" rel=\"stylesheet\"/>" + "\n" +
