@@ -18,6 +18,7 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
       "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js\"></script>" + "\n" +
       "<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js\"></script>" + "\n" +
       "<link href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css\" rel=\"stylesheet\"/>" + "\n" +
+      "<link rel=\"stylesheet\" href=\"/capi-wpt-querybot/assets/css/tabs.css\"/>"+ "\n" +
       "<link rel=\"stylesheet\" href=\"/capi-wpt-querybot/assets/css/style.css\"/>"+ "\n" +
       "<script src=\"/capi-wpt-querybot/assets/js/script.js\"></script>" + "\n" +
       "<script src=\"/capi-wpt-querybot/assets/js/tabs.js\"></script>" + "\n" +
@@ -29,7 +30,7 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
     "<div id=\"head\">" + "\n" +
     "<h1>Current performance of today's Pages</h1>" + "\n" +
     "<p>Job started at: " + DateTime.now + "</p>" + "\n" +
-    "</div>" + "\n" + "</div>" + "\n"
+    "</div>" + "\n"
 
   val HTML_PAGE_TABS_LIST: String = "<div class=\"tabs\">" + "\n" +
     "<ul class=\"tab-links\">" + "\n" +
