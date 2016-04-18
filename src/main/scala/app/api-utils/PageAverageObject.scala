@@ -282,7 +282,7 @@ class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], 
   }
   
   //add mobile averages to return string
-  accumulatorString = accumulatorString.concat("<tr style=\"background-color:" + averageColor + ";\"><td>" + DateTime.now + "</td><td>Android.toDouble/3G</td>")
+  accumulatorString = accumulatorString.concat("<tr style=\"background-color:" + averageColor + ";\"><td>" + DateTime.now + "</td><td>Android/3G</td>")
   if(accumulatorMobileSuccessCount > 1){
     accumulatorString = accumulatorString.concat("<td>" + "Average of " + accumulatorDesktopSuccessCount + "pages  with recognised size issues</td>" +
       "<td>" + typeOfPage + "</td>" +
@@ -438,7 +438,7 @@ class GeneratedInteractiveAverages(resultsList: List[Array[PerformanceResultsObj
   }
 
   //add mobile averages to return string
-  accumulatorString = accumulatorString.concat("<tr style=\"background-color:" + averageColor + ";\"><td>" + DateTime.now + "</td><td>Android.toDouble/3G</td>")
+  accumulatorString = accumulatorString.concat("<tr style=\"background-color:" + averageColor + ";\"><td>" + DateTime.now + "</td><td>Android/3G</td>")
   if(accumulatorMobileSuccessCount > 1){
     accumulatorString = accumulatorString.concat("<td>" + "Average of " + accumulatorDesktopSuccessCount + "pages  with recognised size issues</td>" +
       "<td>" + "Interactive" + "</td>" +
