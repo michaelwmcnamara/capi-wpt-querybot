@@ -39,7 +39,7 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
   //Page Tables
   val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"report\">"+ "\n" +
     "<thead>" + "\n" +
-    "<tr> <th>Time Last Tested</th>" + "<th>Test Type</th>" + "<th>Headline</th>" + "<th>Time till page looks loaded</th>" + "<th>Page weight (MB)</th>" + "<th>Click for more details</th>" +  "</tr>"+ "\n" +
+    "<tr> <th>Time Last Tested</th>" + "<th>Test Type</th>" + "<th>Headline</th>" + "<th>Type of Page</th>" + "<th>Time till page looks loaded</th>" + "<th>Page weight (MB)</th>" + "<th>Click for more details</th>" +  "</tr>"+ "\n" +
     "</thead>" +"\n" +
     "<tbody>"
 

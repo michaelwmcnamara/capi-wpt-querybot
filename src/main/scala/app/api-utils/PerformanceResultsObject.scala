@@ -37,12 +37,23 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   val brokenTest: Boolean = failedNeedsRetest
 
   var headline: Option[String] = None
+  var pageType: Option[String] = None
 
   var fullElementList: List[PageElementFromHTMLTableRow] = List()
   var heavyElementList: List[PageElementFromHTMLTableRow] = List()
   var elementListMaxSize: Int = 5
 
   def setHeadline(text: Option[String]):Unit = {headline = text}
+  def setPageType(text: String):Unit = {pageType = Option(text)}
+
+  def getPageType:String = {
+    if(pageType.nonEmpty){
+      pageType.mkString
+    }
+    else {
+      "Unknown"
+    }
+  }
 
   def addtoElementList(element: PageElementFromHTMLTableRow): Boolean = {
     if (heavyElementList.length < elementListMaxSize){
@@ -79,19 +90,19 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def toFullHTMLTableCells(): String = {
-    "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" + "<td>" + timeFirstPaintInMs.toString + "ms </td><td>" +  timeDocCompleteInSec.toString + "s </td><td>" + mBInDocComplete + "MB </td><td>" + timeFullyLoadedInSec.toString + "s </td><td>" + mBInFullyLoaded + "MB </td><td> $(US)" + estUSPrePaidCost + "</td><td> $(US)" + estUSPostPaidCost + "</td><td>" + speedIndex.toString + " </td><td> " + genTestResultString() + "</td>"
+    "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" + "<td>" + getPageType + "</td>" +  "<td>" + timeFirstPaintInMs.toString + "ms </td><td>" +  timeDocCompleteInSec.toString + "s </td><td>" + mBInDocComplete + "MB </td><td>" + timeFullyLoadedInSec.toString + "s </td><td>" + mBInFullyLoaded + "MB </td><td> $(US)" + estUSPrePaidCost + "</td><td> $(US)" + estUSPostPaidCost + "</td><td>" + speedIndex.toString + " </td><td> " + genTestResultString() + "</td>"
   }
 
   def toHTMLSimpleTableCells(): String = {
-   "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTest+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" +" <td>" + timeFirstPaintInMs.toString + "ms </td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>" + "<td> $(US)" + estUSPrePaidCost + "</td>" + "<td> $(US)" + estUSPostPaidCost + "</td>" + "<td> " + genTestResultString() + "</td>"
+   "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTest+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>"+ "<td>" + getPageType + "</td>" + " <td>" + timeFirstPaintInMs.toString + "ms </td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>" + "<td> $(US)" + estUSPrePaidCost + "</td>" + "<td> $(US)" + estUSPostPaidCost + "</td>" + "<td> " + genTestResultString() + "</td>"
   }
 
   def toHTMLBasicTableCells(): String = {
-    "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTest+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>"
+    "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTest+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" + "<td>" + getPageType + "</td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>"
   }
 
   def toHTMLInteractiveTableCells(): String = {
-    "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTest+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" +" <td>" + timeFirstPaintInSec.toString + "s </td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>" + "</td>" + "<td> " + genTestResultString() + "</td>" + "<td>" + "<a href=" + friendlyResultUrl + ">" + "Click here to see full results." + "</a>" + "</td>"
+    "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTest+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" + "<td>" + getPageType + "</td>" + " <td>" + timeFirstPaintInSec.toString + "s </td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>" + "</td>" + "<td> " + genTestResultString() + "</td>" + "<td>" + "<a href=" + friendlyResultUrl + ">" + "Click here to see full results." + "</a>" + "</td>"
   }
 
   def returnHTMLTopPageElementRows(): String = {
