@@ -266,7 +266,7 @@ object App {
 
     if (interactiveUrls.nonEmpty) {
       println("Generating average values for interactives")
-      val interactiveAverages: PageAverageObject = generatePageAverages(listofLargeInteractives, wptBaseUrl, wptApiKey, wptLocation, interactiveItemLabel, averageColor)
+      val interactiveAverages: PageAverageObject = generateInteractiveAverages(listofLargeInteractives, wptBaseUrl, wptApiKey, wptLocation, interactiveItemLabel, averageColor)
       interactiveResults = interactiveResults.concat(interactiveAverages.toHTMLString)
 
       val interactiveResultsList = listenForResultPages(interactives, "interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation)
@@ -490,6 +490,7 @@ object App {
       val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.pageFields,element.wptResultUrl)
       newElement.testResults = wpt.getResults(newElement.wptResultUrl)
       newElement.testResults.setHeadline(newElement.headline)
+      newElement.testResults.setPageType(newElement.pageType)
       newElement
     })
     val testResults = resultsList.map(element => element.testResults).toList
@@ -595,7 +596,7 @@ object App {
     resultObject
   }
 
-  def generatePageAverages(urlList: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String, itemtype: String, averageColor: String): PageAverageObject = {
+  def generateInteractiveAverages(urlList: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String, itemtype: String, averageColor: String): PageAverageObject = {
     val setHighPriority: Boolean = true
     val webpageTest: WebPageTest = new WebPageTest(wptBaseUrl, wptApiKey)
 

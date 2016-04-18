@@ -160,7 +160,8 @@ class FrontsDefaultAverages(averageColor: String) extends PageAverageObject() {
     "<td> </td></tr>"
 }
 
-class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], averageColor: String) extends PageAverageObject{
+class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], averageColor: String, pageType: String) extends PageAverageObject{
+
   var accumulatorDesktopTimeFirstPaint: Int = 0
   var accumulatorDesktopTimeDocComplete: Int = 0
   var accumulatorDesktopKBInDocComplete: Double = 0
@@ -183,6 +184,7 @@ class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], 
 
   var accumulatorString: String = ""
 
+  val typeOfPage:String = pageType
   val multipleLiveBlogs:String = "liveblogs that were migrated due to size"
   val singleLiveBlog: String = "Example of a liveblog migrated due to size"
   val noLiveBlogs: String = "All tests of migrated liveblogs failed"
@@ -242,6 +244,7 @@ class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], 
   //add desktop averaages to return string
   if(accumulatorDesktopSuccessCount > 1){
     accumulatorString = accumulatorString.concat("<td>" + "Average of " + accumulatorDesktopSuccessCount + "pages  with recognised size issues</td>" +
+      "<td>" + typeOfPage + "</td>" +
       "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
       "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
       "<td>" + desktopMBInDocComplete + "MB</td>" +
@@ -253,6 +256,7 @@ class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], 
   else{
     if (accumulatorDesktopSuccessCount == 1) {
       accumulatorString = accumulatorString.concat("<td> Results from 1 page with recognised size issues</td>" +
+        "<td>" + typeOfPage + "</td>" +
         "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
         "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
         "<td>" + desktopMBInDocComplete + "MB</td>" +
@@ -264,6 +268,7 @@ class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], 
     }
     else {
       accumulatorString = accumulatorString.concat("<td> Standard values to be used for judging page size</td>" +
+        "<td>" + typeOfPage + "</td>" +
         "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
         "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
         "<td>" + desktopMBInDocComplete + "MB</td>" +
@@ -280,6 +285,7 @@ class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], 
   accumulatorString = accumulatorString.concat("<tr style=\"background-color:" + averageColor + ";\"><td>" + DateTime.now + "</td><td>Android.toDouble/3G</td>")
   if(accumulatorMobileSuccessCount > 1){
     accumulatorString = accumulatorString.concat("<td>" + "Average of " + accumulatorDesktopSuccessCount + "pages  with recognised size issues</td>" +
+      "<td>" + typeOfPage + "</td>" +
       "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
       "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
       "<td>" + mobileMBInDocComplete + "MB</td>" +
@@ -291,6 +297,7 @@ class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], 
   else{
     if (accumulatorMobileSuccessCount == 1) {
       accumulatorString = accumulatorString.concat("<td> Results from 1 page with recognised size issues</td>" +
+        "<td>" + typeOfPage + "</td>" +
         "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
         "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
         "<td>" + mobileMBInDocComplete + "MB</td>" +
@@ -302,6 +309,7 @@ class GeneratedPageAverages(resultsList: List[Array[PerformanceResultsObject]], 
     }
     else {
       accumulatorString = accumulatorString.concat("<td> Standard values to be used for judging page size</td>" +
+        "<td>" + typeOfPage + "</td>" +
         "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
         "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
         "<td>" + mobileMBInDocComplete + "MB</td>" +
@@ -399,6 +407,7 @@ class GeneratedInteractiveAverages(resultsList: List[Array[PerformanceResultsObj
   //add desktop averaages to return string
   if(accumulatorDesktopSuccessCount > 1){
     accumulatorString = accumulatorString.concat("<td>" + "Average of " + accumulatorDesktopSuccessCount + "pages  with recognised size issues</td>" +
+      "<td>" + "Interactive" + "</td>" +
       "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
       "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
       "<td>" + desktopMBInDocComplete + "MB</td>" +
@@ -408,6 +417,7 @@ class GeneratedInteractiveAverages(resultsList: List[Array[PerformanceResultsObj
   else{
     if (accumulatorDesktopSuccessCount == 1) {
       accumulatorString = accumulatorString.concat("<td> Results from 1 page with recognised size issues</td>" +
+        "<td>" + "Interactive" + "</td>" +
         "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
         "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
         "<td>" + desktopMBInDocComplete + "MB</td>" +
@@ -417,6 +427,7 @@ class GeneratedInteractiveAverages(resultsList: List[Array[PerformanceResultsObj
     }
     else {
       accumulatorString = accumulatorString.concat("<td> Standard values to be used for judging page size</td>" +
+        "<td>" + "Interactive" + "</td>" +
         "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
         "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
         "<td>" + desktopMBInDocComplete + "MB</td>" +
@@ -430,6 +441,7 @@ class GeneratedInteractiveAverages(resultsList: List[Array[PerformanceResultsObj
   accumulatorString = accumulatorString.concat("<tr style=\"background-color:" + averageColor + ";\"><td>" + DateTime.now + "</td><td>Android.toDouble/3G</td>")
   if(accumulatorMobileSuccessCount > 1){
     accumulatorString = accumulatorString.concat("<td>" + "Average of " + accumulatorDesktopSuccessCount + "pages  with recognised size issues</td>" +
+      "<td>" + "Interactive" + "</td>" +
       "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
       "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
       "<td>" + mobileMBInDocComplete + "MB</td>" +
@@ -439,6 +451,7 @@ class GeneratedInteractiveAverages(resultsList: List[Array[PerformanceResultsObj
   else{
     if (accumulatorMobileSuccessCount == 1) {
       accumulatorString = accumulatorString.concat("<td> Results from 1 page with recognised size issues</td>" +
+        "<td>" + "Interactive" + "</td>" +
         "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
         "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
         "<td>" + mobileMBInDocComplete + "MB</td>" +
@@ -448,6 +461,7 @@ class GeneratedInteractiveAverages(resultsList: List[Array[PerformanceResultsObj
     }
     else {
       accumulatorString = accumulatorString.concat("<td> Standard values to be used for judging page size</td>" +
+        "<td>" + "Interactive" + "</td>" +
         "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
         "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
         "<td>" + mobileMBInDocComplete + "MB</td>" +
