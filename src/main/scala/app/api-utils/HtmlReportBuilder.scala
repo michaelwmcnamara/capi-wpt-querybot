@@ -86,12 +86,20 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
 
   def generatePageElementTable(resultsObject: PerformanceResultsObject): String = {
    if (resultsObject.alertStatus){
-     HTML_PAGE_ELEMENT_TABLE_HEADERS + "\n"  + resultsObject.returnHTMLTopPageElementRows() + HTML_PAGE_ELEMENT_TABLE_END
+     HTML_PAGE_ELEMENT_TABLE_HEADERS + "\n"  + getHTMLForPageElements(resultsObject) + HTML_PAGE_ELEMENT_TABLE_END
    } else {
     ""
    }
   }
 
+
+  def getHTMLForPageElements(resultsObject: PerformanceResultsObject): String = {
+    if (resultsObject.getPageType.contains("Interactive")){
+      resultsObject.returnHTMLHeaviestPageElementRowsAny()
+    } else {
+      resultsObject.returnHTMLHeaviestPageElementRowsEmbeds()
+    }
+  }
 
   //Functions
   def getAlertClass(resultsObject: PerformanceResultsObject): String = {
