@@ -81,6 +81,11 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     }
   }
 
+  def trimToEditorialElements(elementList: List[PageElementFromHTMLTableRow]): List[PageElementFromHTMLTableRow] = {
+    val returnList: List[PageElementFromHTMLTableRow] = for (element <- elementList if element.contentType.contains("image") || element.contentType.contains("video") || element.contentType.contains("application") || element.contentType.contains("document")) yield element
+    returnList
+  }
+
   def toStringList(): List[String] = {
     List(testUrl.toString + ", " + timeFirstPaintInMs.toString + "ms", timeDocCompleteInSec.toString + "s", mBInDocComplete + "MB" , timeFullyLoadedInSec.toString + "s", mBInFullyLoaded + "MB", speedIndex.toString, resultStatus)
   }
@@ -105,9 +110,18 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTest+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" + "<td>" + getPageType + "</td>" + " <td>" + timeFirstPaintInSec.toString + "s </td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>" + "</td>" + "<td> " + genTestResultString() + "</td>" + "<td>" + "<a href=" + friendlyResultUrl + ">" + "Click here to see full results." + "</a>" + "</td>"
   }
 
-  def returnHTMLTopPageElementRows(): String = {
+  def returnHTMLHeaviestPageElementRowsAny(): String = {
     val firstFive:List[PageElementFromHTMLTableRow] = fullElementList.take(5)
     (for (element <- firstFive) yield element.toHTMLRowString()).mkString
+  }
+
+  def returnHTMLHeaviestPageElementRowsEmbeds(): String = {
+    val firstFive:List[PageElementFromHTMLTableRow] = fullElementList.take(5)
+    (for (element <- firstFive) yield element.toHTMLRowString()).mkString
+  }
+
+  def returnHTMLFullPageElementRows(): String = {
+    (for (element <- fullElementList) yield element.toHTMLRowString()).mkString
   }
 
   def returnElementTableRows(): String = {

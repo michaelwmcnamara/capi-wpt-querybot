@@ -179,8 +179,7 @@ class WebPageTest(baseUrl: String, passedKey: String) {
 
     println("Creating PerformanceResultsObject")
     val result: PerformanceResultsObject = new PerformanceResultsObject(testUrl, testType, testSummaryPage, timeToFirstByte, firstPaint, docTime, bytesInDoc, fullyLoadedTime, totalbytesIn, speedIndex, status, false, false, false)
-    val trimmedElementList = trimToEditorialElements(elementsList)
-    val sortedElementList = sortPageElementList(trimmedElementList)
+    val sortedElementList = sortPageElementList(elementsList)
     result.populateHeavyElementList(sortedElementList)
     println("Returning PerformanceResultsObject")
     result
@@ -309,10 +308,6 @@ class WebPageTest(baseUrl: String, passedKey: String) {
     pageElementList
   }
 
-  def trimToEditorialElements(elementList: List[PageElementFromHTMLTableRow]): List[PageElementFromHTMLTableRow] = {
-    val returnList: List[PageElementFromHTMLTableRow] = for (element <- elementList if element.contentType.contains("image") || element.contentType.contains("video") || element.contentType.contains("application") || element.contentType.contains("document")) yield element
-    returnList
-  }
 
   def trimToHTMLTable(pageHTML: String): String = {
     //    val responseStringXML: Elem = scala.xml.XML.loadString(response.body.string)
