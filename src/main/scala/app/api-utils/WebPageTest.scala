@@ -309,10 +309,6 @@ class WebPageTest(baseUrl: String, passedKey: String) {
     pageElementList
   }
 
-  def trimToEditorialElements(elementList: List[PageElementFromHTMLTableRow]): List[PageElementFromHTMLTableRow] = {
-    val returnList: List[PageElementFromHTMLTableRow] = for (element <- elementList if element.contentType.contains("image") || element.contentType.contains("video") || element.contentType.contains("application") || element.contentType.contains("document")) yield element
-    returnList
-  }
 
   def trimToHTMLTable(pageHTML: String): String = {
     //    val responseStringXML: Elem = scala.xml.XML.loadString(response.body.string)
