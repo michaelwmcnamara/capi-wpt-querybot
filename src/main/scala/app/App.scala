@@ -10,6 +10,8 @@ import app.apiutils._
 import com.gu.contentapi.client.model.v1.ContentFields
 import com.typesafe.config.{Config, ConfigFactory}
 import org.joda.time.DateTime
+import play.api.libs.json.{Json, JsObject}
+import play.libs.Json
 import sbt.complete.Completion
 
 import scala.collection.parallel.immutable.ParSeq
@@ -174,6 +176,10 @@ object App {
     val audioUrls: List[String] = for (page <- audioPages) yield page._2
 
     //get all pages from the visuals team api
+
+    val visualsApi = new VisualsApiInterface(visualsApiUrl)
+    val urls = visualsApi.getTodaysPages()
+    println("\n\n\n\n returned URLs: \n" + urls)
 
 
     // send all urls to webpagetest at once to enable parallel testing by test agents
@@ -371,6 +377,8 @@ object App {
         combinedMobileHTMLResults.mkString +
         htmlString.closeTable + htmlString.closePage
 
+      val combinedJsonList: JsObject = Json.obj("PageResults" -> Json.arr(for (result <- sortedCombinedResults) yield result.toJson()))
+
 //      val editorialPageWeightDashboard: String = newhtmlString.generateHTMLPage(sortedCombinedResults)
       val editorialPageWeightDashboardCombined = new PageWeightDashboardCombined(sortedCombinedResults)
 //      val editorialPageWeightDashboardDesktop: String = newhtmlString.generateHTMLPage(sortedCombinedDesktopResults)
@@ -379,6 +387,9 @@ object App {
       val editorialPageWeightDashboardMobile = new PageWeightDashboardMobile(sortedCombinedMobileResults)
 
       val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedCombinedDesktopResults, sortedCombinedDesktopResults, sortedCombinedMobileResults)
+
+
+
       //write fronts results to file
       if (!iamTestingLocally) {
         println(DateTime.now + " Writing liveblog results to S3")
@@ -390,6 +401,9 @@ object App {
         s3Interface.writeFileToS3(editorialDesktopPageweightFilename, editorialPageWeightDashboardDesktop.toString())
         s3Interface.writeFileToS3(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile.toString())
         s3Interface.writeFileToS3(editorialPageweightFilename, editorialPageWeightDashboard.toString())
+
+
+
       }
       else {
         val outputWriter = new LocalFileOperations
@@ -459,7 +473,7 @@ object App {
     } else {
       println("No pages to alert on. Email not sent. \n Job complete")
     }
-
+*/
   }
 
   def getResultPages(urlList: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
