@@ -378,7 +378,7 @@ object App {
 //      val editorialPageWeightDashboardMobile: String = newhtmlString.generateHTMLPage(sortedCombinedMobileResults)
       val editorialPageWeightDashboardMobile = new PageWeightDashboardMobile(sortedCombinedMobileResults)
 
-      val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedCombinedDesktopResults, sortedCombinedDesktopResults, sortedCombinedMobileResults)
+      val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedCombinedResults, sortedCombinedDesktopResults, sortedCombinedMobileResults)
       //write fronts results to file
       if (!iamTestingLocally) {
         println(DateTime.now + " Writing liveblog results to S3")
