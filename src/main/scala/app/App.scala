@@ -185,7 +185,7 @@ object App {
 
     if (articleUrls.nonEmpty) {
       println("Generating average values for articles")
-      val articleAverages: PageAverageObject = new LiveBlogDefaultAverages(averageColor)
+      val articleAverages: PageAverageObject = new ArticleDefaultAverages(averageColor)
       articleResults = articleResults.concat(articleAverages.toHTMLString)
 
       val articleResultsList = listenForResultPages(articles, "article", resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation)
@@ -266,7 +266,8 @@ object App {
 
     if (interactiveUrls.nonEmpty) {
       println("Generating average values for interactives")
-      val interactiveAverages: PageAverageObject = generateInteractiveAverages(listofLargeInteractives, wptBaseUrl, wptApiKey, wptLocation, interactiveItemLabel, averageColor)
+//      val interactiveAverages: PageAverageObject = generateInteractiveAverages(listofLargeInteractives, wptBaseUrl, wptApiKey, wptLocation, interactiveItemLabel, averageColor)
+      val interactiveAverages: PageAverageObject = new InteractiveDefaultAverages(averageColor)
       interactiveResults = interactiveResults.concat(interactiveAverages.toHTMLString)
 
       val interactiveResultsList = listenForResultPages(interactives, "interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation)
