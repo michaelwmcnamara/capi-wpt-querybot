@@ -231,7 +231,7 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
 
 
 
-  def generateAlertEmailBodyElement(alertList: List[PerformanceResultsObject], averages: PageAverageObject): String = {
+  def generateAlertEmailBodyElement(alertList: List[PerformanceResultsObject]): String = {
 //    println("*\n \n \n **** \n \n \n averages.desktopHTMLResultString: \n" + averages.desktopHTMLResultString)
 //    println("*\n \n \n **** \n \n \n averages.mobileHTMLResultString: \n" + averages.mobileHTMLResultString)
     if(alertList.nonEmpty) {
@@ -265,7 +265,7 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
   }
 
 
-  def generateInteractiveAlertBodyElement(alertList: List[PerformanceResultsObject], averages: PageAverageObject): String = {
+  def generateInteractiveAlertBodyElement(alertList: List[PerformanceResultsObject]): String = {
     //    println("*\n \n \n **** \n \n \n averages.desktopHTMLResultString: \n" + averages.desktopHTMLResultString)
     //    println("*\n \n \n **** \n \n \n averages.mobileHTMLResultString: \n" + averages.mobileHTMLResultString)
     if(alertList.nonEmpty) {

@@ -91,7 +91,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def toCSVString(): String = {
-    testUrl.toString + "," + timeOfTest + "," + resultStatus + "," +  timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + heavyElementList.map(element => "," + element.resource + "," + element.contentType + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
+    timeOfTest + "," + testUrl.toString + "," + typeOfTest + "," + friendlyResultUrl + ","  + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + resultStatus + "," + warningStatus + "," + alertStatus + "," + brokenTest + "," + heavyElementList.map(element => "," + element.resource + "," + element.contentType + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
   }
 
   def toFullHTMLTableCells(): String = {

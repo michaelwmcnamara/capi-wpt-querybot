@@ -1,13 +1,15 @@
 package app.api
 
-import java.io.{FileOutputStream, OutputStreamWriter, Writer, File}
+import java.io._
 
+import app.apiutils.PerformanceResultsObject
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model._
 import com.typesafe.config.{ConfigFactory, Config}
 import scala.collection.JavaConversions._
 import org.joda.time.DateTime
 
+import scala.io.Source
 
 
 /**
@@ -19,6 +21,14 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
   val configFileName = configFile
   val emailFileName = emailFile
 
+
+  def doesFileExist(fileKeyName: String): Boolean = {
+    try {
+      s3Client.getObjectMetadata(bucket, fileKeyName); true
+    } catch {
+      case ex: Exception => println("File: " + fileKeyName + " was not present \n"); false
+    }
+  }
 
   def getConfig: Array[String] = {
     println(DateTime.now + " retrieving config from S3 bucket: " + bucket)
@@ -143,6 +153,36 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
 
   }*/
 
+  def getResultsFileFromS3(fileName:String): List[PerformanceResultsObject] = {
+
+    if (doesFileExist(fileName)) {
+      val s3Response = s3Client.getObject(new GetObjectRequest(s3BucketName, fileName))
+      val objectData = s3Response.getObjectContent
+      val myData = scala.io.Source.fromInputStream(objectData).getLines()
+      val resultsIterator = for (line <- myData) yield {
+        val data: Array[String] = line.split(",")
+        new PerformanceResultsObject(data(1),
+          data(2),
+          data(3),
+          data(4).toInt,
+          data(5).toInt,
+          data(6).toInt,
+          data(7).toInt,
+          data(8).toInt,
+          data(9).toInt,
+          data(10).toInt,
+          data(11),
+          data(12).toBoolean,
+          data(13).toBoolean,
+          data(14).toBoolean)
+      }
+      resultsIterator.toList
+    } else {
+      val emptyList: List[PerformanceResultsObject] = List()
+      emptyList
+    }
+  }
+
   def writeFileToS3(fileName:String, outputString: String): Unit ={
     println(DateTime.now + " Writing the following to S3:\n" + outputString + "\n")
     s3Client.putObject(new PutObjectRequest(s3BucketName, fileName, createOutputFile(fileName, outputString)))
@@ -162,6 +202,8 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
     println("returning File object")
     file
   }
+
+
 
   def closeS3Client(): Unit = s3Client.shutdown()
 
