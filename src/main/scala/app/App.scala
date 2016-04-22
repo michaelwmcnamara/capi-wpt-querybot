@@ -523,8 +523,12 @@ object App {
     //Confirm alert status by retesting alerting urls
     println("Confirming any items that have an alert")
     val confirmedTestResults = resultsWithAlerts.map(x => {
-      if (x.alertStatus)
-        confirmAlert(x, averages, wptBaseUrl, wptApiKey, wptLocation)
+      if (x.alertStatus) {
+        val confirmedResult: PerformanceResultsObject = confirmAlert(x, averages, wptBaseUrl, wptApiKey, wptLocation)
+        confirmedResult.setHeadline(x.headline)
+        confirmedResult.setPageType(x.pageType.getOrElse("Unknown"))
+        confirmedResult
+      }
       else
         x
     })
