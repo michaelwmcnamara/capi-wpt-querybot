@@ -101,7 +101,11 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
     def generateHTMLDataRows(resultsList: List[PerformanceResultsObject]): String = {
       (for (result <- resultsList) yield {
         "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<td><div class=\"arrow\"></div></td></tr>" + "\n" +
-          generatePageElementTable(result)
+        if(result.alertStatus{
+            "<tr class=" + getAlertClass(result) + "\">" + result.genTestResultString() + "</tr>" +
+          generatePageElementTable(result)} else {
+          generatePageElementTable(result)   
+          }
       }).mkString
 
     }
