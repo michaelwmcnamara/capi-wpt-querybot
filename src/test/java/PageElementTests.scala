@@ -12,7 +12,7 @@ import scala.io.Source
   class PageElementTests extends UnitSpec with Matchers {
 
     "A pageElementList" should "contain page elements" in {
-      val wpt = new WebPageTest("foo", "bar")
+      val wpt = new WebPageTest("foo", "bar", List())
 
       var htmlString: String = ""
       for (line <- Source.fromFile("webpagetestresultdetails.html").getLines()) {
@@ -26,7 +26,7 @@ import scala.io.Source
     }
 
     "A non-empty pageElementList" should "contain page elements that have non-empty values" in {
-      val wpt = new WebPageTest("foo", "bar")
+      val wpt = new WebPageTest("foo", "bar", List())
 
       var htmlString: String = ""
       for (line <- Source.fromFile("webpagetestresultdetails.html").getLines()) {
@@ -54,7 +54,7 @@ import scala.io.Source
     }
 
     "A sorted pageElementList" should "be sorted in order of largest bytesDownloaded to smallest" in {
-      val wpt = new WebPageTest("foo", "bar")
+      val wpt = new WebPageTest("foo", "bar", List())
 
       var htmlString: String = ""
       for (line <- Source.fromFile("webpagetestresultdetails.html").getLines()) {
