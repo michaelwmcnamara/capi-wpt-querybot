@@ -104,12 +104,15 @@ object App {
     println("defining new S3 Client (this is done regardless but only used if 'iamTestingLocally' flag is set to false)")
     val s3Interface = new S3Operations(s3BucketName, configFileName, emailFileName)
     var configArray: Array[String] = Array("", "", "", "", "", "")
+    var urlFragments: List[String] = List()
 
     //Get config settings
     println("Extracting configuration values")
     if (!iamTestingLocally) {
       println(DateTime.now + " retrieving config from S3 bucket: " + s3BucketName)
-      configArray = s3Interface.getConfig
+      val returnTuple = s3Interface.getConfig
+      configArray = Array(returnTuple._1,returnTuple._2,returnTuple._3,returnTuple._4,returnTuple._5,returnTuple._6,returnTuple._7)
+      urlFragments = returnTuple._8
     }
     else {
       println(DateTime.now + " retrieving local config file: " + configFileName)
@@ -189,7 +192,7 @@ object App {
     //val combinedUrlsFromCapiQueries: List[String] = (articleUrls ::: liveBlogUrls ::: interactiveUrls ::: frontsUrls).distinct
     //val urlsToSend: List[String] = for (url <- combinedUrlsFromCapiQueries if !previousResults.map(_.testUrl).contains(url)) yield url
     println("Combined list of urls: \n" + urlsToSend)
-    val resultUrlList: List[(String, String)] = getResultPages(urlsToSend, wptBaseUrl, wptApiKey, wptLocation)
+    val resultUrlList: List[(String, String)] = getResultPages(urlsToSend, urlFragments, wptBaseUrl, wptApiKey, wptLocation)
 
 
     if (articleUrls.nonEmpty) {
@@ -197,7 +200,7 @@ object App {
       val articleAverages: PageAverageObject = new ArticleDefaultAverages(averageColor)
       articleResults = articleResults.concat(articleAverages.toHTMLString)
 
-      val articleResultsList = listenForResultPages(articles, "article", resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation)
+      val articleResultsList = listenForResultPages(articles, "article", resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
       combinedResultsList = combinedResultsList ::: articleResultsList
       println("About to sort article results list. Length of list is: " + articleResultsList.length)
       val sortedArticleResultsList = orderList(articleResultsList)
@@ -237,7 +240,7 @@ object App {
       val liveBlogAverages: PageAverageObject = new LiveBlogDefaultAverages(averageColor)
       liveBlogResults = liveBlogResults.concat(liveBlogAverages.toHTMLString)
 
-      val liveBlogResultsList = listenForResultPages(liveBlogs, "liveBlog", resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation)
+      val liveBlogResultsList = listenForResultPages(liveBlogs, "liveBlog", resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
       combinedResultsList = combinedResultsList ::: liveBlogResultsList
       val sortedLiveBlogResultsList = orderList(liveBlogResultsList)
       if(sortedLiveBlogResultsList.isEmpty) {
@@ -276,7 +279,7 @@ object App {
       val interactiveAverages: PageAverageObject = new InteractiveDefaultAverages(averageColor)
       interactiveResults = interactiveResults.concat(interactiveAverages.toHTMLString)
 
-      val interactiveResultsList = listenForResultPages(interactives, "interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation)
+      val interactiveResultsList = listenForResultPages(interactives, "interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
       combinedResultsList = combinedResultsList ::: interactiveResultsList
       val sortedInteractiveResultsList = orderList(interactiveResultsList)
       if(sortedInteractiveResultsList.isEmpty) {
@@ -314,7 +317,7 @@ object App {
       val frontsAverages: PageAverageObject = new FrontsDefaultAverages(averageColor)
       frontsResults = frontsResults.concat(frontsAverages.toHTMLString)
 
-      val frontsResultsList = listenForResultPages(fronts, "front", resultUrlList, frontsAverages, wptBaseUrl, wptApiKey, wptLocation)
+      val frontsResultsList = listenForResultPages(fronts, "front", resultUrlList, frontsAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
       combinedResultsList = combinedResultsList ::: frontsResultsList
       val sortedFrontsResultsList = orderList(frontsResultsList)
       if(sortedFrontsResultsList.isEmpty) {
@@ -486,8 +489,8 @@ object App {
 
   }
 
-  def getResultPages(urlList: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
-    val wpt: WebPageTest = new WebPageTest(wptBaseUrl, wptApiKey)
+  def getResultPages(urlList: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
+    val wpt: WebPageTest = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
     val desktopResults: List[(String, String)] = urlList.map(page => {
       (page, wpt.sendPage(page))
     })
@@ -497,7 +500,7 @@ object App {
     desktopResults ::: mobileResults
   }
 
-  def listenForResultPages(capiPages: List[(Option[ContentFields],String)], contentType: String, resultUrlList: List[(String, String)], averages: PageAverageObject, wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[PerformanceResultsObject] = {
+  def listenForResultPages(capiPages: List[(Option[ContentFields],String)], contentType: String, resultUrlList: List[(String, String)], averages: PageAverageObject, wptBaseUrl: String, wptApiKey: String, wptLocation: String, urlFragments: List[String]): List[PerformanceResultsObject] = {
     println("ListenForResultPages called with: \n\n" +
       " List of Urls: \n" + capiPages.map(page => page._2).mkString +
       "\n\nList of WebPage Test results: \n" + resultUrlList.mkString +
@@ -510,7 +513,7 @@ object App {
     println("Listener List created: \n" + listenerList.map(element => "list element: \n" + "url: " + element.pageUrl + "\n" + "resulturl" + element.wptResultUrl + "\n"))
 
     val resultsList: ParSeq[WptResultPageListener] = listenerList.par.map(element => {
-      val wpt = new WebPageTest(wptBaseUrl, wptApiKey)
+      val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
       val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.pageFields,element.wptResultUrl)
       newElement.testResults = wpt.getResults(newElement.wptResultUrl)
       newElement.testResults.setHeadline(newElement.headline)
@@ -524,7 +527,7 @@ object App {
     println("Confirming any items that have an alert")
     val confirmedTestResults = resultsWithAlerts.map(x => {
       if (x.alertStatus) {
-        val confirmedResult: PerformanceResultsObject = confirmAlert(x, averages, wptBaseUrl, wptApiKey, wptLocation)
+        val confirmedResult: PerformanceResultsObject = confirmAlert(x, averages, urlFragments, wptBaseUrl, wptApiKey ,wptLocation)
         confirmedResult.setHeadline(x.headline)
         confirmedResult.setPageType(x.pageType.getOrElse("Unknown"))
         confirmedResult
@@ -535,8 +538,8 @@ object App {
     confirmedTestResults
   }
 
-  def confirmAlert(initialResult: PerformanceResultsObject, averages: PageAverageObject, wptBaseUrl: String, wptApiKey: String, wptLocation: String): PerformanceResultsObject = {
-    val webPageTest = new WebPageTest(wptBaseUrl, wptApiKey)
+  def confirmAlert(initialResult: PerformanceResultsObject, averages: PageAverageObject, urlFragments: List[String],wptBaseUrl: String, wptApiKey: String, wptLocation: String): PerformanceResultsObject = {
+    val webPageTest = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
     val testCount: Int = if (initialResult.timeToFirstByte > 1000) {
       5
     } else {
@@ -624,9 +627,9 @@ object App {
     resultObject
   }
 
-  def generateInteractiveAverages(urlList: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String, itemtype: String, averageColor: String): PageAverageObject = {
+  def generateInteractiveAverages(urlList: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String, urlFragments: List[String], itemtype: String, averageColor: String): PageAverageObject = {
     val setHighPriority: Boolean = true
-    val webpageTest: WebPageTest = new WebPageTest(wptBaseUrl, wptApiKey)
+    val webpageTest: WebPageTest = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
 
     val resultsList: List[Array[PerformanceResultsObject]] = urlList.map(url => {
       val webPageDesktopTestResults: PerformanceResultsObject = webpageTest.desktopChromeCableTest(url, setHighPriority)
@@ -640,8 +643,8 @@ object App {
   }
 
 
-  def retestUrl(initialResult: PerformanceResultsObject, wptBaseUrl: String, wptApiKey: String, wptLocation: String): PerformanceResultsObject = {
-    val webPageTest = new WebPageTest(wptBaseUrl, wptApiKey)
+  def retestUrl(initialResult: PerformanceResultsObject, wptBaseUrl: String, wptApiKey: String, wptLocation: String, urlFragments: List[String]): PerformanceResultsObject = {
+    val webPageTest = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
     val testCount: Int = if (initialResult.timeToFirstByte > 1000) {
       5
     } else {

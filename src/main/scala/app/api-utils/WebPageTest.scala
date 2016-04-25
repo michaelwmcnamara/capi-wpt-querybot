@@ -1,7 +1,7 @@
 package app.apiutils
 
 //import app.api.PerformanceResultsObject
-import com.squareup.okhttp.{OkHttpClient, Request, Response}
+import com.squareup.okhttp._
 import org.joda.time.DateTime
 
 import scala.xml.Elem
@@ -10,10 +10,12 @@ import scala.xml.Elem
 /**
  * Created by mmcnamara on 14/12/15.
  */
-class WebPageTest(baseUrl: String, passedKey: String) {
+class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]) {
 
   val apiBaseUrl:String = baseUrl
+  val apihost: String = baseUrl.split("http://")(1)
   val apiKey:String = passedKey
+  val fragments: List[String] = urlFragments.map(x => "#" + x)
 
   val wptResponseFormat:String = "xml"
   implicit val httpClient = new OkHttpClient()
@@ -52,7 +54,15 @@ class WebPageTest(baseUrl: String, passedKey: String) {
 
   def sendPage(gnmPageUrl:String): String = {
     println("Forming desktop webpage test query")
-    val getUrl: String = apiBaseUrl + "/runtest.php?"+"&f=" + wptResponseFormat + "&k=" + apiKey +"&url=" + gnmPageUrl + "\#noads"
+    val getUrl: HttpUrl = new HttpUrl.Builder()
+    .scheme("http")
+    .host(apihost)
+    .addPathSegment("/runtest.php")
+    .addQueryParameter("f", wptResponseFormat)
+    .addQueryParameter("k", apiKey)
+    .addQueryParameter("url", gnmPageUrl + fragments)
+    .build()
+
     val request: Request = new Request.Builder()
       .url(getUrl)
       .get()
@@ -60,6 +70,7 @@ class WebPageTest(baseUrl: String, passedKey: String) {
 
     println("sending request: " + request.toString)
     val response: Response = httpClient.newCall(request).execute()
+    println("Response: \n" + response )
     val responseXML: Elem = scala.xml.XML.loadString(response.body.string)
     println("response received: \n" + responseXML.text)
     val resultPage: String =  (responseXML \\ "xmlUrl").text
@@ -69,7 +80,16 @@ class WebPageTest(baseUrl: String, passedKey: String) {
 
   def sendHighPriorityPage(gnmPageUrl:String): String = {
     println("Forming high prioirty desktop webpage test query")
-    val getUrl: String = apiBaseUrl + "/runtest.php?" + "&f=" + wptResponseFormat + "&k=" + apiKey + "&priority=1" + "&script=navigate \"" + gnmPageUrl + "\#noads\""
+    val getUrl: HttpUrl = new HttpUrl.Builder()
+    .scheme("http")
+    .host(apihost)
+    .addPathSegment("/runtest.php")
+    .addQueryParameter("f", wptResponseFormat)
+    .addQueryParameter("k", apiKey)
+    .addQueryParameter("priority", "1")
+    .addQueryParameter("url", gnmPageUrl + fragments)
+    .build()
+
     val request: Request = new Request.Builder()
       .url(getUrl)
       .get()
@@ -87,7 +107,19 @@ class WebPageTest(baseUrl: String, passedKey: String) {
 
   def sendMobile3GPage(gnmPageUrl:String, wptLocation: String): String = {
     println("Forming high-priority mobile 3G webpage test query")
-    val getUrl: String = apiBaseUrl + "/runtest.php?" + "&f=" + wptResponseFormat + "&k=" + apiKey + "&mobile=1&mobileDevice=Nexus5&location=" + wptLocation + ":Chrome.3G" + "&url=" + gnmPageUrl + "\#noads"
+//    val getUrl: String = apiBaseUrl + "/runtest.php?" + "&f=" + wptResponseFormat + "&k=" + apiKey + "&mobile=1&mobileDevice=Nexus5&location=" + wptLocation + ":Chrome.3G" + "&url=" + gnmPageUrl + "noads"
+    val getUrl: HttpUrl = new HttpUrl.Builder()
+    .scheme("http")
+    .host(apihost)
+    .addPathSegment("/runtest.php")
+    .addQueryParameter("f", wptResponseFormat)
+    .addQueryParameter("k", apiKey)
+    .addQueryParameter("mobile", "1")
+    .addQueryParameter("mobileDevice", "Nexus5")
+    .addQueryParameter("location", wptLocation + ":Chrome.3G")
+    .addQueryParameter("url", gnmPageUrl + fragments)
+    .build()
+
     val request: Request = new Request.Builder()
       .url(getUrl)
       .get()
@@ -103,7 +135,20 @@ class WebPageTest(baseUrl: String, passedKey: String) {
 
   def sendHighPriorityMobile3GPage(gnmPageUrl:String, wptLocation: String): String = {
     println("Forming mobile 3G webpage test query")
-    val getUrl: String = apiBaseUrl + "/runtest.php?" + "&f=" + wptResponseFormat + "&k=" + apiKey + "&mobile=1&mobileDevice=Nexus5&location=" + wptLocation + ":Chrome.3G" + "&priority=1" + "&url=" + gnmPageUrl + "\#noads"
+//    val getUrl: String = apiBaseUrl + "/runtest.php?" + "&f=" + wptResponseFormat + "&k=" + apiKey + "&mobile=1&mobileDevice=Nexus5&location=" + wptLocation + ":Chrome.3G" + "&priority=1" + "&url=" + gnmPageUrl + "noads"
+    val getUrl: HttpUrl = new HttpUrl.Builder()
+      .scheme("http")
+      .host(apihost)
+      .addPathSegment("/runtest.php")
+      .addQueryParameter("f", wptResponseFormat)
+      .addQueryParameter("k", apiKey)
+      .addQueryParameter("mobile", "1")
+      .addQueryParameter("mobileDevice", "Nexus5")
+      .addQueryParameter("location", wptLocation + ":Chrome.3G")
+      .addQueryParameter("priority", "1")
+      .addQueryParameter("url", gnmPageUrl + fragments)
+      .build()
+
     val request: Request = new Request.Builder()
       .url(getUrl)
       .get()
@@ -159,7 +204,7 @@ class WebPageTest(baseUrl: String, passedKey: String) {
 
   def refineResults(rawXMLResult: Elem, elementsList: List[PageElementFromHTMLTableRow]): PerformanceResultsObject = {
     println("parsing the XML results")
-    val testUrl: String = (rawXMLResult \\ "response" \ "data" \ "testUrl").text.toString
+    val testUrl: String = (rawXMLResult \\ "response" \ "data" \ "testUrl").text.toString.split("#noads")(0)
     val testType: String = if((rawXMLResult \\ "response" \ "data" \ "from").text.toString.contains("Emulated Nexus 5")){"Android/3G"}else{"Desktop"}
     val testSummaryPage: String = (rawXMLResult \\ "response" \ "data" \ "summary").text.toString
     val timeToFirstByte: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "TTFB").text.toInt
@@ -189,7 +234,18 @@ class WebPageTest(baseUrl: String, passedKey: String) {
       println("Alert registered on url: " + url + "\n" + "verify by retesting " + testCount + " times and taking median value")
       if(typeOfTest.contains("Desktop")){
         println("Forming desktop webpage test query to confirm alert status")
-        val getUrl: String = apiBaseUrl + "/runtest.php?" + "&f=" + wptResponseFormat + "&k=" + apiKey + "&runs=" + testCount + "&priority=1" + "&url=" + url + "#noads"
+//        val getUrl: String = apiBaseUrl + "/runtest.php?" + "&f=" + wptResponseFormat + "&k=" + apiKey + "&runs=" + testCount + "&priority=1" + "&url=" + url + "#noads"
+        val getUrl: HttpUrl = new HttpUrl.Builder()
+          .scheme("http")
+          .host(apihost)
+          .addPathSegment("/runtest.php")
+          .addQueryParameter("f", wptResponseFormat)
+          .addQueryParameter("k", apiKey)
+          .addQueryParameter("runs", testCount.toString)
+          .addQueryParameter("priority", "1")
+          .addQueryParameter("url", url + fragments)
+          .build()
+
         val request: Request = new Request.Builder()
           .url(getUrl)
           .get()
@@ -205,7 +261,21 @@ class WebPageTest(baseUrl: String, passedKey: String) {
     }
     else{
         println("Forming mobile 3G webpage test query to confirm alert status")
-        val getUrl: String = apiBaseUrl + "/runtest.php?" + "&f=" + wptResponseFormat + "&k=" + apiKey + "&mobile=1&mobileDevice=Nexus5&location=" + wptLocation + ":Chrome.3G" + "&priority=1" + "&url=" + url + "#noads"
+//        val getUrl: String = apiBaseUrl + "/runtest.php?" + "&f=" + wptResponseFormat + "&k=" + apiKey + "&mobile=1&mobileDevice=Nexus5&location=" + wptLocation + ":Chrome.3G" + "&priority=1" + "&url=" + url + "#noads"
+        val getUrl: HttpUrl = new HttpUrl.Builder()
+          .scheme("http")
+          .host(apihost)
+          .addPathSegment("/runtest.php")
+          .addQueryParameter("f", wptResponseFormat)
+          .addQueryParameter("k", apiKey)
+          .addQueryParameter("mobile", "1")
+          .addQueryParameter("mobileDevice", "Nexus5")
+          .addQueryParameter("location", wptLocation + ":Chrome.3G")
+          .addQueryParameter("runs", testCount.toString)
+          .addQueryParameter("priority", "1")
+          .addQueryParameter("url", url + fragments)
+          .build()
+
         val request: Request = new Request.Builder()
           .url(getUrl)
           .get()
@@ -263,7 +333,7 @@ class WebPageTest(baseUrl: String, passedKey: String) {
 
   def refineMultipleResults(rawXMLResult: Elem, elementsList: List[PageElementFromHTMLTableRow]): PerformanceResultsObject = {
     println("parsing the XML results")
-    val testUrl: String = (rawXMLResult \\ "response" \ "data" \ "testUrl").text.toString
+    val testUrl: String = (rawXMLResult \\ "response" \ "data" \ "testUrl").text.toString.split("#noads")(0)
     val testType: String = if((rawXMLResult \\ "response" \ "data" \ "from").text.toString.contains("Emulated Nexus 5")){"Android/3G"}else{"Desktop"}
     val testSummaryPage: String = (rawXMLResult \\ "response" \ "data" \ "summary").text.toString
     val timeToFirstByte: Int = (rawXMLResult \\ "response" \ "data" \ "median" \ "firstView" \ "TTFB").text.toInt

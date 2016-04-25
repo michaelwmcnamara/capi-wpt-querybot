@@ -38,7 +38,7 @@ class ArticleUrls(key: String) {
     val until = DateTime.now
     val from = until.minusHours(24)
 
-    val articleSearchQuery = new SearchQuery()
+    val searchQuery = new SearchQuery()
       .fromDate(from)
       .toDate(until)
       .showElements("all")
@@ -48,9 +48,9 @@ class ArticleUrls(key: String) {
       .pageSize(20)
       .orderBy("newest")
       .contentType("article")
-    println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
+    println("Sending query to CAPI: \n" + searchQuery.toString)
 
-    val apiResponse = contentApiClient.getResponse(articleSearchQuery)
+    val apiResponse = contentApiClient.getResponse(searchQuery)
 
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
     val articleContentAndUrl: List[(Option[ContentFields],String)] = for (result <- returnedResponse.results) yield {
@@ -64,7 +64,7 @@ class ArticleUrls(key: String) {
     val until = DateTime.now
     val from = until.minusHours(24)
 
-    val liveBlogSearchQuery = new SearchQuery()
+    val searchQuery = new SearchQuery()
       .fromDate(from)
       .toDate(until)
       .showElements("all")
@@ -74,9 +74,9 @@ class ArticleUrls(key: String) {
       .pageSize(20)
       .orderBy("newest")
       .tag("tone/minutebyminute")
-    println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
+    println("Sending query to CAPI: \n" + searchQuery.toString)
 
-    val apiResponse = contentApiClient.getResponse(liveBlogSearchQuery)
+    val apiResponse = contentApiClient.getResponse(searchQuery)
 
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
     val liveBlogContentAndUrl: List[(Option[ContentFields],String)] = for (result <- returnedResponse.results) yield {
@@ -90,7 +90,7 @@ class ArticleUrls(key: String) {
     val until = DateTime.now
     val from = until.minusHours(24)
 
-    val liveBlogSearchQuery = new SearchQuery()
+    val searchQuery = new SearchQuery()
       .fromDate(from)
       .toDate(until)
       .showElements("all")
@@ -100,9 +100,9 @@ class ArticleUrls(key: String) {
       .pageSize(20)
       .orderBy("newest")
       .contentType("interactive")
-    println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
+    println("Sending query to CAPI: \n" + searchQuery.toString)
 
-    val apiResponse = contentApiClient.getResponse(liveBlogSearchQuery)
+    val apiResponse = contentApiClient.getResponse(searchQuery)
 
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
 
@@ -113,7 +113,7 @@ class ArticleUrls(key: String) {
   }
 
   def getFronts: List[(Option[ContentFields],String)] = {
-    val listofFronts: List[String] = List("http://www.theguardian.com/uk"/*,
+    val listofFronts: List[String] = List("http://www.theguardian.com/uk",
       "http://www.theguardian.com/us",
       "http://www.theguardian.com/au",
       "http://www.theguardian.com/uk-news",
@@ -128,7 +128,7 @@ class ArticleUrls(key: String) {
       "http://www.theguardian.com/fashion",
       "http://www.theguardian.com/uk/environment",
       "http://www.theguardian.com/uk/technology",
-      "http://www.theguardian.com/travel"*/)
+      "http://www.theguardian.com/travel")
     val emptyContentFields: Option[ContentFields] = None
     val returnList:List[(Option[ContentFields],String)] = listofFronts.map(url => (emptyContentFields, url))
     println("CAPI Query Success - Fronts: \n" + returnList.map(element => element._2).mkString)
@@ -140,7 +140,7 @@ class ArticleUrls(key: String) {
     val until = DateTime.now
     val from = until.minusHours(24)
 
-    val liveBlogSearchQuery = new SearchQuery()
+    val searchQuery = new SearchQuery()
       .fromDate(from)
       .toDate(until)
       .showElements("all")
@@ -150,9 +150,9 @@ class ArticleUrls(key: String) {
       .pageSize(20)
       .orderBy("newest")
       .contentType("video")
-    println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
+    println("Sending query to CAPI: \n" + searchQuery.toString)
 
-    val apiResponse = contentApiClient.getResponse(liveBlogSearchQuery)
+    val apiResponse = contentApiClient.getResponse(searchQuery)
 
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
     val videoContentAndUrl: List[(Option[ContentFields],String)] = for (result <- returnedResponse.results) yield {
