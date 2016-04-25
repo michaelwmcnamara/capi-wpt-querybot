@@ -563,13 +563,16 @@ object App {
           (resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded)) {
           println("row should be red one of the items qualifies")
           if (resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) {
-            resultObject.alertDescription = "<p>Page takes " + resultObject.timeFirstPaintInSec + "s" + " for text to load and page to become scrollable. Should only take " + averages.desktopTimeFirstPaintInSeconds + "s.</p>"
+//            resultObject.alertDescription = "the page is too slow. Page takes " + resultObject.timeFirstPaintInSec + "s" + " for text to load and page to become scrollable. It should only take " + averages.desktopTimeFirstPaintInSeconds + "s."
+            resultObject.alertDescription = "the page is too slow. Please contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
           }
           if (resultObject.speedIndex >= averages.desktopSpeedIndex) {
-            resultObject.alertDescription = "<p>Page takes " + resultObject.aboveTheFoldCompleteInSec + "To render visible images etc. It should take " + averages.desktopAboveTheFoldCompleteInSec + "s.</P>"
+//            resultObject.alertDescription = "the page is too slow. It is taking " + resultObject.aboveTheFoldCompleteInSec + "s" + " to display visible images etc. It should take no more tham " + averages.desktopAboveTheFoldCompleteInSec + "s."
+            resultObject.alertDescription = "the page is too slow. Please contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
           }
           if (resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded) {
-            resultObject.alertDescription = resultObject.alertDescription + "<p>Page is too heavy. Size is: " + resultObject.kBInFullyLoaded + "KB. It should be less than: " + averages.desktopKBInFullyLoaded + "KB.</p>"
+//            resultObject.alertDescription = resultObject.alertDescription + "the page is too heavy. Page size is: " + resultObject.mBInFullyLoaded + "MB. It should be less than: " + averages.desktopMBInFullyLoaded + "MB."
+            resultObject.alertDescription = "the page is too heavy. Please examine the list of embeds below for items that are unexpectedly large."
           }
           println(resultObject.alertDescription)
           resultObject.warningStatus = true
@@ -599,13 +602,16 @@ object App {
           (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded)) {
           println("warning and alert statuses set to true")
           if (resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) {
-            resultObject.alertDescription = "<p>Page takes " + resultObject.timeFirstPaintInSec + "s" + " for text to load and page to become scrollable. Should only take " + averages.mobileTimeFirstPaintInSeconds + "s.</p>"
+//            resultObject.alertDescription = "the page is too slow. Page takes " + resultObject.timeFirstPaintInSec + "s" + " for text to load and page to become scrollable. It should only take " + averages.mobileTimeFirstPaintInSeconds + "s."
+              resultObject.alertDescription = "the page is too slow. Please contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
           }
           if (resultObject.speedIndex >= averages.mobileSpeedIndex) {
-            resultObject.alertDescription = "<p>Page takes " + resultObject.aboveTheFoldCompleteInSec + "s " + "To render visible images etc. It should take " + averages.mobileAboveTheFoldCompleteInSec + "s or less.</p>"
+//            resultObject.alertDescription = "the page is too slow. It is taking " + resultObject.aboveTheFoldCompleteInSec + "s " + " to display visible images etc. It should take " + averages.mobileAboveTheFoldCompleteInSec + "s or less."
+            resultObject.alertDescription = "the page is too slow. Please contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
           }
           if (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded) {
-            resultObject.alertDescription = resultObject.alertDescription + "<p>Page is too heavy. Size is: " + resultObject.kBInFullyLoaded + "KB. It should be less than: " + averages.mobileKBInFullyLoaded + "KB.</p>"
+//            resultObject.alertDescription = resultObject.alertDescription + "the page is too heavy. Page size is: " + resultObject.mBInFullyLoaded + "MB. It should be less than: " + averages.mobileMBInFullyLoaded + "MB."
+              resultObject.alertDescription = "the page is too heavy. Please examine the list of embeds below for items that are unexpectedly large."
           }
           resultObject.warningStatus = true
           resultObject.alertStatus = true

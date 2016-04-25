@@ -87,7 +87,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def trimToEditorialElements(elementList: List[PageElementFromHTMLTableRow]): List[PageElementFromHTMLTableRow] = {
-    val returnList: List[PageElementFromHTMLTableRow] = for (element <- elementList if element.contentType.contains("image") || element.contentType.contains("video") || element.contentType.contains("application") || element.contentType.contains("document")) yield element
+    val returnList: List[PageElementFromHTMLTableRow] = for (element <- elementList if element.contentType.contains("image") || element.contentType.contains("video") || element.contentType.contains("application")) yield element
     returnList
   }
 
@@ -117,11 +117,14 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   def returnHTMLHeaviestPageElementRowsAny(): String = {
     val firstFive:List[PageElementFromHTMLTableRow] = fullElementList.take(5)
-    (for (element <- firstFive) yield element.toHTMLRowString()).mkString
+    val pageElementString: String = (for (element <- firstFive) yield element.toHTMLRowString()).mkString
+    val returnString = pageElementString + "<tr class=\"datarow\">" + "<td colspan=\"12\">" + "<a href=" + friendlyResultUrl + ">" + "See full test results here" + "</a>" + "</td>" + "</tr>"
+    returnString
   }
 
   def returnHTMLHeaviestPageElementRowsEmbeds(): String = {
-    val firstFive:List[PageElementFromHTMLTableRow] = fullElementList.take(5)
+    val workingList = trimToEditorialElements(fullElementList)
+    val firstFive = workingList.take(5)
     (for (element <- firstFive) yield element.toHTMLRowString()).mkString
   }
 

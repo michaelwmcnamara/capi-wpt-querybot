@@ -65,8 +65,10 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
     "</thead>" +"\n" +
     "<tbody>"
 
-  val HTML_PAGE_ELEMENT_TABLE_HEADERS: String = "<tr>" + "\n" +
-    "<td colspan=\"12\">" + "<table id=\"data\" class=\"data\">" + "\n" +
+  val HTML_PAGE_ELEMENT_TABLE_HEADERSPT1: String = "<tr>" + "\n" +
+    "<td colspan=\"12\">" + "<table id=\"data\" class=\"data\">" + "\n"
+
+  val HTML_PAGE_ELEMENT_TABLE_HEADERSPT2: String =
     "<caption>List of 5 heaviest elements on page - Recommend reviewing these items </caption>" + "\n" +
     "<thead>" + "\n" +
     "<tr>" + "<th>Resource</th>" + "<th>Content Type</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
@@ -103,21 +105,22 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
 
         if(result.alertStatus){
           "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<td><div class=\"arrow\"></div></td></tr>" + "\n" +
-            "<tr class=" + getAlertClass(result) + "\">" + result.genTestResultString() + "</tr>" +
           generatePageElementTable(result)
         } else {
-          "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<td>" + "" + "</td></tr>" + "\n"
+          "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<td><div>" + "" + "</div></td></tr>" + "\n"
           }
       }).mkString
 
     }
 
     def generatePageElementTable(resultsObject: PerformanceResultsObject): String = {
-        HTML_PAGE_ELEMENT_TABLE_HEADERS + "\n"  + getHTMLForPageElements(resultsObject) + HTML_PAGE_ELEMENT_TABLE_END
+        HTML_PAGE_ELEMENT_TABLE_HEADERSPT1 + "\n"  +
+          "<caption class=\"" + getAlertClass(resultsObject) + "\">" + "Alert was triggered because: " + resultsObject.genTestResultString() + "</caption>" +
+        HTML_PAGE_ELEMENT_TABLE_HEADERSPT2 + getHTMLForPageElements(resultsObject) + HTML_PAGE_ELEMENT_TABLE_END
     }
 
     def getHTMLForPageElements(resultsObject: PerformanceResultsObject): String = {
-      if (resultsObject.getPageType.contains("Interactive")){
+      if (resultsObject.getPageType.contains("Interactive") || resultsObject.getPageType.contains("interactive")){
         resultsObject.returnHTMLHeaviestPageElementRowsAny()
       } else {
         resultsObject.returnHTMLHeaviestPageElementRowsEmbeds()
