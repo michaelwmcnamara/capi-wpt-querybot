@@ -15,7 +15,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
   val apiBaseUrl:String = baseUrl
   val apihost: String = baseUrl.split("http://")(1)
   val apiKey:String = passedKey
-  val fragments: List[String] = urlFragments.map(x => "#" + x)
+  val fragments: String = urlFragments.map(x => "#" + x).mkString
 
   val wptResponseFormat:String = "xml"
   implicit val httpClient = new OkHttpClient()
