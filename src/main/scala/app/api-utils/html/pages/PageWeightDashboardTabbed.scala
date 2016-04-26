@@ -34,9 +34,9 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
 
   val HTML_PAGE_TABS_LIST: String = "<div class=\"tabs\">" + "\n" +
     "<ul class=\"tab-links\">" + "\n" +
-    "<li class=\"active\">" + "<a href=\"#combined\">Combined view</a>" + "</li>" + "\n" +
+    "<li class=\"active\">" + "<a href=\"#mobile\">Mobile view</a>" + "</li>" + "\n" +
     "<li>" + "<a href=\"#desktop\">Desktop view</a>" + "</li>" + "\n" +
-    "<li>" + "<a href=\"#mobile\">Mobile view</a>" + "</li>" + "\n" +
+    "<li>" + "<a href=\"#combined\">Combined view</a>" + "</li>" + "\n" +
     "</ul>" + "\n"
   //close div added to HTML_FOOTER
 
@@ -44,17 +44,16 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
   val HTML_TAB_CONTENT: String = "<div id=\"tab-content\">" + "\n"
 
   val HTML_TAB_HEADER: String = "<div class=\"tab-content\">" + "\n"
+  
 
-
-  val HTML_COMBINED_TAB_CONTENT_HEADER: String = "<div id=\"combined\" class=\"tab active\">" + "\n" +
-    "<p>" + "<h2>Combined view" + "</h2>" + "</p>" + "\n"
+  val HTML_MOBILE_TAB_CONTENT_HEADER: String = "<div id=\"mobile\" class=\"tab active\">" + "\n" +
+    "<p>" + "<h2>Mobile view" + "</h2>" + "</p>" + "\n"
 
   val HTML_DESKTOP_TAB_CONTENT_HEADER: String = "<div id=\"desktop\" class=\"tab\">" + "\n" +
     "<p>" + "<h2>Desktop view" + "</h2>" + "</p>" + "\n"
 
-  val HTML_MOBILE_TAB_CONTENT_HEADER: String = "<div id=\"mobile\" class=\"tab\">" + "\n" +
-    "<p>" + "<h2>Mobile view" + "</h2>" + "</p>" + "\n"
-
+  val HTML_COMBINED_TAB_CONTENT_HEADER: String = "<div id=\"combined\" class=\"tab\">" + "\n" +
+    "<p>" + "<h2>Combined view" + "</h2>" + "</p>" + "\n"
 
   val HTML_TAB_CONTENT_FOOTER: String = "</div>" + "\n"
 
@@ -90,9 +89,9 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
 
   //HTML_PAGE
   val HTML_PAGE: String = HTML_PAGE_HEAD + HTML_PAGE_CONTAINER + HTML_PAGE_TABS_LIST +
-    HTML_TAB_CONTENT + HTML_COMBINED_TAB_CONTENT_HEADER + generateHTMLTable(combinedResultsList) + HTML_TAB_CONTENT_FOOTER +
+    HTML_TAB_CONTENT + HTML_MOBILE_TAB_CONTENT_HEADER + generateHTMLTable(mobileResultsList) + HTML_TAB_CONTENT_FOOTER +
     HTML_DESKTOP_TAB_CONTENT_HEADER + generateHTMLTable(desktopResultsList) + HTML_TAB_CONTENT_FOOTER +
-    HTML_MOBILE_TAB_CONTENT_HEADER + generateHTMLTable(mobileResultsList) + HTML_TAB_CONTENT_FOOTER + HTML_FOOTER
+    HTML_COMBINED_TAB_CONTENT_HEADER + generateHTMLTable(combinedResultsList) + HTML_TAB_CONTENT_FOOTER + HTML_FOOTER
 
 
     //page generation methods
