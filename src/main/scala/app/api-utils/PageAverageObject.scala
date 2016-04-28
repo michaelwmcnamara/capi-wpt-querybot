@@ -212,7 +212,7 @@ class FrontsDefaultAverages(averageColor: String) extends PageAverageObject() {
   override val desktopTimeDocCompleteInMs: Int = 15 * 1000
   override val desktopKBInDocComplete: Double = 3 * 1024
   override val desktopTimeFullyLoadedInMs: Int = 20 * 1000
-  override val desktopKBInFullyLoaded: Double = 3 * 1024
+  override val desktopKBInFullyLoaded: Double = 4 * 1024
   override val desktopEstUSPrePaidCost: Double = 0.60
   override val desktopEstUSPostPaidCost: Double = 0.50
   override val desktopSpeedIndex: Int = 1717
