@@ -45,8 +45,8 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   var pageType: Option[String] = None
 
   var fullElementList: List[PageElementFromHTMLTableRow] = List()
-  var heavyElementList: List[PageElementFromHTMLTableRow] = List()
-  var elementListMaxSize: Int = 5
+  var editorialElementList: List[PageElementFromHTMLTableRow] = List()
+  var editorialElementListMaxSize: Int = 5
 
   def setHeadline(text: Option[String]):Unit = {headline = text}
   def setPageType(text: String):Unit = {pageType = Option(text)}
@@ -61,8 +61,8 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def addtoElementList(element: PageElementFromHTMLTableRow): Boolean = {
-    if (heavyElementList.length < elementListMaxSize){
-      heavyElementList = heavyElementList :+ element
+    if (editorialElementList.length < editorialElementListMaxSize){
+      editorialElementList = editorialElementList :+ element
       true
     }
     else{false}
@@ -71,12 +71,13 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   def returnFullElementListByWeight(): List[PageElementFromHTMLTableRow] = {fullElementList.sortWith(_.bytesDownloaded > _.bytesDownloaded)}
 
-  def populateHeavyElementList(elementList: List[PageElementFromHTMLTableRow]): Boolean = {
-    if(elementList.head.bytesDownloaded < elementList.tail.head.bytesDownloaded){
+  def populateEditorialElementList(elementList: List[PageElementFromHTMLTableRow]): Boolean = {
+    val trimmedList = trimToEditorialElements(elementList)
+    if(trimmedList.head.bytesDownloaded < trimmedList.tail.head.bytesDownloaded){
       println("Error: Attempt to feed an unordered list of page elements to Performance Results Object")
       false
     } else {
-      var workingList: List[PageElementFromHTMLTableRow] = for (element <- elementList if element.isMedia()) yield element
+      var workingList: List[PageElementFromHTMLTableRow] = for (element <- trimmedList if element.isMedia()) yield element
       var roomInTheList: Boolean = true
       while(workingList.nonEmpty && roomInTheList) {
         roomInTheList = addtoElementList(workingList.head)
@@ -96,7 +97,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def toCSVString(): String = {
-    timeOfTest + "," + testUrl.toString + "," + typeOfTest + "," + friendlyResultUrl + ","  + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + resultStatus + "," + warningStatus + "," + alertStatus + "," + brokenTest + "," + heavyElementList.map(element => "," + element.resource + "," + element.contentType + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
+    timeOfTest + "," + testUrl.toString + "," + typeOfTest + "," + friendlyResultUrl + ","  + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + resultStatus + "," + warningStatus + "," + alertStatus + "," + brokenTest + "," + editorialElementList.map(element => "," + element.resource + "," + element.contentType + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
   }
 
   def toFullHTMLTableCells(): String = {
@@ -115,17 +116,15 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTestName+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" + "<td>" + getPageType + "</td>" + " <td>" + timeFirstPaintInSec.toString + "s </td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>" + "</td>" + "<td> " + genTestResultString() + "</td>" + "<td>" + "<a href=" + friendlyResultUrl + ">" + "Click here to see full results." + "</a>" + "</td>"
   }
 
-  def returnHTMLHeaviestPageElementRowsAny(): String = {
+  def returnHTMLFullElementList(): String = {
     val firstFive:List[PageElementFromHTMLTableRow] = fullElementList.take(5)
     val pageElementString: String = (for (element <- firstFive) yield element.toHTMLRowString()).mkString
     val returnString = pageElementString + "<tr class=\"datarow\">" + "<td colspan=\"12\">" + "<a href=" + friendlyResultUrl + ">" + "See full test results here" + "</a>" + "</td>" + "</tr>"
     returnString
   }
 
-  def returnHTMLHeaviestPageElementRowsEmbeds(): String = {
-    val workingList = trimToEditorialElements(fullElementList)
-    val firstFive = workingList.take(5)
-    (for (element <- firstFive) yield element.toHTMLRowString()).mkString
+  def returnHTMLEditorialElementList(): String = {
+    (for (element <- editorialElementList) yield element.toHTMLRowString()).mkString
   }
 
   def returnHTMLFullPageElementRows(): String = {
@@ -134,7 +133,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   def returnElementTableRows(): String = {
 
-           heavyElementList.map(element => element.emailHTMLString()).mkString
+           editorialElementList.map(element => element.emailHTMLString()).mkString
   }
 
   def toHTMLAlertMessageCells(): String = {
@@ -149,7 +148,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     tableNormalRowEmailTag + tableNormalCellEmailTag + "<a href=" + testUrl + aHrefEmailStyle + ">" + headline.getOrElse(testUrl) + "</a>" + "</td>" + tableNormalCellEmailTag + typeOfTest + "</td>" + tableNormalCellEmailTag + genTestResultString() +"</td>" + tableNormalCellEmailTag + "<a href=" + friendlyResultUrl + aHrefEmailStyle + ">" + "Click here to see full results." + "</a>" + "</td>" + "</tr>\n" +
     tableMergedRowEmailTag +"List of 5 heaviest elements on page - Recommend reviewing these items </tr>\n" +
     tableNormalRowEmailTag + tableNormalCellEmailTag + "Resource" + "</td>" + tableNormalCellEmailTag + "Content Type" + "</td>" + tableNormalCellEmailTag + "Bytes Transferred" + "</td>" + "</tr>\n" +
-      heavyElementList.map(element => element.emailHTMLString()).mkString
+      editorialElementList.map(element => element.emailHTMLString()).mkString
   }
 
   def toInteractiveAlertMessageCells(): String = {
@@ -182,9 +181,9 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def fillRemainingGapsAndNewline(): String ={
-    var accumulator: Int = heavyElementList.length
+    var accumulator: Int = editorialElementList.length
     var returnString: String = ""
-    while (accumulator < elementListMaxSize-1){
+    while (accumulator < editorialElementListMaxSize-1){
       returnString = returnString + ","
       accumulator += 1
     }

@@ -121,9 +121,9 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
 
     def getHTMLForPageElements(resultsObject: PerformanceResultsObject): String = {
       if (resultsObject.getPageType.contains("Interactive") || resultsObject.getPageType.contains("interactive")){
-        resultsObject.returnHTMLHeaviestPageElementRowsAny()
+        resultsObject.returnHTMLFullElementList()
       } else {
-        resultsObject.returnHTMLHeaviestPageElementRowsEmbeds()
+        resultsObject.returnHTMLEditorialElementList()
       }
     }
 

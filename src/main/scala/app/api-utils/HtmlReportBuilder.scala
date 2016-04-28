@@ -95,9 +95,9 @@ class HtmlReportBuilder(average: String, warning: String, alert: String, article
 
   def getHTMLForPageElements(resultsObject: PerformanceResultsObject): String = {
     if (resultsObject.getPageType.contains("Interactive")){
-      resultsObject.returnHTMLHeaviestPageElementRowsAny()
+      resultsObject.returnHTMLFullElementList()
     } else {
-      resultsObject.returnHTMLHeaviestPageElementRowsEmbeds()
+      resultsObject.returnHTMLEditorialElementList()
     }
   }
 
