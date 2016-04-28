@@ -175,7 +175,7 @@ class InteractiveDefaultAverages(averageColor: String) extends PageAverageObject
   override val mobileTimeDocCompleteInMs: Int = 15 * 1000
   override val mobileKBInDocComplete: Double = 2318
   override val mobileTimeFullyLoadedInMs: Int = 20 * 1000
-  override val mobileKBInFullyLoaded: Double = 2318
+  override val mobileKBInFullyLoaded: Double = 4096
   override val mobileEstUSPrePaidCost: Double = 0.40
   override val mobileEstUSPostPaidCost: Double = 0.30
   override val mobileSpeedIndex: Int = 7139
@@ -222,7 +222,7 @@ class FrontsDefaultAverages(averageColor: String) extends PageAverageObject() {
   override val mobileTimeDocCompleteInMs: Int = 15 * 1000
   override val mobileKBInDocComplete: Double = 3 * 1024
   override val mobileTimeFullyLoadedInMs: Int = 20 * 1000
-  override val mobileKBInFullyLoaded: Double = 3 * 1024
+  override val mobileKBInFullyLoaded: Double = 4 * 1024
   override val mobileEstUSPrePaidCost: Double = 0.40
   override val mobileEstUSPostPaidCost: Double = 0.30
   override val mobileSpeedIndex: Int = 4694
