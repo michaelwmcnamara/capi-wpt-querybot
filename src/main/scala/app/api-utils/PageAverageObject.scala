@@ -165,7 +165,7 @@ class InteractiveDefaultAverages(averageColor: String) extends PageAverageObject
   override val desktopTimeDocCompleteInMs: Int = 15 * 1000
   override val desktopKBInDocComplete: Double = 2900
   override val desktopTimeFullyLoadedInMs: Int = 20 * 1000
-  override val desktopKBInFullyLoaded: Double = 956//2906
+  override val desktopKBInFullyLoaded: Double = 4096//2906
   override val desktopEstUSPrePaidCost: Double = 0.60
   override val desktopEstUSPostPaidCost: Double = 0.50
   override val desktopSpeedIndex: Int = 3011
@@ -175,7 +175,7 @@ class InteractiveDefaultAverages(averageColor: String) extends PageAverageObject
   override val mobileTimeDocCompleteInMs: Int = 15 * 1000
   override val mobileKBInDocComplete: Double = 2318
   override val mobileTimeFullyLoadedInMs: Int = 20 * 1000
-  override val mobileKBInFullyLoaded: Double = 2318
+  override val mobileKBInFullyLoaded: Double = 4096
   override val mobileEstUSPrePaidCost: Double = 0.40
   override val mobileEstUSPostPaidCost: Double = 0.30
   override val mobileSpeedIndex: Int = 7139
@@ -212,7 +212,7 @@ class FrontsDefaultAverages(averageColor: String) extends PageAverageObject() {
   override val desktopTimeDocCompleteInMs: Int = 15 * 1000
   override val desktopKBInDocComplete: Double = 3 * 1024
   override val desktopTimeFullyLoadedInMs: Int = 20 * 1000
-  override val desktopKBInFullyLoaded: Double = 3 * 1024
+  override val desktopKBInFullyLoaded: Double = 4 * 1024
   override val desktopEstUSPrePaidCost: Double = 0.60
   override val desktopEstUSPostPaidCost: Double = 0.50
   override val desktopSpeedIndex: Int = 1717
@@ -222,7 +222,7 @@ class FrontsDefaultAverages(averageColor: String) extends PageAverageObject() {
   override val mobileTimeDocCompleteInMs: Int = 15 * 1000
   override val mobileKBInDocComplete: Double = 3 * 1024
   override val mobileTimeFullyLoadedInMs: Int = 20 * 1000
-  override val mobileKBInFullyLoaded: Double = 3 * 1024
+  override val mobileKBInFullyLoaded: Double = 4 * 1024
   override val mobileEstUSPrePaidCost: Double = 0.40
   override val mobileEstUSPostPaidCost: Double = 0.30
   override val mobileSpeedIndex: Int = 4694

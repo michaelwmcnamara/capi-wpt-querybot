@@ -562,10 +562,6 @@ object App {
           (resultObject.speedIndex >= averages.desktopSpeedIndex) ||
           (resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded)) {
           println("row should be red one of the items qualifies")
-          if (resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) {
-//            resultObject.alertDescription = "the page is too slow. Page takes " + resultObject.timeFirstPaintInSec + "s" + " for text to load and page to become scrollable. It should only take " + averages.desktopTimeFirstPaintInSeconds + "s."
-            resultObject.alertDescription = "the page is too slow. Please contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
-          }
           if (resultObject.speedIndex >= averages.desktopSpeedIndex) {
 //            resultObject.alertDescription = "the page is too slow. It is taking " + resultObject.aboveTheFoldCompleteInSec + "s" + " to display visible images etc. It should take no more tham " + averages.desktopAboveTheFoldCompleteInSec + "s."
             resultObject.alertDescription = "the page is too slow. Please contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
@@ -601,17 +597,13 @@ object App {
           (resultObject.speedIndex >= averages.mobileSpeedIndex) ||
           (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded)) {
           println("warning and alert statuses set to true")
-          if (resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) {
+          if (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded) {
 //            resultObject.alertDescription = "the page is too slow. Page takes " + resultObject.timeFirstPaintInSec + "s" + " for text to load and page to become scrollable. It should only take " + averages.mobileTimeFirstPaintInSeconds + "s."
-              resultObject.alertDescription = "the page is too slow. Please contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
+            resultObject.alertDescription = "the page is too heavy. Please examine the list of embeds below for items that are unexpectedly large."
           }
           if (resultObject.speedIndex >= averages.mobileSpeedIndex) {
 //            resultObject.alertDescription = "the page is too slow. It is taking " + resultObject.aboveTheFoldCompleteInSec + "s " + " to display visible images etc. It should take " + averages.mobileAboveTheFoldCompleteInSec + "s or less."
             resultObject.alertDescription = "the page is too slow. Please contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
-          }
-          if (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded) {
-//            resultObject.alertDescription = resultObject.alertDescription + "the page is too heavy. Page size is: " + resultObject.mBInFullyLoaded + "MB. It should be less than: " + averages.mobileMBInFullyLoaded + "MB."
-              resultObject.alertDescription = "the page is too heavy. Please examine the list of embeds below for items that are unexpectedly large."
           }
           resultObject.warningStatus = true
           resultObject.alertStatus = true
