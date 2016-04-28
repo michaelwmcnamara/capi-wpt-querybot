@@ -16,8 +16,8 @@ abstract  class PageElement {
   val bytesDownloaded: Int
   val errorStatusCode: Int
   val iP: String
-  lazy val sizeInKB: Double = roundAt(2)(bytesDownloaded.toDouble/1024)
-  lazy val sizeInMB: Double = roundAt(2)(bytesDownloaded.toDouble/(1024 * 1024))
+  lazy val sizeInKB: Double = roundAt(3)(bytesDownloaded.toDouble/1024.0)
+  lazy val sizeInMB: Double = roundAt(3)(bytesDownloaded.toDouble/(1024.0 * 1024.0))
 
   def toHTMLTableRow(): String = {
     "<tr>" +
@@ -55,10 +55,10 @@ abstract  class PageElement {
     if(!size.contains("-")) {
       if (size.contains("KB") || size.contains("MB")) {
         if (size.contains("MB")) {
-          (size.slice(0, size.indexOf(" MB")).toDouble * 1024 * 1024).toInt
+          (size.slice(0, size.indexOf(" MB")).toDouble * 1024.0 * 1024.0).toInt
         } else {
           val cleanSize: String = size.replaceAll(",", "")
-          (cleanSize.slice(0, size.indexOf(" KB")).toDouble * 1024).toInt
+          (cleanSize.slice(0, size.indexOf(" KB")).toDouble * 1024.0).toInt
         }
       } else {
         val cleanSize = size.replaceAll(",", "")

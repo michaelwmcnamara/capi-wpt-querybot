@@ -85,9 +85,9 @@ class PageWeightDashboardDesktop(resultsList: List[PerformanceResultsObject]) {
 
   def getHTMLForPageElements(resultsObject: PerformanceResultsObject): String = {
     if (resultsObject.getPageType.contains("Interactive")){
-      resultsObject.returnHTMLHeaviestPageElementRowsAny()
+      resultsObject.returnHTMLFullElementList()
     } else {
-      resultsObject.returnHTMLHeaviestPageElementRowsEmbeds()
+      resultsObject.returnHTMLEditorialElementList()
     }
   }
 

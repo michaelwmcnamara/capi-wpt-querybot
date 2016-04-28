@@ -225,7 +225,8 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     println("Creating PerformanceResultsObject")
     val result: PerformanceResultsObject = new PerformanceResultsObject(testUrl, testType, testSummaryPage, timeToFirstByte, firstPaint, docTime, bytesInDoc, fullyLoadedTime, totalbytesIn, speedIndex, status, false, false, false)
     val sortedElementList = sortPageElementList(elementsList)
-    result.populateHeavyElementList(sortedElementList)
+    result.fullElementList = sortedElementList
+    result.populateEditorialElementList(sortedElementList)
     println("Returning PerformanceResultsObject")
     result
   }
@@ -352,11 +353,11 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     val status: String = "Test Success"
     println("Creating PerformanceResultsObject")
     val result: PerformanceResultsObject = new PerformanceResultsObject(testUrl, testType, testSummaryPage, timeToFirstByte, firstPaint, docTime, bytesInDoc, fullyLoadedTime, totalbytesIn, speedIndex, status, false, false, false)
-    result.fullElementList = elementsList
     val sortedElementList = sortPageElementList(elementsList)
-    result.populateHeavyElementList(sortedElementList)
+    result.fullElementList = sortedElementList
+    result.populateEditorialElementList(sortedElementList)
     println("Result string: " + result.toHTMLSimpleTableCells())
-    println("List of heaviest page Elements contains " + result.heavyElementList.length + " elements")
+    println("List of heaviest page Elements contains " + result.editorialElementList.length + " elements")
     println("Returning PerformanceResultsObject")
     result
   }
