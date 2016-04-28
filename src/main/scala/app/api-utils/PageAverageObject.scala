@@ -165,7 +165,7 @@ class InteractiveDefaultAverages(averageColor: String) extends PageAverageObject
   override val desktopTimeDocCompleteInMs: Int = 15 * 1000
   override val desktopKBInDocComplete: Double = 2900
   override val desktopTimeFullyLoadedInMs: Int = 20 * 1000
-  override val desktopKBInFullyLoaded: Double = 956//2906
+  override val desktopKBInFullyLoaded: Double = 4096//2906
   override val desktopEstUSPrePaidCost: Double = 0.60
   override val desktopEstUSPostPaidCost: Double = 0.50
   override val desktopSpeedIndex: Int = 3011
