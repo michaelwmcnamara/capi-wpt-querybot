@@ -165,20 +165,20 @@ class InteractiveDefaultAverages(averageColor: String) extends PageAverageObject
   override val desktopTimeDocCompleteInMs: Int = 15 * 1000
   override val desktopKBInDocComplete: Double = 2900
   override val desktopTimeFullyLoadedInMs: Int = 20 * 1000
-  override val desktopKBInFullyLoaded: Double = 4096//2906
+  override val desktopKBInFullyLoaded: Double = 5120//2906
   override val desktopEstUSPrePaidCost: Double = 0.60
   override val desktopEstUSPostPaidCost: Double = 0.50
-  override val desktopSpeedIndex: Int = 3011
+  override val desktopSpeedIndex: Int = 2074
   override val desktopSuccessCount = 1
 
   override val mobileTimeFirstPaintInMs: Int = 2 * 1000
   override val mobileTimeDocCompleteInMs: Int = 15 * 1000
   override val mobileKBInDocComplete: Double = 2318
   override val mobileTimeFullyLoadedInMs: Int = 20 * 1000
-  override val mobileKBInFullyLoaded: Double = 4096
+  override val mobileKBInFullyLoaded: Double = 3072
   override val mobileEstUSPrePaidCost: Double = 0.40
   override val mobileEstUSPostPaidCost: Double = 0.30
-  override val mobileSpeedIndex: Int = 7139
+  override val mobileSpeedIndex: Int = 5000
   override val mobileSuccessCount = 1
 
   override val formattedHTMLResultString: String = "<tr style=\"background-color:" + averageColor + ";\">" +
