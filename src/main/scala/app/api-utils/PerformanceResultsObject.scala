@@ -9,6 +9,7 @@ import scala.xml.Elem
  * Created by mmcnamara on 10/02/16.
  */
 class PerformanceResultsObject(url:String, testType: String, urlforTestResults: String, tTFB: Int, tFP:Int, tDC: Int, bDC: Int, tFL: Int, bFL: Int, sI: Int, status: String, warning: Boolean, alert: Boolean, failedNeedsRetest: Boolean) {
+// todo - add publication date; and setters and getters for same ; also add to csv string
   val timeOfTest: String = DateTime.now().toString
   val testUrl: String = url
   val typeOfTest: String = testType
@@ -50,6 +51,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   def setHeadline(text: Option[String]):Unit = {headline = text}
   def setPageType(text: String):Unit = {pageType = Option(text)}
+
 
   def getPageType:String = {
     if(pageType.nonEmpty){

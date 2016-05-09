@@ -215,7 +215,7 @@ class FrontsDefaultAverages(averageColor: String) extends PageAverageObject() {
   override val desktopKBInFullyLoaded: Double = 4 * 1024
   override val desktopEstUSPrePaidCost: Double = 0.60
   override val desktopEstUSPostPaidCost: Double = 0.50
-  override val desktopSpeedIndex: Int = 1717
+  override val desktopSpeedIndex: Int = 4000
   override val desktopSuccessCount = 1
 
   override val mobileTimeFirstPaintInMs: Int = 2 * 1000
@@ -232,6 +232,7 @@ class FrontsDefaultAverages(averageColor: String) extends PageAverageObject() {
     "<td>" + DateTime.now + "/td>" +
     "<td>Desktop/td>" +
     "<td> Alerting thresholds for desktop browser tests</td>" +
+  "<td> Front </td>"
     "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
     "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
     "<td>" + desktopMBInDocComplete + "MB</td>" +

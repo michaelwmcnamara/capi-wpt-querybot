@@ -7,7 +7,7 @@ import java.util
 
 import app.api._
 import app.apiutils._
-import com.gu.contentapi.client.model.v1.ContentFields
+import com.gu.contentapi.client.model.v1.{Office, MembershipTier, CapiDateTime, ContentFields}
 import com.typesafe.config.{Config, ConfigFactory}
 import org.joda.time.DateTime
 import sbt.complete.Completion
@@ -25,6 +25,7 @@ object App {
     println("Job started at: " + DateTime.now)
     println("Local Testing Flag is set to: " + iamTestingLocally.toString)
 
+    // todo - wire in publication date and use it to make sure things dont stick forever
     //  Define names of s3bucket, configuration and output Files
     val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
     val s3BucketName = "capi-wpt-querybot"
@@ -158,7 +159,7 @@ object App {
       }
     }
 
-    val alreadyAlerted: List[PerformanceResultsObject] = for (result <- previousResults if result.alertStatus) yield result
+    val previousAlerts: List[PerformanceResultsObject] = for (result <- previousResults if result.alertStatus) yield result
 
     //Create Email Handler class
     val emailer: EmailOperations = new EmailOperations(emailUsername, emailPassword)
@@ -175,6 +176,7 @@ object App {
     println(DateTime.now + " Closing Content API query connection")
     capiQuery.shutDown
 
+    val previousAlertUrls: List[String] = for (result <- previousAlerts) yield result.testUrl
     val articleUrls: List[String] = for (page <- articles) yield page._2
     val liveBlogUrls: List[String] = for (page <- liveBlogs) yield page._2
     val interactiveUrls: List[String] = for (page <- interactives) yield page._2
@@ -188,12 +190,33 @@ object App {
     // send all urls to webpagetest at once to enable parallel testing by test agents
     //    val urlsToSend: List[String] = (articleUrls:::liveBlogUrls ::: interactiveUrls ::: frontsUrls ::: videoUrls ::: audioUrls).distinct
 
-    val urlsToSend: List[String] = (articleUrls ::: liveBlogUrls ::: interactiveUrls ::: frontsUrls).distinct
+    val urlsToSend: List[String] = (previousAlertUrls ::: articleUrls ::: liveBlogUrls ::: interactiveUrls ::: frontsUrls).distinct
     //val combinedUrlsFromCapiQueries: List[String] = (articleUrls ::: liveBlogUrls ::: interactiveUrls ::: frontsUrls).distinct
     //val urlsToSend: List[String] = for (url <- combinedUrlsFromCapiQueries if !previousResults.map(_.testUrl).contains(url)) yield url
     println("Combined list of urls: \n" + urlsToSend)
     val resultUrlList: List[(String, String)] = getResultPages(urlsToSend, urlFragments, wptBaseUrl, wptApiKey, wptLocation)
 
+
+    if (previousAlerts.nonEmpty){
+      println("Retesting past alerts")
+      val previousArticles: List[PerformanceResultsObject] = for (result <- previousAlerts if result.pageType.contains("Article")) yield result
+      val previousLiveBlogs: List[PerformanceResultsObject] = for (result <- previousAlerts if result.pageType.contains("LiveBlog")) yield result
+      val previousInteractives: List[PerformanceResultsObject] = for (result <- previousAlerts if result.pageType.contains("Interactive")) yield result
+
+      val articleAverages: PageAverageObject = new ArticleDefaultAverages(averageColor)
+      val articleContentFieldsAndUrl = previousArticles.map(result => (Option(makeContentStub(result.headline.getOrElse("Unknown"))), result.testUrl))
+      val pastArticleAlertsResults = listenForResultPages(articleContentFieldsAndUrl, "article", resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
+
+      val liveBlogAverages: PageAverageObject = new LiveBlogDefaultAverages(averageColor)
+      val liveBlogContentFieldsAndUrl = previousLiveBlogs.map(result => (Option(makeContentStub(result.headline.getOrElse("Unknown"))), result.testUrl))
+      val pastLiveBlogAlertsResults = listenForResultPages(liveBlogContentFieldsAndUrl, "LiveBlog", resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
+
+      val interactiveAverages: PageAverageObject = new InteractiveDefaultAverages(averageColor)
+      val interactiveContentFieldsAndUrl = previousInteractives.map(result => (Option(makeContentStub(result.headline.getOrElse("Unknown"))), result.testUrl))
+      val pastInteractiveAlertsResults = listenForResultPages(interactiveContentFieldsAndUrl, "Interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
+
+      combinedResultsList = pastArticleAlertsResults ::: pastLiveBlogAlertsResults ::: pastInteractiveAlertsResults
+    }
 
     if (articleUrls.nonEmpty) {
       println("Generating average values for articles")
@@ -201,7 +224,8 @@ object App {
       articleResults = articleResults.concat(articleAverages.toHTMLString)
 
       val articleResultsList = listenForResultPages(articles, "article", resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
-      combinedResultsList = combinedResultsList ::: articleResultsList
+      val updatedCombinedResultsList = for (oldResult <- combinedResultsList if !articleResultsList.map(_.testUrl).contains(oldResult.testUrl)) yield oldResult
+      combinedResultsList = updatedCombinedResultsList ::: articleResultsList
       println("About to sort article results list. Length of list is: " + articleResultsList.length)
       val sortedArticleResultsList = orderList(articleResultsList)
       if(sortedArticleResultsList.isEmpty) {
@@ -241,7 +265,9 @@ object App {
       liveBlogResults = liveBlogResults.concat(liveBlogAverages.toHTMLString)
 
       val liveBlogResultsList = listenForResultPages(liveBlogs, "liveBlog", resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
-      combinedResultsList = combinedResultsList ::: liveBlogResultsList
+      val updatedCombinedResultsList = for (oldResult <- combinedResultsList if !liveBlogResultsList.map(_.testUrl).contains(oldResult.testUrl)) yield oldResult
+      combinedResultsList = updatedCombinedResultsList ::: liveBlogResultsList
+//      combinedResultsList = combinedResultsList ::: liveBlogResultsList
       val sortedLiveBlogResultsList = orderList(liveBlogResultsList)
       if(sortedLiveBlogResultsList.isEmpty) {
         println("Sorting algorithm for Liveblogs has returned empty list. Aborting")
@@ -280,7 +306,10 @@ object App {
       interactiveResults = interactiveResults.concat(interactiveAverages.toHTMLString)
 
       val interactiveResultsList = listenForResultPages(interactives, "interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
-      combinedResultsList = combinedResultsList ::: interactiveResultsList
+      val updatedCombinedResultsList = for (oldResult <- combinedResultsList if !interactiveResultsList.map(_.testUrl).contains(oldResult.testUrl)) yield oldResult
+      combinedResultsList = updatedCombinedResultsList ::: interactiveResultsList
+
+      //      combinedResultsList = combinedResultsList ::: interactiveResultsList
       val sortedInteractiveResultsList = orderList(interactiveResultsList)
       if(sortedInteractiveResultsList.isEmpty) {
         println("Sorting algorithm has returned empty list. Aborting")
@@ -449,10 +478,10 @@ object App {
 
 
     //check if alert items have already been sent in earlier run
-    val newArticleAlertsList: List[PerformanceResultsObject] = for (result <- articleAlertList if !alreadyAlerted.map(_.testUrl).contains(result.testUrl)) yield result
-    val newLiveBlogAlertsList: List[PerformanceResultsObject] = for (result <- liveBlogAlertList if !alreadyAlerted.map(_.testUrl).contains(result.testUrl)) yield result
-    val newInteractiveAlertsList: List[PerformanceResultsObject] = for (result <- interactiveAlertList if !alreadyAlerted.map(_.testUrl).contains(result.testUrl)) yield result
-    val newFrontsAlertsList: List[PerformanceResultsObject] = for (result <- frontsAlertList if !alreadyAlerted.map(_.testUrl).contains(result.testUrl)) yield result
+    val newArticleAlertsList: List[PerformanceResultsObject] = for (result <- articleAlertList if !previousAlerts.map(_.testUrl).contains(result.testUrl)) yield result
+    val newLiveBlogAlertsList: List[PerformanceResultsObject] = for (result <- liveBlogAlertList if !previousAlerts.map(_.testUrl).contains(result.testUrl)) yield result
+    val newInteractiveAlertsList: List[PerformanceResultsObject] = for (result <- interactiveAlertList if !previousAlerts.map(_.testUrl).contains(result.testUrl)) yield result
+    val newFrontsAlertsList: List[PerformanceResultsObject] = for (result <- frontsAlertList if !previousAlerts.map(_.testUrl).contains(result.testUrl)) yield result
 
     if (newArticleAlertsList.nonEmpty || newLiveBlogAlertsList.nonEmpty || newFrontsAlertsList.nonEmpty) {
       println("\n\n articleAlertList contains: " + newArticleAlertsList.length + " pages")
@@ -518,6 +547,7 @@ object App {
       newElement.testResults = wpt.getResults(newElement.wptResultUrl)
       newElement.testResults.setHeadline(newElement.headline)
       newElement.testResults.setPageType(newElement.pageType)
+      // todo add set publication date
       newElement
     })
     val testResults = resultsList.map(element => element.testResults).toList
@@ -730,6 +760,80 @@ object App {
   def sortTupleList(list: List[(PerformanceResultsObject,PerformanceResultsObject)]): List[(PerformanceResultsObject,PerformanceResultsObject)] = {
     list.sortWith{(leftE:(PerformanceResultsObject, PerformanceResultsObject),rightE:(PerformanceResultsObject, PerformanceResultsObject)) =>
       leftE._1.bytesInFullyLoaded + leftE._2.bytesInFullyLoaded > rightE._1.bytesInFullyLoaded + rightE._2.bytesInFullyLoaded}
+  }
+
+  def makeContentStub(passedHeadline: String): ContentFields = {
+    val contentStub = new ContentFields {override def newspaperEditionDate: Option[CapiDateTime] = None
+
+      override def internalStoryPackageCode: Option[Int] = None
+
+      override def displayHint: Option[String] = None
+
+      override def legallySensitive: Option[Boolean] = None
+
+      override def creationDate: Option[CapiDateTime] = None
+
+      override def shouldHideAdverts: Option[Boolean] = None
+
+      override def wordcount: Option[Int] = None
+
+      override def thumbnail: Option[String] = None
+
+      override def liveBloggingNow: Option[Boolean] = None
+
+      override def showInRelatedContent: Option[Boolean] = None
+
+      override def internalComposerCode: Option[String] = None
+
+      override def lastModified: Option[CapiDateTime] = None
+
+      override def byline: Option[String] = None
+
+      override def isInappropriateForSponsorship: Option[Boolean] = None
+
+      override def commentable: Option[Boolean] = None
+
+      override def trailText: Option[String] = None
+
+      override def internalPageCode: Option[Int] = None
+
+      override def main: Option[String] = None
+
+      override def body: Option[String] = None
+
+      override def productionOffice: Option[Office] = None
+
+      override def newspaperPageNumber: Option[Int] = None
+
+      override def shortUrl: Option[String] = None
+
+      override def publication: Option[String] = None
+
+      override def secureThumbnail: Option[String] = None
+
+      override def contributorBio: Option[String] = None
+
+      override def firstPublicationDate: Option[CapiDateTime] = None
+
+      override def isPremoderated: Option[Boolean] = None
+
+      override def membershipAccess: Option[MembershipTier] = None
+
+      override def scheduledPublicationDate: Option[CapiDateTime] = None
+
+      override def starRating: Option[Int] = None
+
+      override def hasStoryPackage: Option[Boolean] = None
+
+      override def headline: Option[String] = Option(passedHeadline)
+
+      override def commentCloseDate: Option[CapiDateTime] = None
+
+      override def internalOctopusCode: Option[String] = None
+
+      override def standfirst: Option[String] = None
+    }
+  contentStub
   }
 
 }
