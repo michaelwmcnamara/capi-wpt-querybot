@@ -85,10 +85,10 @@ class ArticleDefaultAverages(averageColor: String) extends PageAverageObject {
   override val mobileTimeDocCompleteInMs: Int = 15 * 1000
   override val mobileKBInDocComplete: Double = 1600
   override val mobileTimeFullyLoadedInMs: Int = 20 * 1000
-  override val mobileKBInFullyLoaded: Double = 2110
+  override val mobileKBInFullyLoaded: Double = 3072
   override val mobileEstUSPrePaidCost: Double = 0.40
   override val mobileEstUSPostPaidCost: Double = 0.30
-  override val mobileSpeedIndex: Int = 4000
+  override val mobileSpeedIndex: Int = 3000
   override val mobileSuccessCount = 1
 
   override val formattedHTMLResultString: String = "<tr style=\"background-color:" + averageColor + ";\">" +
