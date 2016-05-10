@@ -73,6 +73,7 @@ object App {
 
     //initialize combinedResultsList - this will be accumulate test results for the combined page
     var combinedResultsList: List[PerformanceResultsObject] = List()
+    var combinedPreviousResultsList: List[PerformanceResultsObject] = List()
 
     //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
     val htmlString = new HtmlStringOperations(averageColor, warningColor, alertColor, articleResultsUrl, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
@@ -215,7 +216,7 @@ object App {
       val interactiveContentFieldsAndUrl = previousInteractives.map(result => (Option(makeContentStub(result.headline.getOrElse("Unknown"))), result.testUrl))
       val pastInteractiveAlertsResults = listenForResultPages(interactiveContentFieldsAndUrl, "Interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
 
-      combinedResultsList = pastArticleAlertsResults ::: pastLiveBlogAlertsResults ::: pastInteractiveAlertsResults
+      combinedPreviousResultsList = pastArticleAlertsResults ::: pastLiveBlogAlertsResults ::: pastInteractiveAlertsResults
     }
 
     if (articleUrls.nonEmpty) {
@@ -224,7 +225,7 @@ object App {
       articleResults = articleResults.concat(articleAverages.toHTMLString)
 
       val articleResultsList = listenForResultPages(articles, "article", resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
-      val updatedCombinedResultsList = for (oldResult <- combinedResultsList if !articleResultsList.map(_.testUrl).contains(oldResult.testUrl)) yield oldResult
+      val updatedCombinedResultsList = for (oldResult <- combinedPreviousResultsList if (oldResult.pageType.contains("Article")&&(!articleResultsList.map(_.testUrl).contains(oldResult.testUrl))) yield oldResult
       combinedResultsList = updatedCombinedResultsList ::: articleResultsList
       println("About to sort article results list. Length of list is: " + articleResultsList.length)
       val sortedArticleResultsList = orderList(articleResultsList)
@@ -258,7 +259,7 @@ object App {
       println("CAPI query found no article pages")
     }
 
-
+//todo - combined result list will forget articles as it currently stands
     if (liveBlogUrls.nonEmpty) {
       println("Generating average values for liveblogs")
       val liveBlogAverages: PageAverageObject = new LiveBlogDefaultAverages(averageColor)
