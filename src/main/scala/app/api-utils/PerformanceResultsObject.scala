@@ -1,5 +1,6 @@
 package app.apiutils
 
+import com.gu.contentapi.client.model.v1.CapiDateTime
 import org.joda.time.DateTime
 
 import scala.xml.Elem
@@ -44,6 +45,8 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   var headline: Option[String] = None
   var pageType: Option[String] = None
+  var pageLastUpdated: Option[CapiDateTime] = None
+  var liveBloggingNow: Option[Boolean] = None
 
   var fullElementList: List[PageElementFromHTMLTableRow] = List()
   var editorialElementList: List[PageElementFromHTMLTableRow] = List()
@@ -51,16 +54,17 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   def setHeadline(text: Option[String]):Unit = {headline = text}
   def setPageType(text: String):Unit = {pageType = Option(text)}
-
+  def setPageLastUpdated(text: String):Unit = {pageLastUpdated = Option(text)}
+  def setLiveBloggingNow(passedBoolean: Boolean):Unit = {liveBloggingNow = Option(passedBoolean)}
 
   def getPageType:String = {
-    if(pageType.nonEmpty){
-      pageType.mkString
+      pageType.getOrElse("Unknown")
     }
-    else {
-      "Unknown"
-    }
+
+  def getLiveBloggingNow:Boolean = {
+      liveBloggingNow.getOrElse(false)
   }
+
 
   def addtoElementList(element: PageElementFromHTMLTableRow): Boolean = {
     if (editorialElementList.length < editorialElementListMaxSize){
@@ -99,7 +103,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def toCSVString(): String = {
-    timeOfTest + "," + testUrl.toString + "," + typeOfTest + "," + friendlyResultUrl + ","  + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + resultStatus + "," + warningStatus + "," + alertStatus + "," + brokenTest + "," + editorialElementList.map(element => "," + element.resource + "," + element.contentType + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
+    timeOfTest + "," + testUrl.toString + "," + headline.getOrElse("Unknown") + "," + getPageType + "," + pageLastUpdated.getOrElse(-1).toString + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + resultStatus + "," + warningStatus + "," + alertStatus + "," + brokenTest + "," + editorialElementList.map(element => "," + element.resource + "," + element.contentType + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
   }
 
   def toFullHTMLTableCells(): String = {

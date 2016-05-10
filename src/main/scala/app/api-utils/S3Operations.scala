@@ -154,7 +154,7 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
   }*/
 
   def getResultsFileFromS3(fileName:String): List[PerformanceResultsObject] = {
-// todo - get publication date
+// todo - update to include new fields
     if (doesFileExist(fileName)) {
       val s3Response = s3Client.getObject(new GetObjectRequest(s3BucketName, fileName))
       val objectData = s3Response.getObjectContent

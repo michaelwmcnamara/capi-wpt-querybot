@@ -198,9 +198,9 @@ object App {
 
     // build result page listeners
     // first format alerts from previous test that arent in the new capi queries
-    val dedupedPreviousArticles: List[PerformanceResultsObject] = for (result <- dedupedPreviousAlerts if result.pageType.contains("Article")) yield result
-    val dedupedPreviousLiveBlogs: List[PerformanceResultsObject] = for (result <- dedupedPreviousAlerts if result.pageType.contains("LiveBlog")) yield result
-    val dedupedPreviousInteractives: List[PerformanceResultsObject] = for (result <- dedupedPreviousAlerts if result.pageType.contains("Interactive")) yield result
+    val dedupedPreviousArticles: List[PerformanceResultsObject] = for (result <- dedupedPreviousAlerts if result.getPageType.contains("Article")) yield result
+    val dedupedPreviousLiveBlogs: List[PerformanceResultsObject] = for (result <- dedupedPreviousAlerts if result.getPageType.contains("LiveBlog")) yield result
+    val dedupedPreviousInteractives: List[PerformanceResultsObject] = for (result <- dedupedPreviousAlerts if result.getPageType.contains("Interactive")) yield result
 
     // munge into proper format and merge these with the capi results
     val articleContentFieldsAndUrl = dedupedPreviousArticles.map(result => (Option(makeContentStub(result.headline.getOrElse("Unknown"))), result.testUrl))
@@ -535,6 +535,8 @@ object App {
       newElement.testResults = wpt.getResults(newElement.wptResultUrl)
       newElement.testResults.setHeadline(newElement.headline)
       newElement.testResults.setPageType(newElement.pageType)
+      newElement.testResults.setPageLastUpdated(newElement.pageLastUpdated)
+      newElement.testResults.setLiveBloggingNow(newElement.liveBloggingNow)
       // todo add set publication date
       newElement
     })
