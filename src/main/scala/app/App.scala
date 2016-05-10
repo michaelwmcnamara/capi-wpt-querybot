@@ -177,7 +177,10 @@ object App {
     println(DateTime.now + " Closing Content API query connection")
     capiQuery.shutDown
 
-    val previousAlertUrls: List[String] = for (result <- previousAlerts) yield result.testUrl
+    val combinedCapiResults = articles ::: liveBlogs ::: interactives ::: fronts
+    val dedupedPreviousAlerts = for (result <- previousAlerts if !combinedCapiResults.map(_._2).contains(result.testUrl)) yield result
+
+    val dedupedPreviousAlertUrls: List[String] = for (result <- dedupedPreviousAlerts) yield result.testUrl
     val articleUrls: List[String] = for (page <- articles) yield page._2
     val liveBlogUrls: List[String] = for (page <- liveBlogs) yield page._2
     val interactiveUrls: List[String] = for (page <- interactives) yield page._2
@@ -189,51 +192,41 @@ object App {
 
 
     // send all urls to webpagetest at once to enable parallel testing by test agents
-    //    val urlsToSend: List[String] = (articleUrls:::liveBlogUrls ::: interactiveUrls ::: frontsUrls ::: videoUrls ::: audioUrls).distinct
-
-    val urlsToSend: List[String] = (previousAlertUrls ::: articleUrls ::: liveBlogUrls ::: interactiveUrls ::: frontsUrls).distinct
-    //val combinedUrlsFromCapiQueries: List[String] = (articleUrls ::: liveBlogUrls ::: interactiveUrls ::: frontsUrls).distinct
-    //val urlsToSend: List[String] = for (url <- combinedUrlsFromCapiQueries if !previousResults.map(_.testUrl).contains(url)) yield url
+    val urlsToSend: List[String] = (dedupedPreviousAlertUrls ::: articleUrls ::: liveBlogUrls ::: interactiveUrls ::: frontsUrls).distinct
     println("Combined list of urls: \n" + urlsToSend)
     val resultUrlList: List[(String, String)] = getResultPages(urlsToSend, urlFragments, wptBaseUrl, wptApiKey, wptLocation)
 
+    // build result page listeners
+    // first format alerts from previous test that arent in the new capi queries
+    val dedupedPreviousArticles: List[PerformanceResultsObject] = for (result <- dedupedPreviousAlerts if result.pageType.contains("Article")) yield result
+    val dedupedPreviousLiveBlogs: List[PerformanceResultsObject] = for (result <- dedupedPreviousAlerts if result.pageType.contains("LiveBlog")) yield result
+    val dedupedPreviousInteractives: List[PerformanceResultsObject] = for (result <- dedupedPreviousAlerts if result.pageType.contains("Interactive")) yield result
 
-    if (previousAlerts.nonEmpty){
-      println("Retesting past alerts")
-      val previousArticles: List[PerformanceResultsObject] = for (result <- previousAlerts if result.pageType.contains("Article")) yield result
-      val previousLiveBlogs: List[PerformanceResultsObject] = for (result <- previousAlerts if result.pageType.contains("LiveBlog")) yield result
-      val previousInteractives: List[PerformanceResultsObject] = for (result <- previousAlerts if result.pageType.contains("Interactive")) yield result
+    // munge into proper format and merge these with the capi results
+    val articleContentFieldsAndUrl = dedupedPreviousArticles.map(result => (Option(makeContentStub(result.headline.getOrElse("Unknown"))), result.testUrl))
+    val liveBlogContentFieldsAndUrl = dedupedPreviousLiveBlogs.map(result => (Option(makeContentStub(result.headline.getOrElse("Unknown"))), result.testUrl))
+    val interactiveContentFieldsAndUrl = dedupedPreviousInteractives.map(result => (Option(makeContentStub(result.headline.getOrElse("Unknown"))), result.testUrl))
 
-      val articleAverages: PageAverageObject = new ArticleDefaultAverages(averageColor)
-      val articleContentFieldsAndUrl = previousArticles.map(result => (Option(makeContentStub(result.headline.getOrElse("Unknown"))), result.testUrl))
-      val pastArticleAlertsResults = listenForResultPages(articleContentFieldsAndUrl, "article", resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
+    val combinedArticleList: List[(Option[ContentFields],String)] = articleContentFieldsAndUrl ::: articles
+    val combinedLiveBlogList: List[(Option[ContentFields],String)] = liveBlogContentFieldsAndUrl ::: liveBlogs
+    val combinedInteractiveList: List[(Option[ContentFields],String)] = interactiveContentFieldsAndUrl ::: interactives
 
-      val liveBlogAverages: PageAverageObject = new LiveBlogDefaultAverages(averageColor)
-      val liveBlogContentFieldsAndUrl = previousLiveBlogs.map(result => (Option(makeContentStub(result.headline.getOrElse("Unknown"))), result.testUrl))
-      val pastLiveBlogAlertsResults = listenForResultPages(liveBlogContentFieldsAndUrl, "LiveBlog", resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
 
-      val interactiveAverages: PageAverageObject = new InteractiveDefaultAverages(averageColor)
-      val interactiveContentFieldsAndUrl = previousInteractives.map(result => (Option(makeContentStub(result.headline.getOrElse("Unknown"))), result.testUrl))
-      val pastInteractiveAlertsResults = listenForResultPages(interactiveContentFieldsAndUrl, "Interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
-
-      combinedPreviousResultsList = pastArticleAlertsResults ::: pastLiveBlogAlertsResults ::: pastInteractiveAlertsResults
-    }
-
-    if (articleUrls.nonEmpty) {
+    //obtain results for articles
+    if (combinedArticleList.nonEmpty) {
       println("Generating average values for articles")
       val articleAverages: PageAverageObject = new ArticleDefaultAverages(averageColor)
       articleResults = articleResults.concat(articleAverages.toHTMLString)
 
-      val articleResultsList = listenForResultPages(articles, "article", resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
-      val updatedCombinedResultsList = for (oldResult <- combinedPreviousResultsList if (oldResult.pageType.contains("Article")&&(!articleResultsList.map(_.testUrl).contains(oldResult.testUrl))) yield oldResult
-      combinedResultsList = updatedCombinedResultsList ::: articleResultsList
+      val articleResultsList = listenForResultPages(combinedArticleList, "article", resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
+      combinedResultsList = articleResultsList
+
       println("About to sort article results list. Length of list is: " + articleResultsList.length)
       val sortedArticleResultsList = orderList(articleResultsList)
       if(sortedArticleResultsList.isEmpty) {
         println("Sorting algorithm for articles has returned empty list. Aborting")
         System exit 1
       }
-
       val articleHTMLResults: List[String] = sortedArticleResultsList.map(x => htmlString.generateHTMLRow(x))
       // write article results to string
       //Create a list of alerting pages and write to string
@@ -259,16 +252,14 @@ object App {
       println("CAPI query found no article pages")
     }
 
-//todo - combined result list will forget articles as it currently stands
-    if (liveBlogUrls.nonEmpty) {
+    //obtain results for liveBlogs
+    if (combinedLiveBlogList.nonEmpty) {
       println("Generating average values for liveblogs")
       val liveBlogAverages: PageAverageObject = new LiveBlogDefaultAverages(averageColor)
       liveBlogResults = liveBlogResults.concat(liveBlogAverages.toHTMLString)
 
-      val liveBlogResultsList = listenForResultPages(liveBlogs, "liveBlog", resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
-      val updatedCombinedResultsList = for (oldResult <- combinedResultsList if !liveBlogResultsList.map(_.testUrl).contains(oldResult.testUrl)) yield oldResult
-      combinedResultsList = updatedCombinedResultsList ::: liveBlogResultsList
-//      combinedResultsList = combinedResultsList ::: liveBlogResultsList
+      val liveBlogResultsList = listenForResultPages(combinedLiveBlogList, "liveBlog", resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
+      combinedResultsList = combinedResultsList ::: liveBlogResultsList
       val sortedLiveBlogResultsList = orderList(liveBlogResultsList)
       if(sortedLiveBlogResultsList.isEmpty) {
         println("Sorting algorithm for Liveblogs has returned empty list. Aborting")
@@ -300,23 +291,19 @@ object App {
       println("CAPI query found no liveblogs")
     }
 
-    if (interactiveUrls.nonEmpty) {
+    if (combinedInteractiveList.nonEmpty) {
       println("Generating average values for interactives")
 //      val interactiveAverages: PageAverageObject = generateInteractiveAverages(listofLargeInteractives, wptBaseUrl, wptApiKey, wptLocation, interactiveItemLabel, averageColor)
       val interactiveAverages: PageAverageObject = new InteractiveDefaultAverages(averageColor)
       interactiveResults = interactiveResults.concat(interactiveAverages.toHTMLString)
 
-      val interactiveResultsList = listenForResultPages(interactives, "interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
-      val updatedCombinedResultsList = for (oldResult <- combinedResultsList if !interactiveResultsList.map(_.testUrl).contains(oldResult.testUrl)) yield oldResult
-      combinedResultsList = updatedCombinedResultsList ::: interactiveResultsList
-
-      //      combinedResultsList = combinedResultsList ::: interactiveResultsList
+      val interactiveResultsList = listenForResultPages(combinedInteractiveList, "interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
+      combinedResultsList = combinedResultsList ::: interactiveResultsList
       val sortedInteractiveResultsList = orderList(interactiveResultsList)
       if(sortedInteractiveResultsList.isEmpty) {
         println("Sorting algorithm has returned empty list. Aborting")
         System exit 1
       }
-
       val interactiveHTMLResults: List[String] = sortedInteractiveResultsList.map(x => htmlString.interactiveHTMLRow(x))
       //generate interactive alert message body
       interactiveAlertList = for (result <- sortedInteractiveResultsList if result.alertStatus) yield result
@@ -348,7 +335,7 @@ object App {
       frontsResults = frontsResults.concat(frontsAverages.toHTMLString)
 
       val frontsResultsList = listenForResultPages(fronts, "front", resultUrlList, frontsAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
-      combinedResultsList = combinedResultsList ::: frontsResultsList
+//      combinedResultsList = combinedResultsList ::: frontsResultsList
       val sortedFrontsResultsList = orderList(frontsResultsList)
       if(sortedFrontsResultsList.isEmpty) {
         println("Sorting algorithm for fronts has returned empty list. Aborting")
