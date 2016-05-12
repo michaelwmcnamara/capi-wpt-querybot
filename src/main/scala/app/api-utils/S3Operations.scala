@@ -5,6 +5,7 @@ import java.io._
 import app.apiutils.PerformanceResultsObject
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model._
+import com.gu.contentapi.client.model.v1.CapiDateTime
 import com.typesafe.config.{ConfigFactory, Config}
 import scala.collection.JavaConversions._
 import org.joda.time.DateTime
@@ -161,20 +162,27 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
       val myData = scala.io.Source.fromInputStream(objectData).getLines()
       val resultsIterator = for (line <- myData) yield {
         val data: Array[String] = line.split(",")
-        new PerformanceResultsObject(data(1),
-          data(2),
-          data(3),
-          data(4).toInt,
-          data(5).toInt,
-          data(6).toInt,
-          data(7).toInt,
+        var result = new PerformanceResultsObject(data(1),
+          data(6),
+          data(7),
           data(8).toInt,
           data(9).toInt,
           data(10).toInt,
-          data(11),
-          data(12).toBoolean,
-          data(13).toBoolean,
-          data(14).toBoolean)
+          data(11).toInt,
+          data(12).toInt,
+          data(13).toInt,
+          data(14).toInt,
+          data(15),
+          data(16).toBoolean,
+          data(17).toBoolean,
+          data(18).toBoolean)
+        //todo - get element list
+        result.setHeadline(Option(data(2)))
+        result.setPageType(data(3))
+        val capiTime: Option[CapiDateTime] = result.stringtoCAPITime(data(4))
+        result.setPageLastUpdated(capiTime)
+        result.setLiveBloggingNow(data(5))
+        result
       }
       resultsIterator.toList
     } else {

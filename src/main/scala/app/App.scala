@@ -203,9 +203,9 @@ object App {
     val dedupedPreviousInteractives: List[PerformanceResultsObject] = for (result <- dedupedPreviousAlerts if result.getPageType.contains("Interactive")) yield result
 
     // munge into proper format and merge these with the capi results
-    val articleContentFieldsAndUrl = dedupedPreviousArticles.map(result => (Option(makeContentStub(result.headline.getOrElse("Unknown"))), result.testUrl))
-    val liveBlogContentFieldsAndUrl = dedupedPreviousLiveBlogs.map(result => (Option(makeContentStub(result.headline.getOrElse("Unknown"))), result.testUrl))
-    val interactiveContentFieldsAndUrl = dedupedPreviousInteractives.map(result => (Option(makeContentStub(result.headline.getOrElse("Unknown"))), result.testUrl))
+    val articleContentFieldsAndUrl = dedupedPreviousArticles.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), result.testUrl))
+    val liveBlogContentFieldsAndUrl = dedupedPreviousLiveBlogs.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), result.testUrl))
+    val interactiveContentFieldsAndUrl = dedupedPreviousInteractives.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), result.testUrl))
 
     val combinedArticleList: List[(Option[ContentFields],String)] = articleContentFieldsAndUrl ::: articles
     val combinedLiveBlogList: List[(Option[ContentFields],String)] = liveBlogContentFieldsAndUrl ::: liveBlogs
@@ -535,9 +535,8 @@ object App {
       newElement.testResults = wpt.getResults(newElement.wptResultUrl)
       newElement.testResults.setHeadline(newElement.headline)
       newElement.testResults.setPageType(newElement.pageType)
-      newElement.testResults.setPageLastUpdated(newElement.pageLastUpdated)
-      newElement.testResults.setLiveBloggingNow(newElement.liveBloggingNow)
-      // todo add set publication date
+      newElement.testResults.setPageLastUpdated(newElement.pageLastModified)
+      newElement.testResults.setLiveBloggingNow(newElement.liveBloggingNow.getOrElse(false))
       newElement
     })
     val testResults = resultsList.map(element => element.testResults).toList
@@ -752,7 +751,7 @@ object App {
       leftE._1.bytesInFullyLoaded + leftE._2.bytesInFullyLoaded > rightE._1.bytesInFullyLoaded + rightE._2.bytesInFullyLoaded}
   }
 
-  def makeContentStub(passedHeadline: String): ContentFields = {
+  def makeContentStub(passedHeadline: Option[String], passedLastModified: Option[CapiDateTime], passedLiveBloggingNow: Option[Boolean]): ContentFields = {
     val contentStub = new ContentFields {override def newspaperEditionDate: Option[CapiDateTime] = None
 
       override def internalStoryPackageCode: Option[Int] = None
@@ -769,13 +768,13 @@ object App {
 
       override def thumbnail: Option[String] = None
 
-      override def liveBloggingNow: Option[Boolean] = None
+      override def liveBloggingNow: Option[Boolean] = passedLiveBloggingNow
 
       override def showInRelatedContent: Option[Boolean] = None
 
       override def internalComposerCode: Option[String] = None
 
-      override def lastModified: Option[CapiDateTime] = None
+      override def lastModified: Option[CapiDateTime] = passedLastModified
 
       override def byline: Option[String] = None
 
@@ -815,7 +814,7 @@ object App {
 
       override def hasStoryPackage: Option[Boolean] = None
 
-      override def headline: Option[String] = Option(passedHeadline)
+      override def headline: Option[String] = passedHeadline
 
       override def commentCloseDate: Option[CapiDateTime] = None
 

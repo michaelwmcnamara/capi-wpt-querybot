@@ -54,8 +54,14 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   def setHeadline(text: Option[String]):Unit = {headline = text}
   def setPageType(text: String):Unit = {pageType = Option(text)}
-  def setPageLastUpdated(text: String):Unit = {pageLastUpdated = Option(text)}
+  def setPageLastUpdated(text: Option[CapiDateTime]):Unit = {pageLastUpdated = text}
   def setLiveBloggingNow(passedBoolean: Boolean):Unit = {liveBloggingNow = Option(passedBoolean)}
+  def setLiveBloggingNow(passedBoolean: String):Unit = {
+    if(passedBoolean.contains("True") || passedBoolean.contains("true"))
+    {liveBloggingNow = Option(true)}
+    else
+    {liveBloggingNow = Option(false)}
+  }
 
   def getPageType:String = {
       pageType.getOrElse("Unknown")
@@ -63,6 +69,14 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   def getLiveBloggingNow:Boolean = {
       liveBloggingNow.getOrElse(false)
+  }
+
+  def getPageLastUpdated: Long = {
+    if(pageLastUpdated.nonEmpty){
+    pageLastUpdated.get.dateTime
+  }else{
+    0
+    }
   }
 
 
@@ -103,7 +117,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def toCSVString(): String = {
-    timeOfTest + "," + testUrl.toString + "," + headline.getOrElse("Unknown") + "," + getPageType + "," + pageLastUpdated.getOrElse(-1).toString + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + resultStatus + "," + warningStatus + "," + alertStatus + "," + brokenTest + "," + editorialElementList.map(element => "," + element.resource + "," + element.contentType + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
+    timeOfTest + "," + testUrl.toString + "," + headline.getOrElse("Unknown") + "," + getPageType + "," + getPageLastUpdated + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + resultStatus + "," + warningStatus + "," + alertStatus + "," + brokenTest + "," + editorialElementList.map(element => "," + element.resource + "," + element.contentType + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
   }
 
   def toFullHTMLTableCells(): String = {
@@ -199,4 +213,16 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   def roundAt(p: Int)(n: Double): Double = { val s = math pow (10, p); (math round n * s) / s }
 
+  def stringtoCAPITime(time: String): Option[CapiDateTime] = {
+    if(time.nonEmpty && !time.equals("0")) {
+      val longTime = time.toLong
+      val capiTime = new CapiDateTime {
+        override def dateTime: Long = longTime
+      }
+      Option(capiTime)
+    } else
+    {
+     None
+    }
+  }
 }
