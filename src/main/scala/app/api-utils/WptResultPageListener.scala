@@ -12,6 +12,7 @@ class WptResultPageListener(page: String, tone: String, fields: Option[ContentFi
   val pageType: String = tone
   val pageFields: Option[ContentFields] = fields
   val headline: Option[String] = pageFields.flatMap(_.headline)
+  val firstPublished: Option[CapiDateTime] = pageFields.flatMap(_.firstPublicationDate)
   val pageLastModified: Option[CapiDateTime] = pageFields.flatMap(_.lastModified)
   val liveBloggingNow: Option[Boolean] = pageFields.flatMap(_.liveBloggingNow)
   val wptResultUrl: String = resultUrl

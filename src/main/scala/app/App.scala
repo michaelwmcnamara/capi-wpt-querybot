@@ -71,9 +71,14 @@ object App {
     val warningColor: String = "rgba(227, 251, 29, 0.32)"
     val alertColor: String = "#f2dede"
 
-    //initialize combinedResultsList - this will be accumulate test results for the combined page
+    //initialize combinedResultsLists - these will be used to sort and accumulate test results
+    // for the combined page and for long term storage file
     var combinedResultsList: List[PerformanceResultsObject] = List()
     var combinedPreviousResultsList: List[PerformanceResultsObject] = List()
+    var combinedResultsLast24Hours: List[PerformanceResultsObject] = List()
+    var combinedOldResults: List[PerformanceResultsObject] = List()
+    var combinedRecentAlertOrLive: List[PerformanceResultsObject] = List()
+    var combinedRecentStatic: List[PerformanceResultsObject] = List()
 
     //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
     val htmlString = new HtmlStringOperations(averageColor, warningColor, alertColor, articleResultsUrl, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
@@ -160,8 +165,31 @@ object App {
       }
     }
 
-    val previousAlerts: List[PerformanceResultsObject] = for (result <- previousResults if result.alertStatus) yield result
+    //split old results into recent results and old results
+    val cutoffTime: Long = DateTime.now.minusHours(24).getMillis
+    val resultsFromLast24Hours = for (result <- previousResults if (result.getFirstPublished >= cutoffTime) || (result.getPageLastUpdated >= cutoffTime)) yield result
+    val oldResults = for (result <- previousResults if (result.getFirstPublished < cutoffTime) && (result.getPageLastUpdated < cutoffTime)) yield result
 
+    val previousResultsToRetest: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if (result.alertStatus || result.getLiveBloggingNow)) yield result
+    val unchangedPreviousResults: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if (!(result.alertStatus || result.getLiveBloggingNow))) yield result
+
+    //validate list handling
+
+    if (!(((previousResultsToRetest.length + unchangedPreviousResults.length) == resultsFromLast24Hours.length) && ((resultsFromLast24Hours.length + oldResults.length) == previousResults.length))) {
+      println("ERROR: previous results list handling is borked!")
+      println("Previous Results to retest length == " + previousResultsToRetest.length + "\n")
+      println("Unchanged previous results length == " + unchangedPreviousResults.length + "\n")
+      println("Results from last 24 hours length == " + resultsFromLast24Hours.length + "\n")
+      println("Old results length == " + oldResults.length + "\n")
+      println("Original list of previous results length == " + previousResults.length + "\n")
+      if(!((previousResultsToRetest.length + unchangedPreviousResults.length) == resultsFromLast24Hours.length)){
+        println("Results to test and unchanged results from last 24 hours dont add up correctly \n")
+      }
+      if(!((resultsFromLast24Hours.length + oldResults.length) == previousResults.length)){
+        println("Results from last 24 hours and old results dont add up \n")
+      }
+      System.exit(1)
+    }
     //Create Email Handler class
     val emailer: EmailOperations = new EmailOperations(emailUsername, emailPassword)
 
@@ -178,9 +206,10 @@ object App {
     capiQuery.shutDown
 
     val combinedCapiResults = articles ::: liveBlogs ::: interactives ::: fronts
-    val dedupedPreviousAlerts = for (result <- previousAlerts if !combinedCapiResults.map(_._2).contains(result.testUrl)) yield result
+    val dedupedResultsToRetest = for (result <- previousResultsToRetest if !combinedCapiResults.map(_._2).contains(result.testUrl)) yield result
+    val dedupedUnchangedResults = for (result <- unchangedPreviousResults if !combinedCapiResults.map(_._2).contains(result.testUrl)) yield result
 
-    val dedupedPreviousAlertUrls: List[String] = for (result <- dedupedPreviousAlerts) yield result.testUrl
+    val dedupedPreviousAlertUrls: List[String] = for (result <- dedupedResultsToRetest) yield result.testUrl
     val articleUrls: List[String] = for (page <- articles) yield page._2
     val liveBlogUrls: List[String] = for (page <- liveBlogs) yield page._2
     val interactiveUrls: List[String] = for (page <- interactives) yield page._2
@@ -198,9 +227,9 @@ object App {
 
     // build result page listeners
     // first format alerts from previous test that arent in the new capi queries
-    val dedupedPreviousArticles: List[PerformanceResultsObject] = for (result <- dedupedPreviousAlerts if result.getPageType.contains("Article")) yield result
-    val dedupedPreviousLiveBlogs: List[PerformanceResultsObject] = for (result <- dedupedPreviousAlerts if result.getPageType.contains("LiveBlog")) yield result
-    val dedupedPreviousInteractives: List[PerformanceResultsObject] = for (result <- dedupedPreviousAlerts if result.getPageType.contains("Interactive")) yield result
+    val dedupedPreviousArticles: List[PerformanceResultsObject] = for (result <- dedupedResultsToRetest if result.getPageType.contains("Article")) yield result
+    val dedupedPreviousLiveBlogs: List[PerformanceResultsObject] = for (result <- dedupedResultsToRetest if result.getPageType.contains("LiveBlog")) yield result
+    val dedupedPreviousInteractives: List[PerformanceResultsObject] = for (result <- dedupedResultsToRetest if result.getPageType.contains("Interactive")) yield result
 
     // munge into proper format and merge these with the capi results
     val articleContentFieldsAndUrl = dedupedPreviousArticles.map(result => (Option(makeContentStub(result.headline, result.pageLastUpdated, result.liveBloggingNow)), result.testUrl))
@@ -367,32 +396,31 @@ object App {
       println("CAPI query found no Fronts")
     }
 
-    if(combinedResultsList.nonEmpty) {
-      val sortedCombinedResults: List[PerformanceResultsObject] = orderList(combinedResultsList)
-      val combinedDesktopResultsList: List[PerformanceResultsObject] = for (result <- combinedResultsList if result.typeOfTest.contains("Desktop")) yield result
-      val sortedCombinedDesktopResults: List[PerformanceResultsObject] = sortHomogenousResults(combinedDesktopResultsList)
-      val combinedMobileResultsList: List[PerformanceResultsObject] = for (result <- combinedResultsList if result.typeOfTest.contains("Android/3G")) yield result
-      val sortedCombinedMobileResults: List[PerformanceResultsObject] = sortHomogenousResults(combinedMobileResultsList)
+    val sortedCombinedResults: List[PerformanceResultsObject] = orderList(combinedResultsList ::: dedupedUnchangedResults)
+    val combinedDesktopResultsList: List[PerformanceResultsObject] = for (result <- combinedResultsList if result.typeOfTest.contains("Desktop")) yield result
+    val sortedCombinedDesktopResults: List[PerformanceResultsObject] = sortHomogenousResults(combinedDesktopResultsList)
+    val combinedMobileResultsList: List[PerformanceResultsObject] = for (result <- combinedResultsList if result.typeOfTest.contains("Android/3G")) yield result
+    val sortedCombinedMobileResults: List[PerformanceResultsObject] = sortHomogenousResults(combinedMobileResultsList)
 
-      val combinedHTMLResults: List[String] = sortedCombinedResults.map(x => htmlString.generateHTMLRow(x))
-      val combinedDesktopHTMLResults: List[String] = sortedCombinedDesktopResults.map(x => htmlString.generateHTMLRow(x))
-      val combinedMobileHTMLResults: List[String] = sortedCombinedMobileResults.map(x => htmlString.generateHTMLRow(x))
+    val combinedHTMLResults: List[String] = sortedCombinedResults.map(x => htmlString.generateHTMLRow(x))
+    val combinedDesktopHTMLResults: List[String] = sortedCombinedDesktopResults.map(x => htmlString.generateHTMLRow(x))
+    val combinedMobileHTMLResults: List[String] = sortedCombinedMobileResults.map(x => htmlString.generateHTMLRow(x))
 
-      val combinedBasicHTMLResults: List[String] = sortedCombinedResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
-      val combinedBasicDesktopHTMLResults: List[String] = sortedCombinedDesktopResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
-      val combinedBasicMobileHTMLResults: List[String] = sortedCombinedMobileResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
+    val combinedBasicHTMLResults: List[String] = sortedCombinedResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
+    val combinedBasicDesktopHTMLResults: List[String] = sortedCombinedDesktopResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
+    val combinedBasicMobileHTMLResults: List[String] = sortedCombinedMobileResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
 
-      val combinedResults: String = htmlString.initialisePageForCombined +
+    val combinedResults: String = htmlString.initialisePageForCombined +
         htmlString.initialiseTable +
         combinedHTMLResults.mkString +
         htmlString.closeTable + htmlString.closePage
 
-      val combinedDesktopResults: String = htmlString.initialisePageForCombined +
+    val combinedDesktopResults: String = htmlString.initialisePageForCombined +
         htmlString.initialiseTable +
         combinedDesktopHTMLResults.mkString +
         htmlString.closeTable + htmlString.closePage
 
-      val combinedMobileResults: String = htmlString.initialisePageForCombined +
+    val combinedMobileResults: String = htmlString.initialisePageForCombined +
         htmlString.initialiseTable +
         combinedMobileHTMLResults.mkString +
         htmlString.closeTable + htmlString.closePage
@@ -407,7 +435,7 @@ object App {
       val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedCombinedResults, sortedCombinedDesktopResults, sortedCombinedMobileResults)
 
       //record results
-      val resultsToRecord = (combinedResultsList ::: previousResults).take(1000)
+      val resultsToRecord = (sortedCombinedResults ::: oldResults).take(1000)
       val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
 
       //write combined results to file
@@ -462,14 +490,14 @@ object App {
         }
 
       }
-    }
+
 
 
     //check if alert items have already been sent in earlier run
-    val newArticleAlertsList: List[PerformanceResultsObject] = for (result <- articleAlertList if !previousAlerts.map(_.testUrl).contains(result.testUrl)) yield result
-    val newLiveBlogAlertsList: List[PerformanceResultsObject] = for (result <- liveBlogAlertList if !previousAlerts.map(_.testUrl).contains(result.testUrl)) yield result
-    val newInteractiveAlertsList: List[PerformanceResultsObject] = for (result <- interactiveAlertList if !previousAlerts.map(_.testUrl).contains(result.testUrl)) yield result
-    val newFrontsAlertsList: List[PerformanceResultsObject] = for (result <- frontsAlertList if !previousAlerts.map(_.testUrl).contains(result.testUrl)) yield result
+    val newArticleAlertsList: List[PerformanceResultsObject] = for (result <- articleAlertList if !previousResultsToRetest.map(_.testUrl).contains(result.testUrl)) yield result
+    val newLiveBlogAlertsList: List[PerformanceResultsObject] = for (result <- liveBlogAlertList if !previousResultsToRetest.map(_.testUrl).contains(result.testUrl)) yield result
+    val newInteractiveAlertsList: List[PerformanceResultsObject] = for (result <- interactiveAlertList if !previousResultsToRetest.map(_.testUrl).contains(result.testUrl)) yield result
+    val newFrontsAlertsList: List[PerformanceResultsObject] = for (result <- frontsAlertList if !previousResultsToRetest.map(_.testUrl).contains(result.testUrl)) yield result
 
     if (newArticleAlertsList.nonEmpty || newLiveBlogAlertsList.nonEmpty || newFrontsAlertsList.nonEmpty) {
       println("\n\n articleAlertList contains: " + newArticleAlertsList.length + " pages")
@@ -535,6 +563,7 @@ object App {
       newElement.testResults = wpt.getResults(newElement.wptResultUrl)
       newElement.testResults.setHeadline(newElement.headline)
       newElement.testResults.setPageType(newElement.pageType)
+      newElement.testResults.setFirstPublished(newElement.firstPublished)
       newElement.testResults.setPageLastUpdated(newElement.pageLastModified)
       newElement.testResults.setLiveBloggingNow(newElement.liveBloggingNow.getOrElse(false))
       newElement
@@ -547,8 +576,11 @@ object App {
     val confirmedTestResults = resultsWithAlerts.map(x => {
       if (x.alertStatus) {
         val confirmedResult: PerformanceResultsObject = confirmAlert(x, averages, urlFragments, wptBaseUrl, wptApiKey ,wptLocation)
-        confirmedResult.setHeadline(x.headline)
-        confirmedResult.setPageType(x.pageType.getOrElse("Unknown"))
+        confirmedResult.headline = x.headline
+        confirmedResult.pageType = x.pageType
+        confirmedResult.firstPublished = x.firstPublished
+        confirmedResult.pageLastUpdated = x.pageLastUpdated
+        confirmedResult.liveBloggingNow = x.liveBloggingNow
         confirmedResult
       }
       else
@@ -823,6 +855,12 @@ object App {
       override def standfirst: Option[String] = None
     }
   contentStub
+  }
+
+  def jodaDateTimetoCapiDateTime(time: DateTime): CapiDateTime = {
+    new CapiDateTime {
+      override def dateTime: Long = time.getMillis
+    }
   }
 
 }

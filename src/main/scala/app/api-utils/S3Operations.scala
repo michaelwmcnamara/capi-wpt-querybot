@@ -163,25 +163,27 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
       val resultsIterator = for (line <- myData) yield {
         val data: Array[String] = line.split(",")
         var result = new PerformanceResultsObject(data(1),
-          data(6),
           data(7),
-          data(8).toInt,
+          data(8),
           data(9).toInt,
           data(10).toInt,
           data(11).toInt,
           data(12).toInt,
           data(13).toInt,
           data(14).toInt,
-          data(15),
-          data(16).toBoolean,
+          data(15).toInt,
+          data(16),
           data(17).toBoolean,
-          data(18).toBoolean)
+          data(18).toBoolean,
+          data(19).toBoolean)
         //todo - get element list
         result.setHeadline(Option(data(2)))
         result.setPageType(data(3))
-        val capiTime: Option[CapiDateTime] = result.stringtoCAPITime(data(4))
-        result.setPageLastUpdated(capiTime)
-        result.setLiveBloggingNow(data(5))
+        val firstPublishedTime: Option[CapiDateTime] = result.stringtoCAPITime(data(4))
+        result.setPageLastUpdated(firstPublishedTime)
+        val lastUpdateTime: Option[CapiDateTime] = result.stringtoCAPITime(data(5))
+        result.setPageLastUpdated(lastUpdateTime)
+        result.setLiveBloggingNow(data(6))
         result
       }
       resultsIterator.toList
