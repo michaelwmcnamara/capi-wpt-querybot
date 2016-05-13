@@ -95,6 +95,7 @@ class ArticleDefaultAverages(averageColor: String) extends PageAverageObject {
     "<td>" + DateTime.now + "</td>" +
     "<td>Desktop</td>" +
     "<td> Alerting thresholds for desktop browser tests</td>" +
+    "<td>article</td>" +
     "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
     "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
     "<td>" + desktopMBInDocComplete + "MB</td>" +
@@ -140,6 +141,7 @@ class LiveBlogDefaultAverages(averageColor: String) extends PageAverageObject {
     "<td>" + DateTime.now + "</td>" +
     "<td>Desktop</td>" +
     "<td> Alerting thresholds for desktop browser tests</td>" +
+    "<td>liveblog</td>" +
     "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
     "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
     "<td>" + desktopMBInDocComplete + "MB</td>" +
@@ -185,6 +187,7 @@ class InteractiveDefaultAverages(averageColor: String) extends PageAverageObject
     "<td>" + DateTime.now + "</td>" +
     "<td>Desktop</td>" +
     "<td> Alerting thresholds for desktop browser tests</td>" +
+    "<td>interactive</td>" +
     "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
     "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
     "<td>" + desktopMBInDocComplete + "MB</td>" +
@@ -196,6 +199,7 @@ class InteractiveDefaultAverages(averageColor: String) extends PageAverageObject
     "<td>" + DateTime.now + "</td>" +
     "<td>Mobile</td>" +
     "<td> Alerting thresholds for mobile 3G browser tests </td>" +
+    "<td>interactive</td>" +
     "<td>" + mobileTimeFirstPaintInSeconds + "s</td>" +
     "<td>" + mobileAboveTheFoldCompleteInSec + "</td>" +
     "<td>" + mobileMBInDocComplete + "MB</td>" +
@@ -229,9 +233,10 @@ class FrontsDefaultAverages(averageColor: String) extends PageAverageObject() {
   override val mobileSuccessCount = 1
 
   override val formattedHTMLResultString: String = "<tr style=\"background-color:" + averageColor + ";\">" +
-    "<td>" + DateTime.now + "/td>" +
-    "<td>Desktop/td>" +
+    "<td>" + DateTime.now + "</td>" +
+    "<td>Desktop</td>" +
     "<td> Alerting thresholds for desktop browser tests</td>" +
+  "<td> Front </td>"
     "<td>" + desktopTimeFirstPaintInSeconds + "s</td>" +
     "<td>" + desktopAboveTheFoldCompleteInSec + "s</td>" +
     "<td>" + desktopMBInDocComplete + "MB</td>" +

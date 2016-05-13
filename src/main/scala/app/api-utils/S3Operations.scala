@@ -5,6 +5,7 @@ import java.io._
 import app.apiutils.PerformanceResultsObject
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model._
+import com.gu.contentapi.client.model.v1.CapiDateTime
 import com.typesafe.config.{ConfigFactory, Config}
 import scala.collection.JavaConversions._
 import org.joda.time.DateTime
@@ -154,27 +155,36 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
   }*/
 
   def getResultsFileFromS3(fileName:String): List[PerformanceResultsObject] = {
-
+// todo - update to include new fields
     if (doesFileExist(fileName)) {
       val s3Response = s3Client.getObject(new GetObjectRequest(s3BucketName, fileName))
       val objectData = s3Response.getObjectContent
       val myData = scala.io.Source.fromInputStream(objectData).getLines()
       val resultsIterator = for (line <- myData) yield {
         val data: Array[String] = line.split(",")
-        new PerformanceResultsObject(data(1),
-          data(2),
-          data(3),
-          data(4).toInt,
-          data(5).toInt,
-          data(6).toInt,
-          data(7).toInt,
-          data(8).toInt,
+        var result = new PerformanceResultsObject(data(1),
+          data(7),
+          data(8),
           data(9).toInt,
           data(10).toInt,
-          data(11),
-          data(12).toBoolean,
-          data(13).toBoolean,
-          data(14).toBoolean)
+          data(11).toInt,
+          data(12).toInt,
+          data(13).toInt,
+          data(14).toInt,
+          data(15).toInt,
+          data(16),
+          data(17).toBoolean,
+          data(18).toBoolean,
+          data(19).toBoolean)
+        //todo - get element list
+        result.setHeadline(Option(data(2)))
+        result.setPageType(data(3))
+        val firstPublishedTime: Option[CapiDateTime] = result.stringtoCAPITime(data(4))
+        result.setPageLastUpdated(firstPublishedTime)
+        val lastUpdateTime: Option[CapiDateTime] = result.stringtoCAPITime(data(5))
+        result.setPageLastUpdated(lastUpdateTime)
+        result.setLiveBloggingNow(data(6))
+        result
       }
       resultsIterator.toList
     } else {

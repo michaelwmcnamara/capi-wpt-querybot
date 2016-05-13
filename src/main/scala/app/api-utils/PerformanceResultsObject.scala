@@ -1,5 +1,6 @@
 package app.apiutils
 
+import com.gu.contentapi.client.model.v1.CapiDateTime
 import org.joda.time.DateTime
 
 import scala.xml.Elem
@@ -9,6 +10,7 @@ import scala.xml.Elem
  * Created by mmcnamara on 10/02/16.
  */
 class PerformanceResultsObject(url:String, testType: String, urlforTestResults: String, tTFB: Int, tFP:Int, tDC: Int, bDC: Int, tFL: Int, bFL: Int, sI: Int, status: String, warning: Boolean, alert: Boolean, failedNeedsRetest: Boolean) {
+// todo - add publication date; and setters and getters for same ; also add to csv string
   val timeOfTest: String = DateTime.now().toString
   val testUrl: String = url
   val typeOfTest: String = testType
@@ -43,6 +45,9 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   var headline: Option[String] = None
   var pageType: Option[String] = None
+  var firstPublished: Option[CapiDateTime] = None
+  var pageLastUpdated: Option[CapiDateTime] = None
+  var liveBloggingNow: Option[Boolean] = None
 
   var fullElementList: List[PageElementFromHTMLTableRow] = List()
   var editorialElementList: List[PageElementFromHTMLTableRow] = List()
@@ -50,15 +55,40 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   def setHeadline(text: Option[String]):Unit = {headline = text}
   def setPageType(text: String):Unit = {pageType = Option(text)}
+  def setFirstPublished(dateTime: Option[CapiDateTime]):Unit = {firstPublished = dateTime}
+  def setPageLastUpdated(dateTime: Option[CapiDateTime]):Unit = {pageLastUpdated = dateTime}
+  def setLiveBloggingNow(passedBoolean: Boolean):Unit = {liveBloggingNow = Option(passedBoolean)}
+  def setLiveBloggingNow(passedBoolean: String):Unit = {
+    if(passedBoolean.contains("True") || passedBoolean.contains("true"))
+    {liveBloggingNow = Option(true)}
+    else
+    {liveBloggingNow = Option(false)}
+  }
 
   def getPageType:String = {
-    if(pageType.nonEmpty){
-      pageType.mkString
+      pageType.getOrElse("Unknown")
     }
-    else {
-      "Unknown"
+
+  def getLiveBloggingNow:Boolean = {
+      liveBloggingNow.getOrElse(false)
+  }
+
+  def getFirstPublished: Long = {
+    if(firstPublished.nonEmpty){
+      firstPublished.get.dateTime
+    }else{
+      0
     }
   }
+
+  def getPageLastUpdated: Long = {
+    if(pageLastUpdated.nonEmpty){
+    pageLastUpdated.get.dateTime
+  }else{
+    0
+    }
+  }
+
 
   def addtoElementList(element: PageElementFromHTMLTableRow): Boolean = {
     if (editorialElementList.length < editorialElementListMaxSize){
@@ -97,7 +127,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def toCSVString(): String = {
-    timeOfTest + "," + testUrl.toString + "," + typeOfTest + "," + friendlyResultUrl + ","  + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + resultStatus + "," + warningStatus + "," + alertStatus + "," + brokenTest + "," + editorialElementList.map(element => "," + element.resource + "," + element.contentType + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
+    timeOfTest + "," + testUrl.toString + "," + headline.getOrElse("Unknown") + "," + getPageType + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + resultStatus + "," + warningStatus + "," + alertStatus + "," + brokenTest + "," + editorialElementList.map(element => "," + element.resource + "," + element.contentType + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
   }
 
   def toFullHTMLTableCells(): String = {
@@ -193,4 +223,16 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   def roundAt(p: Int)(n: Double): Double = { val s = math pow (10, p); (math round n * s) / s }
 
+  def stringtoCAPITime(time: String): Option[CapiDateTime] = {
+    if(time.nonEmpty && !time.equals("0")) {
+      val longTime = time.toLong
+      val capiTime = new CapiDateTime {
+        override def dateTime: Long = longTime
+      }
+      Option(capiTime)
+    } else
+    {
+     None
+    }
+  }
 }
