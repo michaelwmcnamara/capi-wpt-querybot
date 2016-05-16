@@ -102,7 +102,7 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
     def generateHTMLDataRows(resultsList: List[PerformanceResultsObject]): String = {
       (for (result <- resultsList) yield {
 
-        if(result.alertStatus){
+        if(result.alertStatusPageWeight){
           "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<td><div class=\"arrow\"></div></td></tr>" + "\n" +
           generatePageElementTable(result)
         } else {
@@ -126,17 +126,13 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
       }
     }
 
-    def getAlertClass(resultsObject: PerformanceResultsObject): String = {
-      if (resultsObject.alertStatus) {
-        "alert"
-      } else {
-        if (!resultsObject.alertStatus && resultsObject.warningStatus) {
-          "warning"
-        } else {
-          "default"
-        }
-      }
+  def getAlertClass(resultsObject: PerformanceResultsObject): String = {
+    if (resultsObject.alertStatusPageWeight) {
+      "alert"
+    } else {
+      "default"
     }
+  }
 
     // Access Methods
 

@@ -90,15 +90,11 @@ class PageWeightDashboardCombined (resultsList: List[PerformanceResultsObject]) 
   }
 
   def getAlertClass(resultsObject: PerformanceResultsObject): String = {
-    if (resultsObject.alertStatus) {
+    if (resultsObject.alertStatusPageWeight) {
       "alert"
     } else {
-      if (!resultsObject.alertStatus && resultsObject.warningStatus) {
-        "warning"
-      } else {
         "default"
       }
-    }
   }
 
   // Access Methods

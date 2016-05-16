@@ -47,6 +47,8 @@ object App {
     val editorialDesktopPageweightFilename = "editorialpageweightdashboarddesktop.html"
     val editorialMobilePageweightFilename = "editorialpageweightdashboardmobile.html"
 
+    val dotcomPageSpeedFilename = "dotcompagespeeddashboardmobile.html"
+
     val articleResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + articleOutputFilename
     val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + liveBlogOutputFilename
     val interactiveResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + interactiveOutputFilename
@@ -170,8 +172,8 @@ object App {
     val resultsFromLast24Hours = for (result <- previousResults if (result.getFirstPublished >= cutoffTime) || (result.getPageLastUpdated >= cutoffTime)) yield result
     val oldResults = for (result <- previousResults if (result.getFirstPublished < cutoffTime) && (result.getPageLastUpdated < cutoffTime)) yield result
 
-    val previousResultsToRetest: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if (result.alertStatus || result.getLiveBloggingNow)) yield result
-    val unchangedPreviousResults: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if (!(result.alertStatus || result.getLiveBloggingNow))) yield result
+    val previousResultsToRetest: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if (result.alertStatusPageWeight || result.getLiveBloggingNow)) yield result
+    val unchangedPreviousResults: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if (!(result.alertStatusPageWeight || result.getLiveBloggingNow))) yield result
 
     //validate list handling
 
@@ -251,15 +253,16 @@ object App {
       combinedResultsList = articleResultsList
 
       println("About to sort article results list. Length of list is: " + articleResultsList.length)
-      val sortedArticleResultsList = orderList(articleResultsList)
-      if(sortedArticleResultsList.isEmpty) {
+      val sortedByWeightArticleResultsList = orderListByWeight(articleResultsList)
+      val sortedBySpeedArticleResultsList = orderListBySpeed(articleResultsList)
+      if(sortedByWeightArticleResultsList.isEmpty || sortedBySpeedArticleResultsList.isEmpty) {
         println("Sorting algorithm for articles has returned empty list. Aborting")
         System exit 1
       }
-      val articleHTMLResults: List[String] = sortedArticleResultsList.map(x => htmlString.generateHTMLRow(x))
+      val articleHTMLResults: List[String] = sortedByWeightArticleResultsList.map(x => htmlString.generateHTMLRow(x))
       // write article results to string
       //Create a list of alerting pages and write to string
-      articleAlertList = for (result <- sortedArticleResultsList if result.alertStatus) yield result
+      articleAlertList = for (result <- sortedByWeightArticleResultsList if result.alertStatusPageWeight) yield result
       articleResults = articleResults.concat(articleHTMLResults.mkString)
       articleResults = articleResults + htmlString.closeTable + htmlString.closePage
       //write article results to file
@@ -289,7 +292,7 @@ object App {
 
       val liveBlogResultsList = listenForResultPages(combinedLiveBlogList, "liveBlog", resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
       combinedResultsList = combinedResultsList ::: liveBlogResultsList
-      val sortedLiveBlogResultsList = orderList(liveBlogResultsList)
+      val sortedLiveBlogResultsList = orderListByWeight(liveBlogResultsList)
       if(sortedLiveBlogResultsList.isEmpty) {
         println("Sorting algorithm for Liveblogs has returned empty list. Aborting")
         System exit 1
@@ -297,7 +300,7 @@ object App {
       val liveBlogHTMLResults: List[String] = sortedLiveBlogResultsList.map(x => htmlString.generateHTMLRow(x))
       // write liveblog results to string
       //Create a list of alerting pages and write to string
-      liveBlogAlertList = for (result <- sortedLiveBlogResultsList if result.alertStatus) yield result
+      liveBlogAlertList = for (result <- sortedLiveBlogResultsList if result.alertStatusPageWeight) yield result
 
       liveBlogResults = liveBlogResults.concat(liveBlogHTMLResults.mkString)
       liveBlogResults = liveBlogResults + htmlString.closeTable + htmlString.closePage
@@ -328,14 +331,14 @@ object App {
 
       val interactiveResultsList = listenForResultPages(combinedInteractiveList, "interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
       combinedResultsList = combinedResultsList ::: interactiveResultsList
-      val sortedInteractiveResultsList = orderList(interactiveResultsList)
+      val sortedInteractiveResultsList = orderListByWeight(interactiveResultsList)
       if(sortedInteractiveResultsList.isEmpty) {
         println("Sorting algorithm has returned empty list. Aborting")
         System exit 1
       }
       val interactiveHTMLResults: List[String] = sortedInteractiveResultsList.map(x => htmlString.interactiveHTMLRow(x))
       //generate interactive alert message body
-      interactiveAlertList = for (result <- sortedInteractiveResultsList if result.alertStatus) yield result
+      interactiveAlertList = for (result <- sortedInteractiveResultsList if result.alertStatusPageWeight) yield result
       // write interactive results to string
       interactiveResults = interactiveResults.concat(interactiveHTMLResults.mkString)
       interactiveResults = interactiveResults + htmlString.closeTable + htmlString.closePage
@@ -365,14 +368,14 @@ object App {
 
       val frontsResultsList = listenForResultPages(fronts, "front", resultUrlList, frontsAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
 //      combinedResultsList = combinedResultsList ::: frontsResultsList
-      val sortedFrontsResultsList = orderList(frontsResultsList)
+      val sortedFrontsResultsList = orderListByWeight(frontsResultsList)
       if(sortedFrontsResultsList.isEmpty) {
         println("Sorting algorithm for fronts has returned empty list. Aborting")
         System exit 1
       }
       val frontsHTMLResults: List[String] = sortedFrontsResultsList.map(x => htmlString.generateHTMLRow(x))
       //Create a list of alerting pages and write to string
-      frontsAlertList = for (result <- sortedFrontsResultsList if result.alertStatus) yield result
+      frontsAlertList = for (result <- sortedFrontsResultsList if result.alertStatusPageWeight) yield result
 
       // write fronts results to string
       frontsResults = frontsResults.concat(frontsHTMLResults.mkString)
@@ -396,19 +399,21 @@ object App {
       println("CAPI query found no Fronts")
     }
 
-    val sortedCombinedResults: List[PerformanceResultsObject] = orderList(combinedResultsList ::: dedupedUnchangedResults)
+    val sortedByWeightCombinedResults: List[PerformanceResultsObject] = orderListByWeight(combinedResultsList ::: dedupedUnchangedResults)
     val combinedDesktopResultsList: List[PerformanceResultsObject] = for (result <- combinedResultsList if result.typeOfTest.contains("Desktop")) yield result
-    val sortedCombinedDesktopResults: List[PerformanceResultsObject] = sortHomogenousResults(combinedDesktopResultsList)
     val combinedMobileResultsList: List[PerformanceResultsObject] = for (result <- combinedResultsList if result.typeOfTest.contains("Android/3G")) yield result
-    val sortedCombinedMobileResults: List[PerformanceResultsObject] = sortHomogenousResults(combinedMobileResultsList)
 
-    val combinedHTMLResults: List[String] = sortedCombinedResults.map(x => htmlString.generateHTMLRow(x))
-    val combinedDesktopHTMLResults: List[String] = sortedCombinedDesktopResults.map(x => htmlString.generateHTMLRow(x))
-    val combinedMobileHTMLResults: List[String] = sortedCombinedMobileResults.map(x => htmlString.generateHTMLRow(x))
+    //Generate lists for sortByWeight combined pages
 
-    val combinedBasicHTMLResults: List[String] = sortedCombinedResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
-    val combinedBasicDesktopHTMLResults: List[String] = sortedCombinedDesktopResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
-    val combinedBasicMobileHTMLResults: List[String] = sortedCombinedMobileResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
+    val sortedByWeightCombinedDesktopResults: List[PerformanceResultsObject] = sortHomogenousResultsByWeight(combinedDesktopResultsList)
+    val sortedCombinedByWeightMobileResults: List[PerformanceResultsObject] = sortHomogenousResultsByWeight(combinedMobileResultsList)
+    val combinedHTMLResults: List[String] = sortedByWeightCombinedResults.map(x => htmlString.generateHTMLRow(x))
+    val combinedDesktopHTMLResults: List[String] = sortedByWeightCombinedDesktopResults.map(x => htmlString.generateHTMLRow(x))
+    val combinedMobileHTMLResults: List[String] = sortedCombinedByWeightMobileResults.map(x => htmlString.generateHTMLRow(x))
+
+    val combinedBasicHTMLResults: List[String] = sortedByWeightCombinedResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
+    val combinedBasicDesktopHTMLResults: List[String] = sortedByWeightCombinedDesktopResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
+    val combinedBasicMobileHTMLResults: List[String] = sortedCombinedByWeightMobileResults.map(x => htmlString.generatePageWeightDashboardHTMLRow(x))
 
     val combinedResults: String = htmlString.initialisePageForCombined +
         htmlString.initialiseTable +
@@ -425,18 +430,26 @@ object App {
         combinedMobileHTMLResults.mkString +
         htmlString.closeTable + htmlString.closePage
 
-//      val editorialPageWeightDashboard: String = newhtmlString.generateHTMLPage(sortedCombinedResults)
-      val editorialPageWeightDashboardCombined = new PageWeightDashboardCombined(sortedCombinedResults)
-//      val editorialPageWeightDashboardDesktop: String = newhtmlString.generateHTMLPage(sortedCombinedDesktopResults)
-      val editorialPageWeightDashboardDesktop = new PageWeightDashboardDesktop(sortedCombinedDesktopResults)
-//      val editorialPageWeightDashboardMobile: String = newhtmlString.generateHTMLPage(sortedCombinedMobileResults)
-      val editorialPageWeightDashboardMobile = new PageWeightDashboardMobile(sortedCombinedMobileResults)
+//      val editorialPageWeightDashboard: String = newhtmlString.generateHTMLPage(sortedByWeightCombinedResults)
+      val editorialPageWeightDashboardCombined = new PageWeightDashboardCombined(sortedByWeightCombinedResults)
+//      val editorialPageWeightDashboardDesktop: String = newhtmlString.generateHTMLPage(sortedByWeightCombinedDesktopResults)
+      val editorialPageWeightDashboardDesktop = new PageWeightDashboardDesktop(sortedByWeightCombinedDesktopResults)
+//      val editorialPageWeightDashboardMobile: String = newhtmlString.generateHTMLPage(sortedCombinedByWeightMobileResults)
+      val editorialPageWeightDashboardMobile = new PageWeightDashboardMobile(sortedCombinedByWeightMobileResults)
 
-      val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedCombinedResults, sortedCombinedDesktopResults, sortedCombinedMobileResults)
+      val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
 
       //record results
-      val resultsToRecord = (sortedCombinedResults ::: oldResults).take(1000)
+      val resultsToRecord = (sortedByWeightCombinedResults ::: oldResults).take(1000)
       val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
+
+    //Generate Lists for sortBySpeed combined pages
+    val sortedBySpeedCombinedResults: List[PerformanceResultsObject] = orderListBySpeed(combinedResultsList ::: dedupedUnchangedResults)
+    val sortedBySpeedCombinedDesktopResults: List[PerformanceResultsObject] = sortHomogenousResultsBySpeed(combinedDesktopResultsList)
+    val sortedBySpeedCombinedMobileResults: List[PerformanceResultsObject] = sortHomogenousResultsBySpeed(combinedMobileResultsList)
+
+
+    val dotcomPageSpeedDashboard = new PageSpeedDashboardTabbed(sortedBySpeedCombinedResults, sortedBySpeedCombinedDesktopResults, sortedBySpeedCombinedMobileResults)
 
       //write combined results to file
       if (!iamTestingLocally) {
@@ -449,6 +462,7 @@ object App {
         s3Interface.writeFileToS3(editorialDesktopPageweightFilename, editorialPageWeightDashboardDesktop.toString())
         s3Interface.writeFileToS3(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile.toString())
         s3Interface.writeFileToS3(editorialPageweightFilename, editorialPageWeightDashboard.toString())
+        s3Interface.writeFileToS3(dotcomPageSpeedFilename, dotcomPageSpeedDashboard.toString())
         s3Interface.writeFileToS3(resultsFromPreviousTests, resultsToRecordCSVString)
       }
       else {
@@ -479,6 +493,11 @@ object App {
           System exit 1
         }
         val writeSuccessPWDM: Int = outputWriter.writeLocalResultFile(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile.toString())
+        if (writeSuccessPWDM != 0) {
+          println("problem writing local outputfile")
+          System exit 1
+        }
+        val writeSuccessDCPSD: Int = outputWriter.writeLocalResultFile(dotcomPageSpeedFilename, dotcomPageSpeedDashboard.toString())
         if (writeSuccessPWDM != 0) {
           println("problem writing local outputfile")
           System exit 1
@@ -574,7 +593,7 @@ object App {
     //Confirm alert status by retesting alerting urls
     println("Confirming any items that have an alert")
     val confirmedTestResults = resultsWithAlerts.map(x => {
-      if (x.alertStatus) {
+      if (x.alertStatusPageWeight) {
         val confirmedResult: PerformanceResultsObject = confirmAlert(x, averages, urlFragments, wptBaseUrl, wptApiKey ,wptLocation)
         confirmedResult.headline = x.headline
         confirmedResult.pageType = x.pageType
@@ -604,72 +623,61 @@ object App {
   def setAlertStatus(resultObject: PerformanceResultsObject, averages: PageAverageObject): PerformanceResultsObject = {
     //  Add results to string which will eventually become the content of our results file
     if (resultObject.typeOfTest == "Desktop") {
-      if ((resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs80thPercentile) ||
-        (resultObject.speedIndex >= averages.desktopSpeedIndex80thPercentile) ||
-        (resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded80thPercentile) ||
-        (resultObject.estUSPrePaidCost >= averages.desktopEstUSPrePaidCost80thPercentile) ||
-        (resultObject.estUSPostPaidCost >= averages.desktopEstUSPostPaidCost80thPercentile)) {
-        if ((resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) ||
-          (resultObject.speedIndex >= averages.desktopSpeedIndex) ||
-          (resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded)) {
-          println("row should be red one of the items qualifies")
-          if (resultObject.speedIndex >= averages.desktopSpeedIndex) {
-//            resultObject.alertDescription = "the page is too slow. It is taking " + resultObject.aboveTheFoldCompleteInSec + "s" + " to display visible images etc. It should take no more tham " + averages.desktopAboveTheFoldCompleteInSec + "s."
-            resultObject.alertDescription = "the page is too slow. Please contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
-          }
-          if (resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded) {
-//            resultObject.alertDescription = resultObject.alertDescription + "the page is too heavy. Page size is: " + resultObject.mBInFullyLoaded + "MB. It should be less than: " + averages.desktopMBInFullyLoaded + "MB."
-            resultObject.alertDescription = "the page is too heavy. Please examine the list of embeds below for items that are unexpectedly large."
-          }
-          println(resultObject.alertDescription)
-          resultObject.warningStatus = true
-          resultObject.alertStatus = true
-        }
-        else {
-          println("Qualifies for result status but this status has been removed for a trial period")
-          // println("row should be yellow one of the items qualifies")
-          resultObject.warningStatus = false
-          resultObject.alertStatus = false
-        }
+      if (resultObject.kBInFullyLoaded >= averages.desktopKBInFullyLoaded) {
+        println("PageWeight Alert Set")
+        resultObject.alertDescription = "the page is too heavy. Please examine the list of embeds below for items that are unexpectedly large."
+        resultObject.alertStatusPageWeight = true
       }
       else {
-        println("all fields within size limits")
-        resultObject.warningStatus = false
-        resultObject.alertStatus = false
+        println("PageWeight Alert not set")
+        resultObject.alertStatusPageWeight = false
+      }
+      if ((resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) ||
+          (resultObject.speedIndex >= averages.desktopSpeedIndex)) {
+        println("PageSpeed alert set")
+        resultObject.alertStatusPageSpeed = true
+        if ((resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) && (resultObject.speedIndex >= averages.desktopSpeedIndex)) {
+          resultObject.alertDescription = "Time till page is scrollable (time-to-first-paint) and time till page looks loaded (SpeedIndex) are unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
+        } else {
+          if (resultObject.speedIndex >= averages.desktopSpeedIndex) {
+            resultObject.alertDescription = "Time till page looks loaded (SpeedIndex) is unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
+          }
+          else {
+            resultObject.alertDescription = "Time till page is scrollable (time-to-first-paint) is unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
+          }
+        }
+      } else {
+        println("PageSpeed alert not set")
+        resultObject.alertStatusPageSpeed = false
       }
     } else {
       //checking if status of mobile test needs an alert
-      if ((resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs80thPercentile) ||
-        (resultObject.speedIndex >= averages.mobileSpeedIndex80thPercentile) ||
-        (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded80thPercentile) ||
-        (resultObject.estUSPrePaidCost >= averages.mobileEstUSPrePaidCost80thPercentile) ||
-        (resultObject.estUSPostPaidCost >= averages.mobileEstUSPostPaidCost80thPercentile)) {
-        if ((resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) ||
-          (resultObject.speedIndex >= averages.mobileSpeedIndex) ||
-          (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded)) {
-          println("warning and alert statuses set to true")
-          if (resultObject.speedIndex >= averages.mobileSpeedIndex) {
-//            resultObject.alertDescription = "the page is too slow. It is taking " + resultObject.aboveTheFoldCompleteInSec + "s " + " to display visible images etc. It should take " + averages.mobileAboveTheFoldCompleteInSec + "s or less."
-            resultObject.alertDescription = "the page is too slow. Please contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
-          }
-          if (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded) {
-            //            resultObject.alertDescription = "the page is too slow. Page takes " + resultObject.timeFirstPaintInSec + "s" + " for text to load and page to become scrollable. It should only take " + averages.mobileTimeFirstPaintInSeconds + "s."
-            resultObject.alertDescription = "the page is too heavy. Please examine the list of embeds below for items that are unexpectedly large."
-          }
-          resultObject.warningStatus = true
-          resultObject.alertStatus = true
-        }
-        else {
-          println("Qualifies for result status but this status has been removed for a trial period")
-          //          println("warning status set to true")
-          resultObject.warningStatus = false
-          resultObject.alertStatus = false
-        }
+      if (resultObject.kBInFullyLoaded >= averages.mobileKBInFullyLoaded) {
+        println("PageWeight Alert Set")
+        resultObject.alertDescription = "the page is too heavy. Please examine the list of embeds below for items that are unexpectedly large."
+        resultObject.alertStatusPageWeight = true
       }
       else {
-        println("all fields within size limits - both warning and alert status set to false")
-        resultObject.warningStatus = false
-        resultObject.alertStatus = false
+        println("PageWeight Alert not set")
+        resultObject.alertStatusPageWeight = false
+      }
+      if ((resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) ||
+        (resultObject.speedIndex >= averages.mobileSpeedIndex)) {
+        println("PageSpeed alert set")
+        resultObject.alertStatusPageSpeed = true
+        if ((resultObject.timeFirstPaintInMs >= averages.mobileTimeFirstPaintInMs) && (resultObject.speedIndex >= averages.mobileSpeedIndex)) {
+          resultObject.alertDescription = "Time till page is scrollable (time-to-first-paint) and time till page looks loaded (SpeedIndex) are unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
+        } else {
+          if (resultObject.speedIndex >= averages.mobileSpeedIndex) {
+            resultObject.alertDescription = "Time till page looks loaded (SpeedIndex) is unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
+          }
+          else {
+            resultObject.alertDescription = "Time till page is scrollable (time-to-first-paint) is unusually high. Please investigate page elements below or contact <a href=mailto:\"dotcom.health@guardian.co.uk\">the dotcom-health team</a> for assistance."
+          }
+        }
+      } else {
+        println("PageSpeed alert not set")
+        resultObject.alertStatusPageSpeed = false
       }
     }
     println("Returning test result with alert flags set to relevant values")
@@ -700,41 +708,62 @@ object App {
       3
     }
     println("TTFB for " + initialResult.testUrl + "\n therefore setting test count of: " + testCount)
-    //   val AlertConfirmationTestResult: PerformanceResultsObject = setAlertStatus(webPageTest.testMultipleTimes(initialResult.testUrl, initialResult.typeOfTest, wptLocation, testCount), averages)
+    //   val AlertConfirmationTestResult: PerformanceResultsObject = setAlertStatusPageWeight(webPageTest.testMultipleTimes(initialResult.testUrl, initialResult.typeOfTest, wptLocation, testCount), averages)
     webPageTest.testMultipleTimes(initialResult.testUrl, initialResult.typeOfTest, wptLocation, testCount)
   }
 
 
-  def orderList(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+  def orderListByWeight(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
     if(list.length % 2 == 0) {
-      println("orderList called. \n It has " + list.length + " elements.")
+      println("orderListByWeight called. \n It has " + list.length + " elements.")
       val tupleList = listSinglesToPairs(list)
       println("listSinglesToPairs returned a list of " + tupleList.length + " pairs.")
-      val alertsList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if element._1.alertStatus || element._2.alertStatus) yield element
-      val warningList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if element._1.warningStatus || element._2.warningStatus) yield element
-      val okList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if !element._1.alertStatus && !element._1.warningStatus && !element._2.alertStatus && !element._2.warningStatus) yield element
+      val alertsList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if element._1.alertStatusPageWeight || element._2.alertStatusPageWeight) yield element
+      val okList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if !element._1.alertStatusPageWeight && !element._2.alertStatusPageWeight) yield element
 
-      sortByWeight(alertsList) ::: sortByWeight(warningList) ::: sortByWeight(okList)
+      sortByWeight(alertsList) ::: sortByWeight(okList)
     }
     else{
-      println("orderList has odd number of elements. List length is: " + list.length)
+      println("orderListByWeight has odd number of elements. List length is: " + list.length)
       List()
     }
   }
 
-  def sortHomogenousResults(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
-    val alertsResultsList: List[PerformanceResultsObject] = for (result <- list if result.alertStatus) yield result
-    val warningResultsList: List[PerformanceResultsObject] = for (result <- list if result.warningStatus && !result.alertStatus) yield result
-    val okResultsList: List[PerformanceResultsObject] = for (result <- list if !result.alertStatus && !result.warningStatus) yield result
-    val sortedAlertList: List[PerformanceResultsObject] = alertsResultsList.sortWith(_.bytesInFullyLoaded > _.bytesInFullyLoaded)
-    val sortedWarningList: List[PerformanceResultsObject] = warningResultsList.sortWith(_.bytesInFullyLoaded > _.bytesInFullyLoaded)
-    val sortedOkList: List[PerformanceResultsObject] = okResultsList.sortWith(_.bytesInFullyLoaded > _.bytesInFullyLoaded)
-    sortedAlertList ::: sortedWarningList ::: sortedOkList
+  def orderListBySpeed(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    if(list.length % 2 == 0) {
+      println("orderListByWeight called. \n It has " + list.length + " elements.")
+      val tupleList = listSinglesToPairs(list)
+      println("listSinglesToPairs returned a list of " + tupleList.length + " pairs.")
+      val alertsList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if element._1.alertStatusPageSpeed || element._2.alertStatusPageSpeed) yield element
+      val okList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if !element._1.alertStatusPageSpeed && !element._2.alertStatusPageSpeed) yield element
+
+      sortBySpeed(alertsList) ::: sortBySpeed(okList)
+    }
+    else{
+      println("orderListByWeight has odd number of elements. List length is: " + list.length)
+      List()
+    }
   }
 
+  def sortHomogenousResultsByWeight(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    val alertsResultsList: List[PerformanceResultsObject] = for (result <- list if result.alertStatusPageWeight) yield result
+    val okResultsList: List[PerformanceResultsObject] = for (result <- list if !result.alertStatusPageWeight) yield result
+    val sortedAlertList: List[PerformanceResultsObject] = alertsResultsList.sortWith(_.bytesInFullyLoaded > _.bytesInFullyLoaded)
+    val sortedOkList: List[PerformanceResultsObject] = okResultsList.sortWith(_.bytesInFullyLoaded > _.bytesInFullyLoaded)
+    sortedAlertList ::: sortedOkList
+  }
+
+  def sortHomogenousResultsBySpeed(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    val alertsResultsList: List[PerformanceResultsObject] = for (result <- list if result.alertStatusPageSpeed) yield result
+    val okResultsList: List[PerformanceResultsObject] = for (result <- list if !result.alertStatusPageSpeed) yield result
+    val sortedAlertList: List[PerformanceResultsObject] = alertsResultsList.sortWith(_.speedIndex > _.speedIndex)
+    val sortedOkList: List[PerformanceResultsObject] = okResultsList.sortWith(_.speedIndex > _.speedIndex)
+    sortedAlertList ::: sortedOkList
+  }
+  
   def sortByWeight(list: List[(PerformanceResultsObject,PerformanceResultsObject)]): List[PerformanceResultsObject] = {
     if(list.nonEmpty){
-      val sortedTupleList = sortTupleList(list)
+      val sortedTupleList = sortTupleListByWeight(list)
       makeList(sortedTupleList)
     }
     else {
@@ -742,6 +771,18 @@ object App {
         List()
     }
   }
+
+  def sortBySpeed(list: List[(PerformanceResultsObject,PerformanceResultsObject)]): List[PerformanceResultsObject] = {
+    if(list.nonEmpty){
+      val sortedTupleList = sortTupleListBySpeed(list)
+      makeList(sortedTupleList)
+    }
+    else {
+      println("sortByWeight has noElements in list. Passing back empty list")
+      List()
+    }
+  }
+
 
 
   def listSinglesToPairs(list: List[PerformanceResultsObject]): List[(PerformanceResultsObject, PerformanceResultsObject)] = {
@@ -778,10 +819,16 @@ object App {
     fullList
   }
 
-  def sortTupleList(list: List[(PerformanceResultsObject,PerformanceResultsObject)]): List[(PerformanceResultsObject,PerformanceResultsObject)] = {
+  def sortTupleListByWeight(list: List[(PerformanceResultsObject,PerformanceResultsObject)]): List[(PerformanceResultsObject,PerformanceResultsObject)] = {
     list.sortWith{(leftE:(PerformanceResultsObject, PerformanceResultsObject),rightE:(PerformanceResultsObject, PerformanceResultsObject)) =>
       leftE._1.bytesInFullyLoaded + leftE._2.bytesInFullyLoaded > rightE._1.bytesInFullyLoaded + rightE._2.bytesInFullyLoaded}
   }
+
+  def sortTupleListBySpeed(list: List[(PerformanceResultsObject,PerformanceResultsObject)]): List[(PerformanceResultsObject,PerformanceResultsObject)] = {
+    list.sortWith{(leftE:(PerformanceResultsObject, PerformanceResultsObject),rightE:(PerformanceResultsObject, PerformanceResultsObject)) =>
+      leftE._1.speedIndex + leftE._2.speedIndex > rightE._1.speedIndex + rightE._2.speedIndex}
+  }
+
 
   def makeContentStub(passedHeadline: Option[String], passedLastModified: Option[CapiDateTime], passedLiveBloggingNow: Option[Boolean]): ContentFields = {
     val contentStub = new ContentFields {override def newspaperEditionDate: Option[CapiDateTime] = None
