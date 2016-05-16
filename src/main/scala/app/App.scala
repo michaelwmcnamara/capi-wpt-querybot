@@ -518,7 +518,7 @@ object App {
     val newInteractiveAlertsList: List[PerformanceResultsObject] = for (result <- interactiveAlertList if !previousResultsToRetest.map(_.testUrl).contains(result.testUrl)) yield result
     val newFrontsAlertsList: List[PerformanceResultsObject] = for (result <- frontsAlertList if !previousResultsToRetest.map(_.testUrl).contains(result.testUrl)) yield result
 
-    if (newArticleAlertsList.nonEmpty || newLiveBlogAlertsList.nonEmpty || newFrontsAlertsList.nonEmpty) {
+/*    if (newArticleAlertsList.nonEmpty || newLiveBlogAlertsList.nonEmpty || newFrontsAlertsList.nonEmpty) {
       println("\n\n articleAlertList contains: " + newArticleAlertsList.length + " pages")
       println("\n\n liveBlogAlertList contains: " + newLiveBlogAlertsList.length + " pages")
       println("\n\n frontsAlertList contains: " + newFrontsAlertsList.length + " pages")
@@ -549,8 +549,19 @@ object App {
         println(DateTime.now + "ERROR: Job completed, but sending of Interactve Emails failed")
     } else {
       println("No pages to alert on. Email not sent. \n Job complete")
-    }
+    }*/
+    val alertsToSend = newArticleAlertsList ::: newLiveBlogAlertsList ::: newInteractiveAlertsList
+    if (alertsToSend.nonEmpty) {
+      val emailContent = new PageWeightEmailTemplate(newArticleAlertsList ::: newLiveBlogAlertsList ::: newInteractiveAlertsList)
 
+      val emailSuccess = emailer.send(generalAlertsAddressList, emailContent.toString())
+      if (emailSuccess)
+        println(DateTime.now + " General Alert Emails sent successfully. ")
+      else
+        println(DateTime.now + "ERROR: Job completed, but sending of general Alert Emails failed")
+    }else {
+      println("No pages to alert on. Email not sent. \n Job complete")
+    }
   }
 
   def getResultPages(urlList: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
