@@ -127,7 +127,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def toCSVString(): String = {
-    timeOfTest + "," + testUrl.toString + "," + headline.getOrElse("Unknown") + "," + getPageType + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + resultStatus + "," + alertStatusPageWeight + "," + alertStatusPageSpeed + "," + brokenTest + "," + editorialElementList.map(element => "," + element.resource + "," + element.contentType + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
+    timeOfTest + "," + testUrl.toString + "," + cleanForCSV(headline.getOrElse("Unknown")) + "," + cleanForCSV(getPageType) + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + cleanForCSV(resultStatus) + "," + alertStatusPageWeight + "," + alertStatusPageSpeed + "," + brokenTest + "," + editorialElementList.map(element => "," + cleanForCSV(element.resource) + "," + cleanForCSV(element.contentType) + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
   }
 
   def toFullHTMLTableCells(): String = {
@@ -155,6 +155,10 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   def returnHTMLEditorialElementList(): String = {
     (for (element <- editorialElementList) yield element.toHTMLRowString()).mkString
+  }
+
+  def returnEmailEditorialElementList(): String = {
+    (for (element <- editorialElementList) yield element.toEmailRowString()).mkString
   }
 
   def returnHTMLFullPageElementRows(): String = {
@@ -234,5 +238,9 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     {
      None
     }
+  }
+
+  def cleanForCSV(inputString: String): String = {
+    inputString.replace(",", "")
   }
 }

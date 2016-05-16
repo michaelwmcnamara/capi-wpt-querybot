@@ -191,6 +191,15 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
     returnString
   }
 
+  def toEmailRowString():String = {
+    val returnString: String = "<tr class=\"datarow\">" +
+      "<td> - " + sizeInMB + " MB for the " +
+      contentType + ": " +
+      "<a href = \"" + resource + "\">" + resource + "</a></td>" +
+      "</tr>" + "\n"
+    returnString
+  }
+
   def alertHTMLString():String = {
     val returnString: String = "<tr>" +
       "<td><a href = \"" + resource + "\">" + resource + "</a></td>" +
