@@ -9,7 +9,7 @@ import scala.xml.Elem
 /**
  * Created by mmcnamara on 10/02/16.
  */
-class PerformanceResultsObject(url:String, testType: String, urlforTestResults: String, tTFB: Int, tFP:Int, tDC: Int, bDC: Int, tFL: Int, bFL: Int, sI: Int, status: String, warning: Boolean, alert: Boolean, failedNeedsRetest: Boolean) {
+class PerformanceResultsObject(url:String, testType: String, urlforTestResults: String, tTFB: Int, tFP:Int, tDC: Int, bDC: Int, tFL: Int, bFL: Int, sI: Int, status: String, alertWeight: Boolean, alertSpeed: Boolean, failedNeedsRetest: Boolean) {
 // todo - add publication date; and setters and getters for same ; also add to csv string
   val timeOfTest: String = DateTime.now().toString
   val testUrl: String = url
@@ -38,9 +38,9 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   val speedIndex: Int = sI
   val aboveTheFoldCompleteInSec: Double = roundAt(3)(speedIndex.toDouble/1000)
   val resultStatus:String = status
-  var alertDescription: String = ""
-  var warningStatus: Boolean = warning
-  var alertStatus: Boolean = alert
+  var alertDescription: String = "No alerts have been set for this page"
+  var alertStatusPageWeight: Boolean = alertWeight
+  var alertStatusPageSpeed: Boolean = alertSpeed
   val brokenTest: Boolean = failedNeedsRetest
 
   var headline: Option[String] = None
@@ -127,7 +127,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def toCSVString(): String = {
-    timeOfTest + "," + testUrl.toString + "," + headline.getOrElse("Unknown") + "," + getPageType + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + resultStatus + "," + warningStatus + "," + alertStatus + "," + brokenTest + "," + editorialElementList.map(element => "," + element.resource + "," + element.contentType + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
+    timeOfTest + "," + testUrl.toString + "," + headline.getOrElse("Unknown") + "," + getPageType + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + resultStatus + "," + alertStatusPageWeight + "," + alertStatusPageSpeed + "," + brokenTest + "," + editorialElementList.map(element => "," + element.resource + "," + element.contentType + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
   }
 
   def toFullHTMLTableCells(): String = {
@@ -204,7 +204,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def genTestResultString(): String = {
-    if(this.alertStatus)
+    if(this.alertStatusPageWeight)
     this.alertDescription
     else
       this.resultStatus

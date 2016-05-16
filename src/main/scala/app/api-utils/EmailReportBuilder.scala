@@ -54,17 +54,10 @@ class EmailReportBuilder(average: String, warning: String, alert: String, articl
     //  Define new web-page-test API request and send it the url to test
     //  Add results to string which will eventually become the content of our results file
 
-    if (resultsObject.warningStatus) {
-      if (resultsObject.alertStatus) {
+    if (resultsObject.alertStatusPageWeight) {
         println("row should be red one of the items qualifies")
         returnString = "<tr style=\"background-color:" + alertColor + ";\">" + resultsObject.toHTMLSimpleTableCells() + "</tr>"
-      }
-      else {
-        println("row should be yellow one of the items qualifies")
-        returnString = "<tr style=\"background-color:" + warningColor + ";\">" + resultsObject.toHTMLSimpleTableCells() + "</tr>"
-      }
-    }
-    else {
+      } else {
       println("all fields within size limits")
       returnString = "<tr>" + resultsObject.toHTMLSimpleTableCells() + "</tr>"
     }
@@ -79,17 +72,10 @@ class EmailReportBuilder(average: String, warning: String, alert: String, articl
     //  Define new web-page-test API request and send it the url to test
     //  Add results to string which will eventually become the content of our results file
 
-    if (resultsObject.warningStatus) {
-      if (resultsObject.alertStatus) {
+    if (resultsObject.alertStatusPageWeight) {
         println("row should be red one of the items qualifies")
         returnString = "<tr style=\"background-color:" + alertColor + ";\">" + resultsObject.toHTMLInteractiveTableCells() + "</tr>"
-      }
-      else {
-        println("row should be yellow one of the items qualifies")
-        returnString = "<tr style=\"background-color:" + warningColor + ";\">" + resultsObject.toHTMLInteractiveTableCells() + "</tr>"
-      }
-    }
-    else {
+      } else {
       println("all fields within size limits")
       returnString = "<tr>" + resultsObject.toHTMLInteractiveTableCells() + "</tr>"
     }
