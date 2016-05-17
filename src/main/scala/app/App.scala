@@ -444,20 +444,18 @@ object App {
         combinedMobileHTMLResults.mkString +
         htmlString.closeTable + htmlString.closePage
 
-//      val editorialPageWeightDashboard: String = newhtmlString.generateHTMLPage(sortedByWeightCombinedResults)
-      val editorialPageWeightDashboardCombined = new PageWeightDashboardCombined(sortedByWeightCombinedResults)
-//      val editorialPageWeightDashboardDesktop: String = newhtmlString.generateHTMLPage(sortedByWeightCombinedDesktopResults)
-      val editorialPageWeightDashboardDesktop = new PageWeightDashboardDesktop(sortedByWeightCombinedDesktopResults)
-//      val editorialPageWeightDashboardMobile: String = newhtmlString.generateHTMLPage(sortedCombinedByWeightMobileResults)
-      val editorialPageWeightDashboardMobile = new PageWeightDashboardMobile(sortedCombinedByWeightMobileResults)
+    val editorialPageWeightDashboardCombined = new PageWeightDashboardCombined(sortedByWeightCombinedResults)
+    val editorialPageWeightDashboardDesktop = new PageWeightDashboardDesktop(sortedByWeightCombinedDesktopResults)
+    val editorialPageWeightDashboardMobile = new PageWeightDashboardMobile(sortedCombinedByWeightMobileResults)
+    val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
 
-      val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
+//  strip out errors
+    val errorFreeSortedByWeightCombinedResults = for (result <- sortedByWeightCombinedDesktopResults if(result.speedIndex != -1)) yield result
+//record results
+    val resultsToRecord = (errorFreeSortedByWeightCombinedResults ::: oldResults).take(1000)
+    val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
 
-      //record results
-      val resultsToRecord = (sortedByWeightCombinedResults ::: oldResults).take(1000)
-      val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
-
-    //Generate Lists for sortBySpeed combined pages
+//Generate Lists for sortBySpeed combined pages
     val sortedBySpeedCombinedResults: List[PerformanceResultsObject] = orderListBySpeed(combinedResultsList ::: dedupedUnchangedResults)
     val sortedBySpeedCombinedDesktopResults: List[PerformanceResultsObject] = sortHomogenousResultsBySpeed(combinedDesktopResultsList)
     val sortedBySpeedCombinedMobileResults: List[PerformanceResultsObject] = sortHomogenousResultsBySpeed(combinedMobileResultsList)
