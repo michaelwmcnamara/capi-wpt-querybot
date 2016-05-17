@@ -66,7 +66,7 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject]) {
 
   def generateHTMLDataRows(resultsList: List[PerformanceResultsObject]): String = {
     (for (result <- resultsList) yield {
-      "<tr class=\"pageclass default\">" + "<td> The article: " + "<a href=\"" + result.testUrl + "\">" + result.headline + "</a>" +
+      "<tr class=\"pageclass default\">" + "<td> The article: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
        "is weighing in at " + result.mBInFullyLoaded + " MB." + "</td>" + "</tr>" + "\n" +
         generatePageElementTable(result)
     }).mkString
