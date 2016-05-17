@@ -14,105 +14,139 @@ class ArticleUrls(key: String) {
   println("testApi = " + testApi)
   val contentApiClient = new GuardianContentClient(key)
 
-/*  def getUrlsForContentType(contentType: String): List[String] = {
+  val until = DateTime.now
+  val from = until.minusHours(3)
+  val pageSize: Int = 30
+
+  def getUrlsForContentType(contentType: String): List[(Option[ContentFields],String)] = {
      contentType match {
-      //case("Article") => getArticles
-      case ("LiveBlog") =>  getMinByMins
-      case ("Interactive") => getInteractives
-      case ("Video") => getVideoPages
-      case ("Audio") => getAudioPages
-      case("Front") => getFronts
+      case("Article") => getArticles(1)
+      case ("LiveBlog") =>  getMinByMins(1)
+      case ("Interactive") => getInteractives(1)
+      case ("Video") => getVideoPages(1)
+      case ("Audio") => getAudioPages(1)
+      case("Front") => getFronts(1)
       case (_) => {
-        val empty: List[String] = List()
-        empty
+        val emptyList: List[(Option[ContentFields], String)] = List()
+        emptyList
       }
     }
-  }*/
+  }
 
   def shutDown = {
     println("Closing connection to Content API")
     contentApiClient.shutdown()
   }
 
-  def getArticles: List[(Option[ContentFields], String)] = {
-    val until = DateTime.now
-    val from = until.minusHours(24)
+  def getArticles(pageNumber: Int): List[(Option[ContentFields], String)] = {
 
-    val searchQuery = new SearchQuery()
-      .fromDate(from)
-      .toDate(until)
-      .showElements("all")
-      .showFields("all")
-      .showTags("all")
-      .page(1)
-      .pageSize(20)
-      .orderBy("newest")
-      .contentType("article")
-    println("Sending query to CAPI: \n" + searchQuery.toString)
+    try {
+      val searchQuery = new SearchQuery()
+        .fromDate(from)
+        .toDate(until)
+        .showElements("all")
+        .showFields("all")
+        .showTags("all")
+        .page(pageNumber)
+        .pageSize(pageSize)
+        .orderBy("newest")
+        .contentType("article")
+      println("Sending query to CAPI: \n" + searchQuery.toString)
 
-    val apiResponse = contentApiClient.getResponse(searchQuery)
-
-    val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-    val articleContentAndUrl: List[(Option[ContentFields],String)] = for (result <- returnedResponse.results) yield {
-      (result.fields, result.webUrl) }
-    println("CAPI Query Success - Article: \n" + articleContentAndUrl.map(element => element._2).mkString)
-    articleContentAndUrl
-
+      val apiResponse = contentApiClient.getResponse(searchQuery)
+      val returnedResponse = Await.result(apiResponse, (20, SECONDS))
+      val articleContentAndUrl: List[(Option[ContentFields], String)] = for (result <- returnedResponse.results) yield {
+        (result.fields, result.webUrl)
+      }
+      println("received " + articleContentAndUrl.length + " pages from this query")
+      if (articleContentAndUrl.length < pageSize) {
+        articleContentAndUrl
+      } else {
+        Thread.sleep(2000)
+        println("calling page: " + pageNumber + 1)
+        articleContentAndUrl ::: getArticles(pageNumber + 1)
+      }
+    } catch {
+      case _: Throwable => {
+        println("bad request - page is empty - returning empty list")
+        val emptyList: List[(Option[ContentFields], String)] = List()
+        emptyList
+      }
+    }
   }
 
-  def getMinByMins: List[(Option[ContentFields],String)] = {
-    val until = DateTime.now
-    val from = until.minusHours(24)
-
+  def getMinByMins(pageNumber: Int): List[(Option[ContentFields],String)] = {
+  try {
     val searchQuery = new SearchQuery()
       .fromDate(from)
       .toDate(until)
       .showElements("all")
       .showFields("all")
       .showTags("all")
-      .page(1)
-      .pageSize(20)
+      .page(pageNumber)
+      .pageSize(pageSize)
       .orderBy("newest")
       .tag("tone/minutebyminute")
     println("Sending query to CAPI: \n" + searchQuery.toString)
 
     val apiResponse = contentApiClient.getResponse(searchQuery)
-
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-    val liveBlogContentAndUrl: List[(Option[ContentFields],String)] = for (result <- returnedResponse.results) yield {
-      (result.fields, result.webUrl) }
-    println("CAPI Query Success - LiveBlog: \n" + liveBlogContentAndUrl.map(element => element._2).mkString)
-    liveBlogContentAndUrl
+    val liveBlogContentAndUrl: List[(Option[ContentFields], String)] = for (result <- returnedResponse.results) yield {
+        (result.fields, result.webUrl)
+      }
+    println("received " + liveBlogContentAndUrl.length + " pages from this query")
+    if (liveBlogContentAndUrl.length < pageSize) {
+      liveBlogContentAndUrl
+    } else {
+      Thread.sleep(2000)
+      liveBlogContentAndUrl ::: getMinByMins(pageNumber + 1)
+    }
+  } catch {
+      case _: Throwable => {
+        println("bad request - page is empty - returning empty list")
+        val emptyList: List[(Option[ContentFields], String)] = List()
+        emptyList
+      }
+    }
   }
 
 
-  def getInteractives: List[(Option[ContentFields],String)] = {
-    val until = DateTime.now
-    val from = until.minusHours(24)
-
+  def getInteractives(pageNumber: Int): List[(Option[ContentFields],String)] = {
+  try {
     val searchQuery = new SearchQuery()
       .fromDate(from)
       .toDate(until)
       .showElements("all")
       .showFields("all")
       .showTags("all")
-      .page(1)
-      .pageSize(20)
+      .page(pageNumber)
+      .pageSize(pageSize)
       .orderBy("newest")
       .contentType("interactive")
     println("Sending query to CAPI: \n" + searchQuery.toString)
 
     val apiResponse = contentApiClient.getResponse(searchQuery)
-
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-
-    val interactiveContentAndUrl: List[(Option[ContentFields],String)] = for (result <- returnedResponse.results) yield {
-      (result.fields, result.webUrl) }
-    println("CAPI Query Success - Interactives: \n" + interactiveContentAndUrl.map(element => element._2).mkString)
-    interactiveContentAndUrl
+    val interactiveContentAndUrl: List[(Option[ContentFields], String)] = for (result <- returnedResponse.results) yield {
+        (result.fields, result.webUrl)
+    }
+    println("received " + interactiveContentAndUrl.length + " pages from this query")
+    if (interactiveContentAndUrl.length < pageSize) {
+      interactiveContentAndUrl
+    } else {
+      Thread.sleep(2000)
+      interactiveContentAndUrl ::: getInteractives(pageNumber + 1)
+    }
+  } catch {
+      case _: Throwable => {
+        println("bad request - page is empty - returning empty list")
+        val emptyList: List[(Option[ContentFields], String)] = List()
+        emptyList
+      }
+    }
   }
 
-  def getFronts: List[(Option[ContentFields],String)] = {
+  def getFronts(pageNumber: Int): List[(Option[ContentFields],String)] = {
     val listofFronts: List[String] = List("http://www.theguardian.com/uk"/*,
       "http://www.theguardian.com/us",
       "http://www.theguardian.com/au",
@@ -136,10 +170,8 @@ class ArticleUrls(key: String) {
   }
 
 
-  def getVideoPages: List[(Option[ContentFields],String)] = {
-    val until = DateTime.now
-    val from = until.minusHours(24)
-
+  def getVideoPages(pageNumber: Int): List[(Option[ContentFields],String)] = {
+  try {
     val searchQuery = new SearchQuery()
       .fromDate(from)
       .toDate(until)
@@ -153,35 +185,59 @@ class ArticleUrls(key: String) {
     println("Sending query to CAPI: \n" + searchQuery.toString)
 
     val apiResponse = contentApiClient.getResponse(searchQuery)
-
     val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-    val videoContentAndUrl: List[(Option[ContentFields],String)] = for (result <- returnedResponse.results) yield {
-      (result.fields, result.webUrl) }
-    videoContentAndUrl
+    val videoContentAndUrl: List[(Option[ContentFields], String)] = for (result <- returnedResponse.results) yield {
+        (result.fields, result.webUrl)
+      }
+    println("received " + videoContentAndUrl.length + " pages from this query")
+    if (videoContentAndUrl.length < pageSize) {
+      videoContentAndUrl
+    } else {
+      Thread.sleep(2000)
+      videoContentAndUrl ::: getVideoPages(pageNumber + 1)
+    }
+  } catch {
+      case _: Throwable => {
+        println("bad request - page is empty - returning empty list")
+        val emptyList: List[(Option[ContentFields], String)] = List()
+        emptyList
+      }
+    }
   }
 
-  def getAudioPages: List[(Option[ContentFields],String)] = {
-    val until = DateTime.now
-    val from = until.minusHours(24)
+  def getAudioPages(pageNumber: Int): List[(Option[ContentFields],String)] = {
+    try {
+      val liveBlogSearchQuery = new SearchQuery()
+        .fromDate(from)
+        .toDate(until)
+        .showElements("all")
+        .showFields("all")
+        .showTags("all")
+        .page(1)
+        .pageSize(20)
+        .orderBy("newest")
+        .contentType("audio")
+      println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
 
-    val liveBlogSearchQuery = new SearchQuery()
-      .fromDate(from)
-      .toDate(until)
-      .showElements("all")
-      .showFields("all")
-      .showTags("all")
-      .page(1)
-      .pageSize(20)
-      .orderBy("newest")
-      .contentType("audio")
-    println("Sending query to CAPI: \n" + liveBlogSearchQuery.toString)
-
-    val apiResponse = contentApiClient.getResponse(liveBlogSearchQuery)
-
-    val returnedResponse = Await.result(apiResponse, (20, SECONDS))
-    val audioContentAndUrl: List[(Option[ContentFields],String)] = for (result <- returnedResponse.results) yield {
-      (result.fields, result.webUrl) }
-    audioContentAndUrl
+      val apiResponse = contentApiClient.getResponse(liveBlogSearchQuery)
+      val returnedResponse = Await.result(apiResponse, (20, SECONDS))
+      val audioContentAndUrl: List[(Option[ContentFields], String)] = for (result <- returnedResponse.results) yield {
+          (result.fields, result.webUrl)
+        }
+      println("received " + audioContentAndUrl.length + " pages from this query")
+      if (audioContentAndUrl.length < pageSize) {
+        audioContentAndUrl
+      } else {
+        Thread.sleep(2000)
+        audioContentAndUrl ::: getAudioPages(pageNumber + 1)
+      }
+    } catch {
+      case _: Throwable => {
+        println("bad request - page is empty - returning empty list")
+        val emptyList: List[(Option[ContentFields], String)] = List()
+        emptyList
+      }
+    }
   }
 
 
