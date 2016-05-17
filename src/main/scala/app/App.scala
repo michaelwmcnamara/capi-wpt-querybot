@@ -64,9 +64,6 @@ object App {
     val resultsFromPreviousTests = "resultsFromPreviousTests.csv"
 
 
-
-
-
     //Define colors to be used for average values, warnings and alerts
     val averageColor: String = "#d9edf7"
     //    val warningColor: String = "#fcf8e3"
@@ -192,25 +189,43 @@ object App {
       }
       System.exit(1)
     }
+    println("Retrieved results from file\n")
+    println(previousResults.length + " results retrieved in total")
+    println(resultsFromLast24Hours.length + " results for last 24 hours")
+    println(previousResultsToRetest.length + " results will be retested")
+    println(unchangedPreviousResults.length + " results will be listed but not tested")
     //Create Email Handler class
     val emailer: EmailOperations = new EmailOperations(emailUsername, emailPassword)
 
     //  Define new CAPI Query object
     val capiQuery = new ArticleUrls(contentApiKey)
     //get all content-type-lists
-    val articles: List[(Option[ContentFields],String)] = capiQuery.getArticles
-    val liveBlogs: List[(Option[ContentFields],String)] = capiQuery.getMinByMins
-    val interactives: List[(Option[ContentFields],String)] = capiQuery.getInteractives
-    val fronts:  List[(Option[ContentFields],String)] = capiQuery.getFronts
-    val videoPages: List[(Option[ContentFields],String)] = capiQuery.getVideoPages
-    val audioPages: List[(Option[ContentFields],String)] = capiQuery.getAudioPages
+    val articles: List[(Option[ContentFields],String)] = capiQuery.getUrlsForContentType("Article")
+    val liveBlogs: List[(Option[ContentFields],String)] = capiQuery.getUrlsForContentType("LiveBlog")
+    val interactives: List[(Option[ContentFields],String)] = capiQuery.getUrlsForContentType("Interactive")
+    val fronts:  List[(Option[ContentFields],String)] = capiQuery.getUrlsForContentType("Front")
+    val videoPages: List[(Option[ContentFields],String)] = capiQuery.getUrlsForContentType("Video")
+    val audioPages: List[(Option[ContentFields],String)] = capiQuery.getUrlsForContentType("Audio")
     println(DateTime.now + " Closing Content API query connection")
     capiQuery.shutDown
+
+    println("CAPI call summary: \n")
+    println("Retrieved: " + articles.length + " article pages")
+    println("Retrieved: " + liveBlogs.length + " liveblog pages")
+    println("Retrieved: " + interactives.length + " intearactive pages")
+    println("Retrieved: " + fronts.length + " fronts")
+    println("Retrieved: " + videoPages.length + " video pages")
+    println("Retrieved: " + audioPages.length + " audio pages")
+    println((articles.length + liveBlogs.length + interactives.length + fronts.length + videoPages.length + audioPages.length) + " pages returned in total")
 
     val combinedCapiResults = articles ::: liveBlogs ::: interactives ::: fronts
     val dedupedResultsToRetest = for (result <- previousResultsToRetest if !combinedCapiResults.map(_._2).contains(result.testUrl)) yield result
     val dedupedUnchangedResults = for (result <- unchangedPreviousResults if !combinedCapiResults.map(_._2).contains(result.testUrl)) yield result
 
+    println("Summary of pages after comparing CAPI response with existing test results: \n")
+    println(dedupedResultsToRetest.length + " pages to be tested - this includes previous alerts, liveblogs, updated pages and new CAPI results")
+    println(dedupedUnchangedResults.length + " pages that will be displayed but not tested - these are unchanged pages to which we already have results")
+    
     val dedupedPreviousAlertUrls: List[String] = for (result <- dedupedResultsToRetest) yield result.testUrl
     val articleUrls: List[String] = for (page <- articles) yield page._2
     val liveBlogUrls: List[String] = for (page <- liveBlogs) yield page._2
@@ -562,6 +577,7 @@ object App {
     }else {
       println("No pages to alert on. Email not sent. \n Job complete")
     }
+
   }
 
   def getResultPages(urlList: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
