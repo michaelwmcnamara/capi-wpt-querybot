@@ -190,8 +190,15 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       testResults = scala.xml.XML.loadString(response.body.string)
       if ((testResults \\ "response" \ "data" \ "successfulFVRuns").text.toInt > 0) {
         println("\n" + DateTime.now + " statusCode == 200: Page ready after " + ((iterator + 1) * msTimeBetweenPings).toDouble / 1000 + " seconds\n Refining results")
-        val elementsList: List[PageElementFromHTMLTableRow] = obtainPageRequestDetails(resultUrl)
-        refineResults(testResults, elementsList)
+        try{
+          val elementsList: List[PageElementFromHTMLTableRow] = obtainPageRequestDetails(resultUrl)
+          refineResults(testResults, elementsList)
+        } catch {
+          case _: Throwable => {
+            println("Page failed for some reason")
+            failedTestUnknown(resultUrl, testResults)
+          }
+        }
       } else {
         println(DateTime.now + " Test results show 0 successful runs ")
         failedTestNoSuccessfulRuns(resultUrl, testResults)
@@ -204,31 +211,42 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
 
   def refineResults(rawXMLResult: Elem, elementsList: List[PageElementFromHTMLTableRow]): PerformanceResultsObject = {
     println("parsing the XML results")
-    val testUrl: String = (rawXMLResult \\ "response" \ "data" \ "testUrl").text.toString.split("#noads")(0)
-    val testType: String = if((rawXMLResult \\ "response" \ "data" \ "from").text.toString.contains("Emulated Nexus 5")){"Android/3G"}else{"Desktop"}
-    val testSummaryPage: String = (rawXMLResult \\ "response" \ "data" \ "summary").text.toString
-    val timeToFirstByte: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "TTFB").text.toInt
-    val firstPaint: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "firstPaint").text.toInt
-    println ("firstPaint = " + firstPaint)
-    val docTime: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "docTime").text.toInt
-    println ("docTime = " + docTime)
-    val bytesInDoc: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "bytesInDoc").text.toInt
-    println ("bytesInDoc = " + bytesInDoc)
-    val fullyLoadedTime: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "fullyLoaded").text.toInt
-    println ("Time to Fully loaded = " + fullyLoadedTime)
-    val totalbytesIn: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "bytesIn").text.toInt
-    println ("Total bytes = " + totalbytesIn)
-    val speedIndex: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "SpeedIndex").text.toInt
-    println ("SpeedIndex = " + speedIndex)
-    val status: String = "Test Success"
+    try {
+      val testUrl: String = (rawXMLResult \\ "response" \ "data" \ "testUrl").text.toString.split("#noads")(0)
+      val testType: String = if ((rawXMLResult \\ "response" \ "data" \ "from").text.toString.contains("Emulated Nexus 5")) {
+        "Android/3G"
+      } else {
+        "Desktop"
+      }
+      val testSummaryPage: String = (rawXMLResult \\ "response" \ "data" \ "summary").text.toString
+      val timeToFirstByte: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "TTFB").text.toInt
+      val firstPaint: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "firstPaint").text.toInt
+      println("firstPaint = " + firstPaint)
+      val docTime: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "docTime").text.toInt
+      println("docTime = " + docTime)
+      val bytesInDoc: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "bytesInDoc").text.toInt
+      println("bytesInDoc = " + bytesInDoc)
+      val fullyLoadedTime: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "fullyLoaded").text.toInt
+      println("Time to Fully loaded = " + fullyLoadedTime)
+      val totalbytesIn: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "bytesIn").text.toInt
+      println("Total bytes = " + totalbytesIn)
+      val speedIndex: Int = (rawXMLResult \\ "response" \ "data" \ "run" \ "firstView" \ "results" \ "SpeedIndex").text.toInt
+      println("SpeedIndex = " + speedIndex)
+      val status: String = "Test Success"
 
-    println("Creating PerformanceResultsObject")
-    val result: PerformanceResultsObject = new PerformanceResultsObject(testUrl, testType, testSummaryPage, timeToFirstByte, firstPaint, docTime, bytesInDoc, fullyLoadedTime, totalbytesIn, speedIndex, status, false, false, false)
-    val sortedElementList = sortPageElementList(elementsList)
-    result.fullElementList = sortedElementList
-    result.populateEditorialElementList(sortedElementList)
-    println("Returning PerformanceResultsObject")
-    result
+      println("Creating PerformanceResultsObject")
+      val result: PerformanceResultsObject = new PerformanceResultsObject(testUrl, testType, testSummaryPage, timeToFirstByte, firstPaint, docTime, bytesInDoc, fullyLoadedTime, totalbytesIn, speedIndex, status, false, false, false)
+      val sortedElementList = sortPageElementList(elementsList)
+      result.fullElementList = sortedElementList
+      result.populateEditorialElementList(sortedElementList)
+      println("Returning PerformanceResultsObject")
+      result
+    } catch {
+      case _: Throwable => {
+        println("Page failed for some reason")
+        failedTestUnknown("Unknown - Exception occurred during refineResults", rawXMLResult)
+      }
+    }
   }
 
   def testMultipleTimes(url: String, typeOfTest: String, wptLocation: String, testCount: Int): PerformanceResultsObject = {
@@ -320,8 +338,15 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       testResults = scala.xml.XML.loadString(response.body.string)
       if ((testResults \\ "response" \ "data" \ "successfulFVRuns").text.toInt > 0) {
         println("\n" + DateTime.now + " statusCode == 200: Page ready after " + roundAt(0)(((iterator + 1) * msTimeBetweenPings).toDouble / 1000).toInt + " seconds\n Refining results")
-        val elementsList: List[PageElementFromHTMLTableRow] = obtainPageRequestDetails(resultUrl)
-        refineMultipleResults(testResults, elementsList)
+        try {
+          val elementsList: List[PageElementFromHTMLTableRow] = obtainPageRequestDetails(resultUrl)
+          refineMultipleResults(testResults, elementsList)
+        } catch {
+          case _: Throwable => {
+            println("Page failed for some reason")
+            failedTestUnknown(resultUrl, testResults)
+          }
+        }
       } else {
         println(DateTime.now + " Test results show 0 successful runs ")
         failedTestNoSuccessfulRuns(resultUrl, testResults)
@@ -334,32 +359,43 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
 
   def refineMultipleResults(rawXMLResult: Elem, elementsList: List[PageElementFromHTMLTableRow]): PerformanceResultsObject = {
     println("parsing the XML results")
-    val testUrl: String = (rawXMLResult \\ "response" \ "data" \ "testUrl").text.toString.split("#noads")(0)
-    val testType: String = if((rawXMLResult \\ "response" \ "data" \ "from").text.toString.contains("Emulated Nexus 5")){"Android/3G"}else{"Desktop"}
-    val testSummaryPage: String = (rawXMLResult \\ "response" \ "data" \ "summary").text.toString
-    val timeToFirstByte: Int = (rawXMLResult \\ "response" \ "data" \ "median" \ "firstView" \ "TTFB").text.toInt
-    val firstPaint: Int = (rawXMLResult \\ "response" \ "data" \ "median" \ "firstView" \ "firstPaint").text.toInt
-    println ("firstPaint = " + firstPaint)
-    val docTime: Int = (rawXMLResult \\ "response" \ "data" \ "median" \ "firstView" \  "docTime").text.toInt
-    println ("docTime = " + docTime)
-    val bytesInDoc: Int = (rawXMLResult \\ "response" \ "data" \ "median" \ "firstView" \ "bytesInDoc").text.toInt
-    println ("bytesInDoc = " + bytesInDoc)
-    val fullyLoadedTime: Int = (rawXMLResult \\ "response" \ "data" \ "median" \ "firstView" \ "fullyLoaded").text.toInt
-    println ("Time to Fully loaded = " + fullyLoadedTime)
-    val totalbytesIn: Int = (rawXMLResult \\ "response" \ "data" \ "median" \ "firstView" \ "bytesIn").text.toInt
-    println ("Total bytes = " + totalbytesIn)
-    val speedIndex: Int = (rawXMLResult \\ "response" \ "data" \ "median" \ "firstView" \ "SpeedIndex").text.toInt
-    println ("SpeedIndex = " + speedIndex)
-    val status: String = "Test Success"
-    println("Creating PerformanceResultsObject")
-    val result: PerformanceResultsObject = new PerformanceResultsObject(testUrl, testType, testSummaryPage, timeToFirstByte, firstPaint, docTime, bytesInDoc, fullyLoadedTime, totalbytesIn, speedIndex, status, false, false, false)
-    val sortedElementList = sortPageElementList(elementsList)
-    result.fullElementList = sortedElementList
-    result.populateEditorialElementList(sortedElementList)
-    println("Result string: " + result.toHTMLSimpleTableCells())
-    println("List of heaviest page Elements contains " + result.editorialElementList.length + " elements")
-    println("Returning PerformanceResultsObject")
-    result
+    try {
+      val testUrl: String = (rawXMLResult \\ "response" \ "data" \ "testUrl").text.toString.split("#noads")(0)
+      val testType: String = if ((rawXMLResult \\ "response" \ "data" \ "from").text.toString.contains("Emulated Nexus 5")) {
+        "Android/3G"
+      } else {
+        "Desktop"
+      }
+      val testSummaryPage: String = (rawXMLResult \\ "response" \ "data" \ "summary").text.toString
+      val timeToFirstByte: Int = (rawXMLResult \\ "response" \ "data" \ "median" \ "firstView" \ "TTFB").text.toInt
+      val firstPaint: Int = (rawXMLResult \\ "response" \ "data" \ "median" \ "firstView" \ "firstPaint").text.toInt
+      println("firstPaint = " + firstPaint)
+      val docTime: Int = (rawXMLResult \\ "response" \ "data" \ "median" \ "firstView" \ "docTime").text.toInt
+      println("docTime = " + docTime)
+      val bytesInDoc: Int = (rawXMLResult \\ "response" \ "data" \ "median" \ "firstView" \ "bytesInDoc").text.toInt
+      println("bytesInDoc = " + bytesInDoc)
+      val fullyLoadedTime: Int = (rawXMLResult \\ "response" \ "data" \ "median" \ "firstView" \ "fullyLoaded").text.toInt
+      println("Time to Fully loaded = " + fullyLoadedTime)
+      val totalbytesIn: Int = (rawXMLResult \\ "response" \ "data" \ "median" \ "firstView" \ "bytesIn").text.toInt
+      println("Total bytes = " + totalbytesIn)
+      val speedIndex: Int = (rawXMLResult \\ "response" \ "data" \ "median" \ "firstView" \ "SpeedIndex").text.toInt
+      println("SpeedIndex = " + speedIndex)
+      val status: String = "Test Success"
+      println("Creating PerformanceResultsObject")
+      val result: PerformanceResultsObject = new PerformanceResultsObject(testUrl, testType, testSummaryPage, timeToFirstByte, firstPaint, docTime, bytesInDoc, fullyLoadedTime, totalbytesIn, speedIndex, status, false, false, false)
+      val sortedElementList = sortPageElementList(elementsList)
+      result.fullElementList = sortedElementList
+      result.populateEditorialElementList(sortedElementList)
+      println("Result string: " + result.toHTMLSimpleTableCells())
+      println("List of heaviest page Elements contains " + result.editorialElementList.length + " elements")
+      println("Returning PerformanceResultsObject")
+      result
+    } catch {
+      case _: Throwable => {
+        println("Page failed for some reason")
+        failedTestUnknown("Unknown - Exception occurred during refineMultipleresults", rawXMLResult)
+      }
+    }
   }
 
   def obtainPageRequestDetails(webpageTestResultUrl: String): List[PageElementFromHTMLTableRow] = {
@@ -418,6 +454,15 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
     val failIndicator: Int = -1
     val testType: String = if((rawResults \\ "response" \ "data" \ "from").text.toString.contains("Emulated Nexus 5")){"Android/3G"}else{"Desktop"}
     val failComment: String = "Test request timed out"
+    // set warning status as result may have timed out due to very large page
+    val failElement: PerformanceResultsObject = new PerformanceResultsObject(url, testType, failComment, failIndicator, failIndicator,failIndicator,failIndicator,failIndicator,failIndicator,failIndicator, failComment, true, true, true)
+    failElement
+  }
+
+  def failedTestUnknown(url: String, rawResults: Elem): PerformanceResultsObject = {
+    val failIndicator: Int = -1
+    val testType: String = "Unknown"
+    val failComment: String = "Test failed for unknown reason"
     // set warning status as result may have timed out due to very large page
     val failElement: PerformanceResultsObject = new PerformanceResultsObject(url, testType, failComment, failIndicator, failIndicator,failIndicator,failIndicator,failIndicator,failIndicator,failIndicator, failComment, true, true, true)
     failElement

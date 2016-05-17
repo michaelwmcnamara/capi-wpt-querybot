@@ -204,7 +204,7 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
     val returnString: String = "<tr>" +
       "<td><a href = \"" + resource + "\">" + resource + "</a></td>" +
       "<td>" + contentType + "</td>" +
-      "<td>" + sizeInKB + "KB</td>" +
+      "<td>" + sizeInMB + "MB</td>" +
       "</tr>"
     returnString
   }
