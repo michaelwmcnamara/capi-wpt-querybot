@@ -77,7 +77,7 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject]) {
   }
 
   def getHTMLForPageElements(resultsObject: PerformanceResultsObject): String = {
-      resultsObject.returnHTMLEditorialElementList()
+      resultsObject.returnEmailEditorialElementList()
   }
 
   def getAlertClass(resultsObject: PerformanceResultsObject): String = {
