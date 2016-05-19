@@ -186,7 +186,7 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
     val returnString: String = "<tr class=\"datarow\">" +
       "<td><a href = \"" + resource + "\">" + resource + "</a></td>" +
       "<td>" + contentType + "</td>" +
-      "<td>" + sizeInKB + "KB</td>" +
+      "<td>" + sizeInMB + " MB</td>" +
       "</tr>" + "\n"
     returnString
   }
@@ -196,7 +196,7 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
     "<td colspan=\"1\" align=\"right\"> - </td>" +
       "<td>" + sizeInMB + " MB for the following " +
       contentType + ": " +
-      "</td>" + "</tr>" + "\n"
+      "</td>" + "</tr>" + "\n" +
       "<tr class=\"datarow\">" +
       "<td colspan=\"1\"> </td>" +
       "<a href = \"" + resource + "\">" + resource + "</a></td>" +

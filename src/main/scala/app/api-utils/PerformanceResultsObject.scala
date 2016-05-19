@@ -139,7 +139,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def toHTMLBasicTableCells(): String = {
-    "<td>"+DateTime.now+"</td>"+"<td>"+typeOfTestName+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" + "<td>" + getPageType + "</td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>"
+    "<td>"+pageLastUpdated.getOrElse(firstPublished.getOrElse("Unknown"))+"</td>"+"<td>"+typeOfTestName+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" + "<td>" + getPageType + "</td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>"
   }
 
   def toHTMLInteractiveTableCells(): String = {
@@ -147,8 +147,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def returnHTMLFullElementList(): String = {
-    val firstFive:List[PageElementFromHTMLTableRow] = fullElementList.take(5)
-    val pageElementString: String = (for (element <- firstFive) yield element.toHTMLRowString()).mkString
+    val pageElementString: String = (for (element <- fullElementList) yield element.toHTMLRowString()).mkString
     val returnString = pageElementString + "<tr class=\"datarow\">" + "<td colspan=\"12\">" + "<a href=" + friendlyResultUrl + ">" + "See full test results here" + "</a>" + "</td>" + "</tr>"
     returnString
   }

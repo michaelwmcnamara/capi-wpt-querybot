@@ -239,6 +239,8 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
       val sortedElementList = sortPageElementList(elementsList)
       result.fullElementList = sortedElementList
       result.populateEditorialElementList(sortedElementList)
+      println("Result string: " + result.toHTMLSimpleTableCells())
+      println("List of heaviest page Elements contains " + result.editorialElementList.length + " elements")
       println("Returning PerformanceResultsObject")
       result
     } catch {
