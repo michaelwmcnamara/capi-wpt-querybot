@@ -127,7 +127,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def toCSVString(): String = {
-    timeOfTest + "," + testUrl.toString + "," + cleanForCSV(headline.getOrElse("Unknown")) + "," + cleanForCSV(getPageType) + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + cleanForCSV(resultStatus) + "," + alertStatusPageWeight + "," + alertStatusPageSpeed + "," + brokenTest + "," + editorialElementList.map(element => "," + cleanForCSV(element.resource) + "," + cleanForCSV(element.contentType) + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
+    timeOfTest + "," + testUrl.toString + "," + cleanString(headline.getOrElse("Unknown")) + "," + cleanString(getPageType) + "," + getFirstPublished + "," + getPageLastUpdated + ","  + getLiveBloggingNow + ","  + typeOfTest + "," + friendlyResultUrl + "," + timeToFirstByte.toString + "," + timeFirstPaintInMs.toString + "," + timeDocCompleteInMs + "," + bytesInDocComplete + "," + timeFullyLoadedInMs + "," + bytesInFullyLoaded + "," + speedIndex + "," + cleanString(resultStatus) + "," + alertStatusPageWeight + "," + alertStatusPageSpeed + "," + brokenTest + "," + editorialElementList.map(element => "," + cleanString(element.resource) + "," + cleanString(element.contentType) + "," + element.bytesDownloaded ).mkString + fillRemainingGapsAndNewline()
   }
 
   def toFullHTMLTableCells(): String = {
@@ -240,7 +240,12 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     }
   }
 
-  def cleanForCSV(inputString: String): String = {
-    inputString.replace(",", "")
+  def cleanString(inputString: String): String = {
+    var clean= inputString.replace(",", " ")
+    clean.replace("\n", "")
+    clean.replace("<", "")
+    clean.replace(">", "")
+    clean.replace("/", "")
+    clean
   }
 }
