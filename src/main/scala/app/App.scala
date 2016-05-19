@@ -603,12 +603,19 @@ object App {
     val resultsList: ParSeq[WptResultPageListener] = listenerList.par.map(element => {
       val wpt = new WebPageTest(wptBaseUrl, wptApiKey, urlFragments)
       val newElement = new WptResultPageListener(element.pageUrl, element.pageType, element.pageFields,element.wptResultUrl)
+      println("getting result for page element")
       newElement.testResults = wpt.getResults(newElement.wptResultUrl)
+      println("result received\n setting headline")
       newElement.testResults.setHeadline(newElement.headline)
+      println("headline set\n setting pagetype")
       newElement.testResults.setPageType(newElement.pageType)
+      println("pagetype set\n setting FirstPublished")
       newElement.testResults.setFirstPublished(newElement.firstPublished)
+      println("FirstPublished set\n setting LastUpdated")
       newElement.testResults.setPageLastUpdated(newElement.pageLastModified)
+      println("Lastupdated set\n setting LiveBloggingNow")
       newElement.testResults.setLiveBloggingNow(newElement.liveBloggingNow.getOrElse(false))
+      println("all variables set for element")
       newElement
     })
     val testResults = resultsList.map(element => element.testResults).toList

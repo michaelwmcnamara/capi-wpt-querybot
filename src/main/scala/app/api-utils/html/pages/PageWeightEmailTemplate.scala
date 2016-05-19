@@ -10,6 +10,8 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject]) {
 
   //HTML Page elements
   //Page Header
+  val dashboardUrl = "https://s3-eu-west-1.amazonaws.com/capi-wpt-querybot/editorialpageweightdashboard.html"
+
   val HTML_PAGE_HEAD: String = "<!DOCTYPE html><html lang=\"en\">" + "\n" +
     "<head> <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>" + "\n" +
     "<title>Daily REPORT - [Pageweight Dashboard - Combined]</title>" + "\n" +
@@ -48,7 +50,7 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject]) {
 
   //Page Footer
   val HTML_FOOTER: String = "</div>" + "\n" +
-    "<div id=\"footer\">" + "<p>Job completed at: [DATA]</p>" + "</div>" + "\n" +
+    "<div id=\"footer\">" + "<p>" + "<a href=\"" + dashboardUrl + "\">" + "click here for more information"+ "</a>" + "</p>" + "</div>" + "\n" +
     "</div>" + "\n" +
     "</body>" + "\n" +
     "</html>"
@@ -77,7 +79,7 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject]) {
   }
 
   def getHTMLForPageElements(resultsObject: PerformanceResultsObject): String = {
-      resultsObject.returnHTMLEditorialElementList()
+      resultsObject.returnEmailEditorialElementList()
   }
 
   def getAlertClass(resultsObject: PerformanceResultsObject): String = {
