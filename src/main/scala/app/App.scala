@@ -89,6 +89,7 @@ object App {
     var videoResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
 
     //Initialize email alerts string - this will be used to generate emails
+
     var articleAlertList: List[PerformanceResultsObject] = List()
     var liveBlogAlertList: List[PerformanceResultsObject] = List()
     var interactiveAlertList: List[PerformanceResultsObject] = List()
@@ -239,6 +240,7 @@ object App {
     // send all urls to webpagetest at once to enable parallel testing by test agents
     val urlsToSend: List[String] = (dedupedPreviousAlertUrls ::: articleUrls ::: liveBlogUrls ::: interactiveUrls ::: frontsUrls).distinct
     println("Combined list of urls: \n" + urlsToSend)
+
     val resultUrlList: List[(String, String)] = getResultPages(urlsToSend, urlFragments, wptBaseUrl, wptApiKey, wptLocation)
 
     // build result page listeners
@@ -530,7 +532,9 @@ object App {
     val newInteractiveAlertsList: List[PerformanceResultsObject] = for (result <- interactiveAlertList if !previousResultsToRetest.map(_.testUrl).contains(result.testUrl)) yield result
     val newFrontsAlertsList: List[PerformanceResultsObject] = for (result <- frontsAlertList if !previousResultsToRetest.map(_.testUrl).contains(result.testUrl)) yield result
 
-/*    if (newArticleAlertsList.nonEmpty || newLiveBlogAlertsList.nonEmpty || newFrontsAlertsList.nonEmpty) {
+
+
+    /*    if (newArticleAlertsList.nonEmpty || newLiveBlogAlertsList.nonEmpty || newFrontsAlertsList.nonEmpty) {
       println("\n\n articleAlertList contains: " + newArticleAlertsList.length + " pages")
       println("\n\n liveBlogAlertList contains: " + newLiveBlogAlertsList.length + " pages")
       println("\n\n frontsAlertList contains: " + newFrontsAlertsList.length + " pages")
