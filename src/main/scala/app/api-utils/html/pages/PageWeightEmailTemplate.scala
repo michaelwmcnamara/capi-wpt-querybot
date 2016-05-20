@@ -68,8 +68,8 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject]) {
   def generateHTMLDataRows(resultsList: List[PerformanceResultsObject]): String = {
     (for (result <- resultsList) yield {
       "<tr class=\"pageclass default\">" + "<td> The article: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
-       "is weighing in at " + result.mBInFullyLoaded + " MB." + "</td>" + "</tr>" + "\n" +
-        generatePageElementTable(result)
+       "is weighing in at " + result.mBInFullyLoaded + " MB. for " + result.typeOfTestName. +  
+       "<a href = \"" + dashboardUr + "\"> Click here for more information on how to resolve this.</a>" + "<\td>" + "</tr>" + "\n"
     }).mkString
 
   }
@@ -89,6 +89,7 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject]) {
       "default"
     }
   }
+  
 
   // Access Methods
 
