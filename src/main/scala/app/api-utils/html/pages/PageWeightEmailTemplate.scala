@@ -27,7 +27,7 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject]) {
   val HTML_PAGE_CONTAINER: String = "<body>" + "\n" +
     "<div id=\"container\">" + "\n" +
     "<div id=\"head\">" + "\n" +
-    "<h1>Alert: Pageweight problems detected</h1>" + "\n" +
+    "<h1>Alert: The following pages may be too heavy</h1>" + "\n" +
     "<p>Job started at: " + DateTime.now + "</p>" + "\n" +
     "</div>"
 
@@ -37,7 +37,7 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject]) {
   //Page Tables
   val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"report\">"+ "\n" +
     "<thead>" + "\n" +
-    "<tr> <th>You have been alerted because the following pages have been found to be too heavy and require investigation</th>" + "</tr>"+ "\n" +
+    "<tr> <th>You have been alerted because the following pages have been found to be too heavy and require review.</th>" + "</tr>"+ "\n" +
     "</thead>" +"\n" +
     "<tbody>"
 
