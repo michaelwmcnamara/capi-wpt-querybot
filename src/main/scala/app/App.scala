@@ -665,7 +665,8 @@ object App {
       }
       else {
         println("PageWeight Alert not set")
-        resultObject.alertStatusPageWeight = false
+        //todo - fix this so that its not always true!
+        resultObject.alertStatusPageWeight = true//false
       }
       if ((resultObject.timeFirstPaintInMs >= averages.desktopTimeFirstPaintInMs) ||
           (resultObject.speedIndex >= averages.desktopSpeedIndex)) {

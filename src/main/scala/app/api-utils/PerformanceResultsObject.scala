@@ -239,6 +239,26 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
     }
   }
 
+  def printTimeLastLaunched(): String = {
+    if(pageLastUpdated.nonEmpty) {
+      capiTimeToString(pageLastUpdated)
+    } else {
+      capiTimeToString(firstPublished)
+    }
+  }
+
+  def capiTimeToString(time: Option[CapiDateTime]): String = {
+    if(time.nonEmpty){
+      val capiDT:CapiDateTime = time.get
+      val timeLong = capiDT.dateTime
+      val moreUseableTime = new DateTime(timeLong)
+      moreUseableTime.toDate.toString
+    }
+    else{
+      "Unknown"
+    }
+  }
+
   def cleanString(inputString: String): String = {
     var clean= inputString.replace(",", " ")
     clean.replace("\n", "")

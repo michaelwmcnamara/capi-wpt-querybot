@@ -35,18 +35,18 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject]) {
   val HTML_PAGE_CONTENT: String = "<div id=\"content\">" + "\n"
 
   //Page Tables
-  val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"report\">"+ "\n" +
-    "<thead>" + "\n" +
-    "<tr> <th>You have been alerted because the following pages have been found to be too heavy and require investigation</th>" + "</tr>"+ "\n" +
-    "</thead>" +"\n" +
-    "<tbody>"
+  val HTML_REPORT_LIST_HEADERS: String = "<div id=\"report\">"+ "\n" +
+    "<p>" + "\n" +
+    "<h2>You have been alerted because the following pages have been found to be too heavy and require investigation</h2>"+ "\n" +
+    "</p>" +"\n" +
+    "<div>"
 
-  val HTML_PAGE_ELEMENT_TABLE_HEADERS: String = "<tr>" + "\n" +
-    "<td colspan=\"12\">" + "Main cause seems to be these elements, which weigh in at: </td>" + "\n"
+  val HTML_PAGE_ELEMENT_LIST_HEADERS: String = "<div>" + "\n" +
+    "<p>" + "Main cause seems to be these elements, which weigh in at: </p>" + "\n"
 
-  val HTML_TABLE_END: String = "</tbody>" + "\n" + "</table>"+ "\n"
+  val HTML_LIST_END: String = "</div>" + "\n" + "</div>"+ "\n"
 
-  val HTML_PAGE_ELEMENT_TABLE_END: String = "</tbody>" + "\n" + "</table>"+ "\n" + "</td>" + "\n" + "</tr>" + "\n"
+  val HTML_PAGE_ELEMENT_LIST_END: String = "</div>" + "\n" + "</div>"+ "\n" + "</div>" + "\n" + "</div>" + "\n"
 
   //Page Footer
   val HTML_FOOTER: String = "</div>" + "\n" +
@@ -62,20 +62,22 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject]) {
 
   //page generation methods
   def generateHTMLTable(resultsList: List[PerformanceResultsObject]): String = {
-    HTML_REPORT_TABLE_HEADERS + "\n" + generateHTMLDataRows(resultsList) + "\n" + HTML_TABLE_END
+    HTML_REPORT_LIST_HEADERS + "\n" + generateHTMLDataLines(resultsList) + "\n" + HTML_LIST_END
   }
 
-  def generateHTMLDataRows(resultsList: List[PerformanceResultsObject]): String = {
+  def generateHTMLDataLines(resultsList: List[PerformanceResultsObject]): String = {
     (for (result <- resultsList) yield {
+
       "<tr class=\"pageclass default\">" + "<td> The article: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
-       "is weighing in at " + result.mBInFullyLoaded + " MB. for " + result.typeOfTestName. +  
-       "<a href = \"" + dashboardUr + "\"> Click here for more information on how to resolve this.</a>" + "<\td>" + "</tr>" + "\n"
+       "is weighing in at " + result.mBInFullyLoaded + " MB. for " + result.typeOfTestName + "." +
+       "<a href = \"" + dashboardUrl + "\"> Click here for more information on how to resolve this.</a>" + "<\td>" + "</tr>" + "\n"
+
     }).mkString
 
   }
 
   def generatePageElementTable(resultsObject: PerformanceResultsObject): String = {
-    HTML_PAGE_ELEMENT_TABLE_HEADERS + "\n"  + getHTMLForPageElements(resultsObject) + HTML_PAGE_ELEMENT_TABLE_END
+    HTML_PAGE_ELEMENT_LIST_HEADERS + "\n"  + getHTMLForPageElements(resultsObject) + HTML_PAGE_ELEMENT_LIST_END
   }
 
   def getHTMLForPageElements(resultsObject: PerformanceResultsObject): String = {
