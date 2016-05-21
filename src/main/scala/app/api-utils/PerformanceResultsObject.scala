@@ -139,7 +139,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def toHTMLBasicTableCells(): String = {
-    "<td>"+pageLastUpdated.getOrElse(firstPublished.getOrElse("Unknown"))+"</td>"+"<td>"+typeOfTestName+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" + "<td>" + getPageType + "</td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>"
+    "<td>"+printTimeLastLaunched()+"</td>"+"<td>"+typeOfTestName+"</td>"+ "<td>" + "<a href=" + testUrl + ">" + headline.getOrElse(testUrl) + "</a>" + " </td>" + "<td>" + getPageType + "</td>" + "<td>" + aboveTheFoldCompleteInSec.toString + "s </td>" + "<td>" + mBInFullyLoaded + "MB </td>"
   }
 
   def toHTMLInteractiveTableCells(): String = {
@@ -238,6 +238,27 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
      None
     }
   }
+
+ def printTimeLastLaunched(): String = {
+     if(pageLastUpdated.nonEmpty) {
+       capiTimeToString(pageLastUpdated)
+     } else {
+       capiTimeToString(firstPublished)
+     }
+   }
+ 
+   def capiTimeToString(time: Option[CapiDateTime]): String = {
+     if(time.nonEmpty){
+       val capiDT:CapiDateTime = time.get
+       val timeLong = capiDT.dateTime
+       val moreUseableTime = new DateTime(timeLong)
+       moreUseableTime.toDate.toString
+     }
+     else{
+       "Unknown"
+     }
+   }
+ 
 
   def cleanString(inputString: String): String = {
     var clean= inputString.replace(",", " ")
