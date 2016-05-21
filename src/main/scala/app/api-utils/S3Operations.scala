@@ -157,11 +157,13 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
   def getResultsFileFromS3(fileName:String): List[PerformanceResultsObject] = {
 // todo - update to include new fields
     if (doesFileExist(fileName)) {
+      try{
       val s3Response = s3Client.getObject(new GetObjectRequest(s3BucketName, fileName))
       val objectData = s3Response.getObjectContent
       val myData = scala.io.Source.fromInputStream(objectData).getLines()
       val resultsIterator = for (line <- myData) yield {
         val data: Array[String] = line.split(",")
+        println("file line: " + data)
         var result = new PerformanceResultsObject(data(1),
           data(7),
           data(8),

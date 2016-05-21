@@ -46,7 +46,9 @@ object App {
     val editorialDesktopPageweightFilename = "editorialpageweightdashboarddesktop.html"
     val editorialMobilePageweightFilename = "editorialpageweightdashboardmobile.html"
 
-    val dotcomPageSpeedFilename = "dotcompagespeeddashboardmobile.html"
+    val dotcomPageSpeedFilename = "dotcompagespeeddashboard.html"
+
+    val interactiveDashboardFilename = "interactivedashboard.html"
 
     val articleResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + articleOutputFilename
     val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + liveBlogOutputFilename
@@ -77,6 +79,7 @@ object App {
     var combinedOldResults: List[PerformanceResultsObject] = List()
     var combinedRecentAlertOrLive: List[PerformanceResultsObject] = List()
     var combinedRecentStatic: List[PerformanceResultsObject] = List()
+
 
     //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
     val htmlString = new HtmlStringOperations(averageColor, warningColor, alertColor, articleResultsUrl, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
@@ -221,6 +224,8 @@ object App {
     val combinedCapiResults = articles ::: liveBlogs ::: interactives ::: fronts
     val dedupedResultsToRetest = for (result <- previousResultsToRetest if !combinedCapiResults.map(_._2).contains(result.testUrl)) yield result
     val dedupedUnchangedResults = for (result <- unchangedPreviousResults if !combinedCapiResults.map(_._2).contains(result.testUrl)) yield result
+    val dedupedDesktopResults = for (result <- dedupedUnchangedResults if result.typeOfTestName.contains("Desktop")) yield result
+    val dedupedMobileResults = for (result <- dedupedUnchangedResults if result.typeOfTestName.contains("Mobile")) yield result
 
     println("Summary of pages after comparing CAPI response with existing test results: \n")
     println(dedupedResultsToRetest.length + " pages to be tested - this includes previous alerts, liveblogs, updated pages and new CAPI results")
@@ -459,11 +464,21 @@ object App {
 
 //Generate Lists for sortBySpeed combined pages
     val sortedBySpeedCombinedResults: List[PerformanceResultsObject] = orderListBySpeed(combinedResultsList ::: dedupedUnchangedResults)
-    val sortedBySpeedCombinedDesktopResults: List[PerformanceResultsObject] = sortHomogenousResultsBySpeed(combinedDesktopResultsList)
-    val sortedBySpeedCombinedMobileResults: List[PerformanceResultsObject] = sortHomogenousResultsBySpeed(combinedMobileResultsList)
+    val sortedBySpeedCombinedDesktopResults: List[PerformanceResultsObject] = sortHomogenousResultsBySpeed(combinedDesktopResultsList ::: dedupedDesktopResults)
+    val sortedBySpeedCombinedMobileResults: List[PerformanceResultsObject] = sortHomogenousResultsBySpeed(combinedMobileResultsList ::: dedupedMobileResults)
+
+//Generate Lists for interactive pages
+    val combiledInteractiveResultsList = for (result <- combinedResultsList ::: dedupedUnchangedResults  if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
+    val interactiveDesktopResults = for (result <- combinedDesktopResultsList ::: dedupedDesktopResults if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
+    val interactiveMobileResults = for (result <- combinedMobileResultsList ::: dedupedMobileResults if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
+
+    val sortedInteractiveCombinedResults: List[PerformanceResultsObject] = orderInteractivesBySpeed(combiledInteractiveResultsList)
+    val sortedInteractiveDesktopResults: List[PerformanceResultsObject] = sortHomogenousInteractiveResultsBySpeed(interactiveDesktopResults)
+    val sortedInteractiveMobileResults: List[PerformanceResultsObject] = sortHomogenousInteractiveResultsBySpeed(interactiveMobileResults)
 
 
     val dotcomPageSpeedDashboard = new PageSpeedDashboardTabbed(sortedBySpeedCombinedResults, sortedBySpeedCombinedDesktopResults, sortedBySpeedCombinedMobileResults)
+    val interactiveDashboard = new InteractiveDashboardTabbed(sortedInteractiveCombinedResults, sortedInteractiveDesktopResults, sortedInteractiveMobileResults)
 
       //write combined results to file
       if (!iamTestingLocally) {
@@ -477,6 +492,7 @@ object App {
         s3Interface.writeFileToS3(editorialMobilePageweightFilename, editorialPageWeightDashboardMobile.toString())
         s3Interface.writeFileToS3(editorialPageweightFilename, editorialPageWeightDashboard.toString())
         s3Interface.writeFileToS3(dotcomPageSpeedFilename, dotcomPageSpeedDashboard.toString())
+        s3Interface.writeFileToS3(interactiveDashboardFilename, interactiveDashboard.toString())
         s3Interface.writeFileToS3(resultsFromPreviousTests, resultsToRecordCSVString)
       }
       else {
@@ -512,6 +528,11 @@ object App {
           System exit 1
         }
         val writeSuccessDCPSD: Int = outputWriter.writeLocalResultFile(dotcomPageSpeedFilename, dotcomPageSpeedDashboard.toString())
+        if (writeSuccessPWDM != 0) {
+          println("problem writing local outputfile")
+          System exit 1
+        }
+        val writeSuccessIPSD: Int = outputWriter.writeLocalResultFile(interactiveDashboardFilename, interactiveDashboard.toString())
         if (writeSuccessPWDM != 0) {
           println("problem writing local outputfile")
           System exit 1
@@ -775,7 +796,23 @@ object App {
       sortBySpeed(alertsList) ::: sortBySpeed(okList)
     }
     else{
-      println("orderListByWeight has odd number of elements. List length is: " + list.length)
+      println("orderListBySpeed has odd number of elements. List length is: " + list.length)
+      List()
+    }
+  }
+
+  def orderInteractivesBySpeed(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    if(list.length % 2 == 0) {
+      println("orderListByWeight called. \n It has " + list.length + " elements.")
+      val tupleList = listSinglesToPairs(list)
+      println("listSinglesToPairs returned a list of " + tupleList.length + " pairs.")
+      val alertsList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if element._1.alertStatusPageSpeed || element._2.alertStatusPageSpeed || element._1.alertStatusPageWeight || element._2.alertStatusPageWeight) yield element
+      val okList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if !element._1.alertStatusPageSpeed && !element._2.alertStatusPageSpeed && !element._1.alertStatusPageWeight && !element._2.alertStatusPageWeight) yield element
+
+      sortBySpeed(alertsList) ::: sortBySpeed(okList)
+    }
+    else{
+      println("orderInteractivesBySpeed has odd number of elements. List length is: " + list.length)
       List()
     }
   }
@@ -795,7 +832,15 @@ object App {
     val sortedOkList: List[PerformanceResultsObject] = okResultsList.sortWith(_.speedIndex > _.speedIndex)
     sortedAlertList ::: sortedOkList
   }
-  
+
+  def sortHomogenousInteractiveResultsBySpeed(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    val alertsResultsList: List[PerformanceResultsObject] = for (result <- list if result.alertStatusPageSpeed || result.alertStatusPageWeight) yield result
+    val okResultsList: List[PerformanceResultsObject] = for (result <- list if !result.alertStatusPageSpeed && !result.alertStatusPageWeight) yield result
+    val sortedAlertList: List[PerformanceResultsObject] = alertsResultsList.sortWith(_.speedIndex > _.speedIndex)
+    val sortedOkList: List[PerformanceResultsObject] = okResultsList.sortWith(_.speedIndex > _.speedIndex)
+    sortedAlertList ::: sortedOkList
+  }
+
   def sortByWeight(list: List[(PerformanceResultsObject,PerformanceResultsObject)]): List[PerformanceResultsObject] = {
     if(list.nonEmpty){
       val sortedTupleList = sortTupleListByWeight(list)
