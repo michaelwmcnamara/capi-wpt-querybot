@@ -115,7 +115,11 @@ class InteractiveDashboardTabbed(combinedResultsList: List[PerformanceResultsObj
   def generatePageElementTable(resultsObject: PerformanceResultsObject): String = {
     HTML_PAGE_ELEMENT_TABLE_HEADERSPT1 + "\n"  +
       "<caption class=\"" + getAlertClass(resultsObject) + "\">" + "Alert was triggered because: " + resultsObject.genTestResultString() + "</caption>" +
-      HTML_PAGE_ELEMENT_TABLE_HEADERSPT2 + getHTMLForPageElements(resultsObject) + HTML_PAGE_ELEMENT_TABLE_END
+      HTML_PAGE_ELEMENT_TABLE_HEADERSPT2 + 
+      "<tr class=\"datarow\">" + "<a href=\"" + resultsObject.friendlyResultUrl + "\">" + Click here for full result summary + "</a>" + "</tr>" +
+      getHTMLForPageElements(resultsObject) + 
+      "<tr class=\"datarow\">" + "<a href=\""+ resultsObject.friendlyResultUrl + "/1/details/\">Click here for full elements summary</a>" + "</tr>" +
+      + HTML_PAGE_ELEMENT_TABLE_END
   }
 
   def getHTMLForPageElements(resultsObject: PerformanceResultsObject): String = {
