@@ -74,12 +74,6 @@ object App {
     //initialize combinedResultsLists - these will be used to sort and accumulate test results
     // for the combined page and for long term storage file
     var combinedResultsList: List[PerformanceResultsObject] = List()
-    var combinedPreviousResultsList: List[PerformanceResultsObject] = List()
-    var combinedResultsLast24Hours: List[PerformanceResultsObject] = List()
-    var combinedOldResults: List[PerformanceResultsObject] = List()
-    var combinedRecentAlertOrLive: List[PerformanceResultsObject] = List()
-    var combinedRecentStatic: List[PerformanceResultsObject] = List()
-
 
     //  Initialize results string - this will be used to accumulate the results from each test so that only one write to file is needed.
     val htmlString = new HtmlStringOperations(averageColor, warningColor, alertColor, articleResultsUrl, liveBlogResultsUrl, interactiveResultsUrl, frontsResultsUrl)
@@ -172,8 +166,14 @@ object App {
     val resultsFromLast24Hours = for (result <- previousResults if (result.getFirstPublished >= cutoffTime) || (result.getPageLastUpdated >= cutoffTime)) yield result
     val oldResults = for (result <- previousResults if (result.getFirstPublished < cutoffTime) && (result.getPageLastUpdated < cutoffTime)) yield result
 
-    val previousResultsToRetest: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if (result.alertStatusPageWeight || result.getLiveBloggingNow)) yield result
-    val unchangedPreviousResults: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if (!(result.alertStatusPageWeight || result.getLiveBloggingNow))) yield result
+    val previousResultsToRetest: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if result.alertStatusPageWeight || result.alertStatusPageSpeed || result.getLiveBloggingNow) yield result
+    val unchangedPreviousResults: List[PerformanceResultsObject] = for (result <- resultsFromLast24Hours if !(result.alertStatusPageWeight || result.alertStatusPageSpeed || result.getLiveBloggingNow)) yield result
+
+    val desktopPreviousResultsToReTest = for (result <- previousResultsToRetest if result.typeOfTest.contains("Desktop")) yield result
+    val mobilePreviousResultsToReTest = for (result <- previousResultsToRetest if result.typeOfTest.contains("Android/3G")) yield result
+
+    val dedupedMobilePreviousResultsToRetest = for (result <- mobilePreviousResultsToReTest if!desktopPreviousResultsToReTest.map(_.testUrl).contains(result.testUrl)) yield result
+    val dedupedPreviousResultsToRestest: List[PerformanceResultsObject] = dedupedMobilePreviousResultsToRetest ::: desktopPreviousResultsToReTest
 
     //validate list handling
 
@@ -195,8 +195,10 @@ object App {
     println("Retrieved results from file\n")
     println(previousResults.length + " results retrieved in total")
     println(resultsFromLast24Hours.length + " results for last 24 hours")
-    println(previousResultsToRetest.length + " results will be retested")
+    println(previousResultsToRetest.length + " results will be elegible for retest")
+    println(dedupedPreviousResultsToRestest + " results are not duplicates and will actually be retested")
     println(unchangedPreviousResults.length + " results will be listed but not tested")
+
     //Create Email Handler class
     val emailer: EmailOperations = new EmailOperations(emailUsername, emailPassword)
 
@@ -222,7 +224,7 @@ object App {
     println((articles.length + liveBlogs.length + interactives.length + fronts.length + videoPages.length + audioPages.length) + " pages returned in total")
 
     val combinedCapiResults = articles ::: liveBlogs ::: interactives ::: fronts
-    val dedupedResultsToRetest = for (result <- previousResultsToRetest if !combinedCapiResults.map(_._2).contains(result.testUrl)) yield result
+    val dedupedResultsToRetest = for (result <- dedupedPreviousResultsToRestest if !combinedCapiResults.map(_._2).contains(result.testUrl)) yield result
     val dedupedUnchangedResults = for (result <- unchangedPreviousResults if !combinedCapiResults.map(_._2).contains(result.testUrl)) yield result
     val dedupedDesktopResults = for (result <- dedupedUnchangedResults if result.typeOfTestName.contains("Desktop")) yield result
     val dedupedMobileResults = for (result <- dedupedUnchangedResults if result.typeOfTestName.contains("Mobile")) yield result
@@ -231,7 +233,7 @@ object App {
     println(dedupedResultsToRetest.length + " pages to be tested - this includes previous alerts, liveblogs, updated pages and new CAPI results")
     println(dedupedUnchangedResults.length + " pages that will be displayed but not tested - these are unchanged pages to which we already have results")
     
-    val dedupedPreviousAlertUrls: List[String] = for (result <- dedupedResultsToRetest) yield result.testUrl
+    val dedupedResultsToRetestUrls: List[String] = for (result <- dedupedResultsToRetest) yield result.testUrl
     val articleUrls: List[String] = for (page <- articles) yield page._2
     val liveBlogUrls: List[String] = for (page <- liveBlogs) yield page._2
     val interactiveUrls: List[String] = for (page <- interactives) yield page._2
@@ -243,7 +245,7 @@ object App {
 
 
     // send all urls to webpagetest at once to enable parallel testing by test agents
-    val urlsToSend: List[String] = (dedupedPreviousAlertUrls ::: articleUrls ::: liveBlogUrls ::: interactiveUrls ::: frontsUrls).distinct
+    val urlsToSend: List[String] = (dedupedResultsToRetestUrls ::: articleUrls ::: liveBlogUrls ::: interactiveUrls ::: frontsUrls).distinct
     println("Combined list of urls: \n" + urlsToSend)
 
     val resultUrlList: List[(String, String)] = getResultPages(urlsToSend, urlFragments, wptBaseUrl, wptApiKey, wptLocation)
@@ -548,10 +550,10 @@ object App {
 
 
     //check if alert items have already been sent in earlier run
-    val newArticleAlertsList: List[PerformanceResultsObject] = for (result <- articleAlertList if !previousResultsToRetest.map(_.testUrl).contains(result.testUrl)) yield result
-    val newLiveBlogAlertsList: List[PerformanceResultsObject] = for (result <- liveBlogAlertList if !previousResultsToRetest.map(_.testUrl).contains(result.testUrl)) yield result
-    val newInteractiveAlertsList: List[PerformanceResultsObject] = for (result <- interactiveAlertList if !previousResultsToRetest.map(_.testUrl).contains(result.testUrl)) yield result
-    val newFrontsAlertsList: List[PerformanceResultsObject] = for (result <- frontsAlertList if !previousResultsToRetest.map(_.testUrl).contains(result.testUrl)) yield result
+    val newArticleAlertsList: List[PerformanceResultsObject] = for (result <- articleAlertList if !dedupedPreviousResultsToRestest.map(_.testUrl).contains(result.testUrl)) yield result
+    val newLiveBlogAlertsList: List[PerformanceResultsObject] = for (result <- liveBlogAlertList if !dedupedPreviousResultsToRestest.map(_.testUrl).contains(result.testUrl)) yield result
+    val newInteractiveAlertsList: List[PerformanceResultsObject] = for (result <- interactiveAlertList if !dedupedPreviousResultsToRestest.map(_.testUrl).contains(result.testUrl)) yield result
+    val newFrontsAlertsList: List[PerformanceResultsObject] = for (result <- frontsAlertList if !dedupedPreviousResultsToRestest.map(_.testUrl).contains(result.testUrl)) yield result
 
 
 
@@ -774,16 +776,27 @@ object App {
     webPageTest.testMultipleTimes(initialResult.testUrl, initialResult.typeOfTest, wptLocation, testCount)
   }
 
+  def returnValidListOfPairs(list: List[PerformanceResultsObject]): (List[PerformanceResultsObject],List[PerformanceResultsObject]) = {
+    val desktopList = for (result <- list if result.typeOfTest.contains("Desktop")) yield result
+    val mobileList = for (result <- list if result.typeOfTest.contains("Android/3G")) yield result
+    val missingFromDesktop = for (result <- mobileList if!desktopList.map(_.testUrl).contains(result.testUrl)) yield result
+    val missingFromMobile = for (result <- desktopList if!mobileList.map(_.testUrl).contains(result.testUrl)) yield result
+    val validListOfPairs = for (result <- list if(!missingFromDesktop.map(_.testUrl).contains(result.testUrl)) && (!missingFromMobile.map(_.testUrl).contains(result.testUrl))) yield result
+    (validListOfPairs, missingFromDesktop ::: missingFromMobile)
+  }
 
   def orderListByWeight(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
     if(list.length % 2 == 0) {
       println("orderListByWeight called. \n It has " + list.length + " elements.")
-      val tupleList = listSinglesToPairs(list)
+      val validatedList = returnValidListOfPairs(list)
+      val tupleList = listSinglesToPairs(validatedList._1)
+      val leftOverAlerts = for (result <- validatedList._2 if result.alertStatusPageWeight) yield result
+      val leftOverNormal = for (result <- validatedList._2 if !result.alertStatusPageWeight) yield result
       println("listSinglesToPairs returned a list of " + tupleList.length + " pairs.")
-      val alertsList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if element._1.alertStatusPageWeight || element._2.alertStatusPageWeight) yield element
+      val alertsList: List[(PerformanceResultsObject, PerformanceResultsObject)] = (for (element <- tupleList if element._1.alertStatusPageWeight || element._2.alertStatusPageWeight) yield element)
       val okList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if !element._1.alertStatusPageWeight && !element._2.alertStatusPageWeight) yield element
 
-      sortByWeight(alertsList) ::: sortByWeight(okList)
+      sortByWeight(alertsList) ::: leftOverAlerts ::: sortByWeight(okList) ::: leftOverNormal
     }
     else{
       println("orderListByWeight has odd number of elements. List length is: " + list.length)
@@ -794,12 +807,15 @@ object App {
   def orderListBySpeed(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
     if(list.length % 2 == 0) {
       println("orderListByWeight called. \n It has " + list.length + " elements.")
-      val tupleList = listSinglesToPairs(list)
+      val validatedList = returnValidListOfPairs(list)
+      val tupleList = listSinglesToPairs(validatedList._1)
+      val leftOverAlerts = for (result <- validatedList._2 if result.alertStatusPageSpeed) yield result
+      val leftOverNormal = for (result <- validatedList._2 if !result.alertStatusPageSpeed) yield result
       println("listSinglesToPairs returned a list of " + tupleList.length + " pairs.")
       val alertsList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if element._1.alertStatusPageSpeed || element._2.alertStatusPageSpeed) yield element
       val okList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if !element._1.alertStatusPageSpeed && !element._2.alertStatusPageSpeed) yield element
 
-      sortBySpeed(alertsList) ::: sortBySpeed(okList)
+      sortBySpeed(alertsList) ::: leftOverAlerts ::: sortBySpeed(okList) ::: leftOverNormal
     }
     else{
       println("orderListBySpeed has odd number of elements. List length is: " + list.length)
