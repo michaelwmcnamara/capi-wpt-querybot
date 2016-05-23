@@ -68,12 +68,14 @@ class InteractiveDashboardTabbed(combinedResultsList: List[PerformanceResultsObj
   val HTML_PAGE_ELEMENT_TABLE_HEADERSPT1: String = "<tr>" + "\n" +
     "<td colspan=\"12\">" + "<table id=\"data\" class=\"data\">" + "\n"
 
-  val HTML_PAGE_ELEMENT_TABLE_HEADERSPT2: String =
+  val HTML_PAGE_ELEMENT_TABLE_HEADERSPT2A: String =
     "<caption>List of page elements loaded during test. These are sorted by size - Recommend reviewing these items."
 
 
+  val HTML_PAGE_ELEMENT_TABLE_HEADERSPT2B: String =
+    ".</caption>" + "\n"
+
   val HTML_PAGE_ELEMENT_TABLE_HEADERSPT3: String =
-    ".</caption>" + "\n" +
   "<thead>" + "\n" +
     "<tr>" + "<th>Resource</th>" + "<th>Content Type</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
     "</thead>" +"\n" +
@@ -120,8 +122,8 @@ class InteractiveDashboardTabbed(combinedResultsList: List[PerformanceResultsObj
     HTML_PAGE_ELEMENT_TABLE_HEADERSPT1 + "\n"  +
       "<caption class=\"" + getAlertClass(resultsObject) + "\">" + "Alert was triggered because: " + resultsObject.genTestResultString() +
       "  <a href=\"" + resultsObject.friendlyResultUrl + "\">" + "Click here for full result summary" + "</a>" + "</caption>" +
-      HTML_PAGE_ELEMENT_TABLE_HEADERSPT2 + " <a href=\""+ resultsObject.friendlyResultUrl + "/1/details/\">Click here for full elements summary</a>" + HTML_PAGE_ELEMENT_TABLE_HEADERSPT3 +
-      getHTMLForPageElements(resultsObject)
+      HTML_PAGE_ELEMENT_TABLE_HEADERSPT2A + "  <a href=\""+ resultsObject.friendlyResultUrl + "/1/details/\">Click here for full elements summary</a>" + HTML_PAGE_ELEMENT_TABLE_HEADERSPT2B +
+      HTML_PAGE_ELEMENT_TABLE_HEADERSPT3 + getHTMLForPageElements(resultsObject) +
       HTML_PAGE_ELEMENT_TABLE_END
   }
 
