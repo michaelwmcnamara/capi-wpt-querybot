@@ -589,13 +589,19 @@ object App {
     }*/
     val alertsToSend = newArticleAlertsList ::: newLiveBlogAlertsList ::: newInteractiveAlertsList
     if (alertsToSend.nonEmpty) {
-      val emailContent = new PageWeightEmailTemplate(newArticleAlertsList ::: newLiveBlogAlertsList ::: newInteractiveAlertsList)
-
-      val emailSuccess = emailer.send(generalAlertsAddressList, emailContent.toString())
-      if (emailSuccess)
-        println(DateTime.now + " General Alert Emails sent successfully. ")
+      val pageWeightEmailAlerts = new PageWeightEmailTemplate(newArticleAlertsList ::: newLiveBlogAlertsList ::: newInteractiveAlertsList, amazonDomain + s3BucketName + editorialPageweightFilename)
+      val interactiveEmailAlerts = new InteractiveEmailTemplate(newInteractiveAlertsList, amazonDomain + s3BucketName + interactiveDashboardFilename)
+      val pageWeightEmailSuccess = emailer.send(generalAlertsAddressList, pageWeightEmailAlerts.toString())
+      val interactiveEmailSuccess = if(newInteractiveAlertsList.nonEmpty){
+        emailer.send(interactiveAlertsAddressList, interactiveEmailAlerts.toString())
+      } else {
+        println("no interactive alerts to send, therefore Interactive Alert Email not sent. \n Returning \"true\"")
+        true
+      }
+      if (pageWeightEmailSuccess && interactiveEmailSuccess)
+        println(DateTime.now + " General Alert Emails and (if any) Interactive Alert Emails sent successfully. ")
       else
-        println(DateTime.now + "ERROR: Job completed, but sending of general Alert Emails failed")
+        println(DateTime.now + "ERROR: Job completed, but sending of General Alert Emails and/or Interactive Alert Emails failed")
     }else {
       println("No pages to alert on. Email not sent. \n Job complete")
     }
