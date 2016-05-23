@@ -69,11 +69,15 @@ class InteractiveDashboardTabbed(combinedResultsList: List[PerformanceResultsObj
     "<td colspan=\"12\">" + "<table id=\"data\" class=\"data\">" + "\n"
 
   val HTML_PAGE_ELEMENT_TABLE_HEADERSPT2: String =
-    "<caption>List of 5 heaviest elements on page - Recommend reviewing these items </caption>" + "\n" +
-      "<thead>" + "\n" +
-      "<tr>" + "<th>Resource</th>" + "<th>Content Type</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
-      "</thead>" +"\n" +
-      "<tbody>"
+    "<caption>List of page elements loaded during test. These are sorted by size - Recommend reviewing these items."
+
+
+  val HTML_PAGE_ELEMENT_TABLE_HEADERSPT3: String =
+    ".</caption>" + "\n" +
+  "<thead>" + "\n" +
+    "<tr>" + "<th>Resource</th>" + "<th>Content Type</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
+    "</thead>" +"\n" +
+    "<tbody>"
 
   val HTML_TABLE_END: String = "</tbody>" + "\n" + "</table>"+ "\n"
 
@@ -114,11 +118,10 @@ class InteractiveDashboardTabbed(combinedResultsList: List[PerformanceResultsObj
 
   def generatePageElementTable(resultsObject: PerformanceResultsObject): String = {
     HTML_PAGE_ELEMENT_TABLE_HEADERSPT1 + "\n"  +
-      "<caption class=\"" + getAlertClass(resultsObject) + "\">" + "Alert was triggered because: " + resultsObject.genTestResultString() + "</caption>" +
-      HTML_PAGE_ELEMENT_TABLE_HEADERSPT2 + 
-      "<tr class=\"datarow\">" + "<a href=\"" + resultsObject.friendlyResultUrl + "\">" + "Click here for full result summary" + "</a>" + "</tr>" +
-      getHTMLForPageElements(resultsObject) + 
-      "<tr class=\"datarow\">" + "<a href=\""+ resultsObject.friendlyResultUrl + "/1/details/\">Click here for full elements summary</a>" + "</tr>" +
+      "<caption class=\"" + getAlertClass(resultsObject) + "\">" + "Alert was triggered because: " + resultsObject.genTestResultString() +
+      "  <a href=\"" + resultsObject.friendlyResultUrl + "\">" + "Click here for full result summary" + "</a>" + "</caption>" +
+      HTML_PAGE_ELEMENT_TABLE_HEADERSPT2 + " <a href=\""+ resultsObject.friendlyResultUrl + "/1/details/\">Click here for full elements summary</a>" + HTML_PAGE_ELEMENT_TABLE_HEADERSPT3 +
+      getHTMLForPageElements(resultsObject)
       HTML_PAGE_ELEMENT_TABLE_END
   }
 
