@@ -776,6 +776,7 @@ object App {
     webPageTest.testMultipleTimes(initialResult.testUrl, initialResult.typeOfTest, wptLocation, testCount)
   }
 
+  //This is to resolve issues where there is a missing Desktop or Mobile test so the tuple sorting gets borked - it wont give a perfect sort in this case, but better than the current state of things.
   def returnValidListOfPairs(list: List[PerformanceResultsObject]): (List[PerformanceResultsObject],List[PerformanceResultsObject]) = {
     val desktopList = for (result <- list if result.typeOfTest.contains("Desktop")) yield result
     val mobileList = for (result <- list if result.typeOfTest.contains("Android/3G")) yield result
