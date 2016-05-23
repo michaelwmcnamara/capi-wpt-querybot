@@ -470,11 +470,11 @@ object App {
     val sortedBySpeedCombinedMobileResults: List[PerformanceResultsObject] = sortHomogenousResultsBySpeed(combinedMobileResultsList ::: dedupedMobileResults)
 
 //Generate Lists for interactive pages
-    val combiledInteractiveResultsList = for (result <- combinedResultsList ::: dedupedUnchangedResults  if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
+    val combinedInteractiveResultsList = for (result <- combinedResultsList ::: dedupedUnchangedResults  if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
     val interactiveDesktopResults = for (result <- combinedDesktopResultsList ::: dedupedDesktopResults if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
     val interactiveMobileResults = for (result <- combinedMobileResultsList ::: dedupedMobileResults if (result.getPageType.contains("Interactive") || result.getPageType.contains("interactive"))) yield result
 
-    val sortedInteractiveCombinedResults: List[PerformanceResultsObject] = orderInteractivesBySpeed(combiledInteractiveResultsList)
+    val sortedInteractiveCombinedResults: List[PerformanceResultsObject] = orderInteractivesBySpeed(combinedInteractiveResultsList)
     val sortedInteractiveDesktopResults: List[PerformanceResultsObject] = sortHomogenousInteractiveResultsBySpeed(interactiveDesktopResults)
     val sortedInteractiveMobileResults: List[PerformanceResultsObject] = sortHomogenousInteractiveResultsBySpeed(interactiveMobileResults)
 
@@ -808,7 +808,7 @@ object App {
 
   def orderListBySpeed(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
     if(list.length % 2 == 0) {
-      println("orderListByWeight called. \n It has " + list.length + " elements.")
+      println("orderListBySpeed called. \n It has " + list.length + " elements.")
       val validatedList = returnValidListOfPairs(list)
       val tupleList = listSinglesToPairs(validatedList._1)
       val leftOverAlerts = for (result <- validatedList._2 if result.alertStatusPageSpeed) yield result
@@ -827,13 +827,16 @@ object App {
 
   def orderInteractivesBySpeed(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
     if(list.length % 2 == 0) {
-      println("orderListByWeight called. \n It has " + list.length + " elements.")
-      val tupleList = listSinglesToPairs(list)
+      println("orderInteractivesBySpeed called. \n It has " + list.length + " elements.")
+      val validatedList = returnValidListOfPairs(list)
+      val tupleList = listSinglesToPairs(validatedList._1)
+      val leftOverAlerts = for (result <- validatedList._2 if result.alertStatusPageSpeed) yield result
+      val leftOverNormal = for (result <- validatedList._2 if !result.alertStatusPageSpeed) yield result
       println("listSinglesToPairs returned a list of " + tupleList.length + " pairs.")
       val alertsList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if element._1.alertStatusPageSpeed || element._2.alertStatusPageSpeed || element._1.alertStatusPageWeight || element._2.alertStatusPageWeight) yield element
       val okList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if !element._1.alertStatusPageSpeed && !element._2.alertStatusPageSpeed && !element._1.alertStatusPageWeight && !element._2.alertStatusPageWeight) yield element
 
-      sortBySpeed(alertsList) ::: sortBySpeed(okList)
+      sortBySpeed(alertsList) ::: leftOverAlerts ::: sortBySpeed(okList) ::: leftOverNormal
     }
     else{
       println("orderInteractivesBySpeed has odd number of elements. List length is: " + list.length)
