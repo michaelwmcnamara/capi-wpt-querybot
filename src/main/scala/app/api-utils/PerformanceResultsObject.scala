@@ -262,11 +262,12 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
   def cleanString(inputString: String): String = {
     var clean= inputString.replace(",", " ")
-    clean.replace("\r", "")
-    clean.replace("\n", "")
-    clean.replace("<", "")
-    clean.replace(">", "")
-    clean.replace("/", "")
+    clean = clean.replace("\r", "")
+    clean = clean.replace("\n", "")
+    clean = clean.replace("\\", "")
+    clean = clean.replace("<", "")
+    clean = clean.replace(">", "")
+    clean = clean.replace("/", "")
     clean
   }
 }
