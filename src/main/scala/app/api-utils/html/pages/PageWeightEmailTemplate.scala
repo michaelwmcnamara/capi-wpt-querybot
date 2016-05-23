@@ -36,10 +36,9 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject], url:
 
   //Page Tables
   val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"report\">"+ "\n" +
-    "<thead>" + "\n" +
-    "<tr> <th>You have been alerted because the following pages have been found to be too heavy and require review.</th>" + "</tr>"+ "\n" +
-    "</thead>" +"\n" +
-    "<tbody>"
+    "<tbody>" + "\n" +
+    "<tr> <th>You have been alerted because the following pages have been found to be too heavy and require review.</th>" + "</tr>"+ "\n"
+
 
   val HTML_PAGE_ELEMENT_TABLE_HEADERS: String = "<tr>" + "\n" +
     "<td colspan=\"12\">" + "Main cause seems to be these elements, which weigh in at: </td>" + "\n"
@@ -50,7 +49,7 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject], url:
 
   //Page Footer
   val HTML_FOOTER: String = "</div>" + "\n" +
-    "<div id=\"footer\">" + "<p>" + "<a href=\"" + dashboardUrl + "\">" + "click here for more information"+ "</a>" + "</p>" + "</div>" + "\n" +
+    "<div id=\"footer\">"  + "</div>" + "\n" +
     "</div>" + "\n" +
     "</body>" + "\n" +
     "</html>"
@@ -68,8 +67,9 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject], url:
   def generateHTMLDataRows(resultsList: List[PerformanceResultsObject]): String = {
     (for (result <- resultsList) yield {
       "<tr class=\"pageclass default\">" + "<td> The article: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
-       "is weighing in at " + result.mBInFullyLoaded + " MB. for " + result.typeOfTestName + "." +  
-       "<a href = \"" + dashboardUrl + "\"> Click here for more information on how to resolve this.</a>" + "<\td>" + "</tr>" + "\n"
+       " is weighing in at " + result.mBInFullyLoaded + " MB, for " + result.typeOfTestName + " pageviews." +  "</td>" + "</tr>" + "\n" +
+      "<tr class=\"pageclass default\">" + "<td> <a href = \"" + dashboardUrl + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
+        "<tr class=\"pageclass default\">" + "<td>  </td>" + "</tr>" + "\n"
     }).mkString
 
   }

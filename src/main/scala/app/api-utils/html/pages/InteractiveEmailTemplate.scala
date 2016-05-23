@@ -36,10 +36,8 @@
 
     //Page Tables
     val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"report\">"+ "\n" +
-      "<thead>" + "\n" +
-      "<tr> <th>You have been alerted because the following pages have been found to be too heavy and require review.</th>" + "</tr>"+ "\n" +
-      "</thead>" +"\n" +
-      "<tbody>"
+      "<tbody>" + "\n" +
+      "<tr> <th>You have been alerted because the following interactive pages have been found to have weight or performance problems and require review.</th>" + "</tr>"+ "\n"
 
     val HTML_PAGE_ELEMENT_TABLE_HEADERS: String = "<tr>" + "\n" +
       "<td colspan=\"12\">" + "Main cause seems to be these elements, which weigh in at: </td>" + "\n"
@@ -50,7 +48,7 @@
 
     //Page Footer
     val HTML_FOOTER: String = "</div>" + "\n" +
-      "<div id=\"footer\">" + "<p>" + "<a href=\"" + dashboardUrl + "\">" + "click here for more information"+ "</a>" + "</p>" + "</div>" + "\n" +
+      "<div id=\"footer\">" + "</div>" + "\n" +
       "</div>" + "\n" +
       "</body>" + "\n" +
       "</html>"

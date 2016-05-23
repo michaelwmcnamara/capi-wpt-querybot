@@ -184,7 +184,7 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
 
   def toHTMLRowString():String = {
     val returnString: String = "<tr class=\"datarow\">" +
-      "<td><a href = \"" + resource + "\">" + resource + "</a></td>" +
+      "<td><a href = \"" + resource + "\">" + resource.take(180) + "</a></td>" +
       "<td>" + contentType + "</td>" +
       "<td>" + sizeInMB + " MB</td>" +
       "</tr>" + "\n"
