@@ -6,11 +6,11 @@ import org.joda.time.DateTime
 /**
  * Created by mmcnamara on 15/04/16.
  */
-class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject]) {
+class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject], url: String) {
 
   //HTML Page elements
   //Page Header
-  val dashboardUrl = "https://s3-eu-west-1.amazonaws.com/capi-wpt-querybot/editorialpageweightdashboard.html"
+  val dashboardUrl = url
 
   val HTML_PAGE_HEAD: String = "<!DOCTYPE html><html lang=\"en\">" + "\n" +
     "<head> <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>" + "\n" +
