@@ -37,7 +37,7 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject], url:
   //Page Tables
   val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"report\">"+ "\n" +
     "<tbody>" + "\n" +
-    "<tr> <th>You have been alerted because the following pages have been found to be too heavy and require review.</th>" + "</tr>"+ "\n"
+    "<tr><th>You have been alerted because the following pages have been found to be too heavy and require review.</th>" + "</tr>"+ "\n"
 
 
   val HTML_PAGE_ELEMENT_TABLE_HEADERS: String = "<tr>" + "\n" +
