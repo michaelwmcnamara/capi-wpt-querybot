@@ -788,8 +788,6 @@ object App {
   }
 
   def orderListByWeight(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
-    if(list.length % 2 == 0) {
-      println("orderListByWeight called. \n It has " + list.length + " elements.")
       val validatedList = returnValidListOfPairs(list)
       val tupleList = listSinglesToPairs(validatedList._1)
       val leftOverAlerts = for (result <- validatedList._2 if result.alertStatusPageWeight) yield result
@@ -799,15 +797,9 @@ object App {
       val okList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if !element._1.alertStatusPageWeight && !element._2.alertStatusPageWeight) yield element
 
       sortByWeight(alertsList) ::: leftOverAlerts ::: sortByWeight(okList) ::: leftOverNormal
-    }
-    else{
-      println("orderListByWeight has odd number of elements. List length is: " + list.length)
-      List()
-    }
   }
 
   def orderListBySpeed(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
-    if(list.length % 2 == 0) {
       println("orderListBySpeed called. \n It has " + list.length + " elements.")
       val validatedList = returnValidListOfPairs(list)
       val tupleList = listSinglesToPairs(validatedList._1)
@@ -818,15 +810,9 @@ object App {
       val okList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if !element._1.alertStatusPageSpeed && !element._2.alertStatusPageSpeed) yield element
 
       sortBySpeed(alertsList) ::: leftOverAlerts ::: sortBySpeed(okList) ::: leftOverNormal
-    }
-    else{
-      println("orderListBySpeed has odd number of elements. List length is: " + list.length)
-      List()
-    }
   }
 
   def orderInteractivesBySpeed(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
-    if(list.length % 2 == 0) {
       println("orderInteractivesBySpeed called. \n It has " + list.length + " elements.")
       val validatedList = returnValidListOfPairs(list)
       val tupleList = listSinglesToPairs(validatedList._1)
@@ -837,11 +823,6 @@ object App {
       val okList: List[(PerformanceResultsObject, PerformanceResultsObject)] = for (element <- tupleList if !element._1.alertStatusPageSpeed && !element._2.alertStatusPageSpeed && !element._1.alertStatusPageWeight && !element._2.alertStatusPageWeight) yield element
 
       sortBySpeed(alertsList) ::: leftOverAlerts ::: sortBySpeed(okList) ::: leftOverNormal
-    }
-    else{
-      println("orderInteractivesBySpeed has odd number of elements. List length is: " + list.length)
-      List()
-    }
   }
 
   def sortHomogenousResultsByWeight(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
@@ -900,8 +881,24 @@ object App {
       tupleList
     }
     else {
-      println("listSinglesToPairs has been passed an empty or odd number of elements: list has " + list.length + "elements" )
-      makeTuple(List((list.head, list.tail.head)), list.tail.tail)
+      if (list.isEmpty) {
+        println("listSinglesToPairs passed empty list. Returning empty list of correct type")
+        val returnList: List[(PerformanceResultsObject, PerformanceResultsObject)] = List()
+        returnList
+      } else {
+        if(list.length == 1){
+          println("listSinglesToPairs passed list of 1. Returning tuple of single element - will introduce a duplicate result")
+          val dummyTestType = if(list.head.typeOfTest.contains("Desktop")){
+            "Android/3G"
+          } else {
+            "Desktop"
+          }
+          List((list.head, new PerformanceResultsObject("Missing test of type", dummyTestType, " for the above url", -1, -1, -1, -1, -1, -1, -1, "", false, false, true)))
+        } else {
+          println("listSinglesToPairs has been passed an empty or odd number of elements: list has " + list.length + "elements")
+          makeTuple(List((list.head, list.tail.head)), list.tail.tail)
+        }
+      }
     }
   }
 
