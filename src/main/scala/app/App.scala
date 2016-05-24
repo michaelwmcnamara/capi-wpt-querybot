@@ -574,8 +574,8 @@ object App {
     }
 
     if (newInteractiveAlertsList.nonEmpty) {
-      println("There are new interactive email alerts to send - length of list is: " + newInteractivePageWeightAlertsList.length)
-      val interactiveEmailAlerts = new InteractiveEmailTemplate(newInteractivePageWeightAlertsList, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardFilename)
+      println("There are new interactive email alerts to send - length of list is: " + newInteractiveAlertsList.length)
+      val interactiveEmailAlerts = new InteractiveEmailTemplate(newInteractiveAlertsList, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardFilename)
       val interactiveEmailSuccess = emailer.send(interactiveAlertsAddressList, interactiveEmailAlerts.toString())
       if (interactiveEmailSuccess) {
         println("Interactive Alert email sent successfully.")
