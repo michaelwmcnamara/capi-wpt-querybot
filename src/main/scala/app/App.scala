@@ -85,14 +85,17 @@ object App {
     var audioResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
     var videoResults: String = htmlString.initialisePageForLiveblog + htmlString.initialiseTable
 
-    //Initialize email alerts string - this will be used to generate emails
+    //Initialize Page-Weight email alerts lists - these will be used to generate emails
 
-    var articleAlertList: List[PerformanceResultsObject] = List()
-    var liveBlogAlertList: List[PerformanceResultsObject] = List()
+    var articlePageWeightAlertList: List[PerformanceResultsObject] = List()
+    var liveBlogPageWeightAlertList: List[PerformanceResultsObject] = List()
+    var interactivePageWeightAlertList: List[PerformanceResultsObject] = List()
+    var frontsPageWeightAlertList: List[PerformanceResultsObject] = List()
+    var audioPageWeightAlertList: List[PerformanceResultsObject] = List()
+    var videoPageWeightAlertList: List[PerformanceResultsObject] = List()
+
+    //Initialize Interactive email alerts lists - these will be used to generate emails
     var interactiveAlertList: List[PerformanceResultsObject] = List()
-    var frontsAlertList: List[PerformanceResultsObject] = List()
-    var audioAlertList: List[PerformanceResultsObject] = List()
-    var videoAlertList: List[PerformanceResultsObject] = List()
 
     // var articleCSVResults: String = ""
     //  var liveBlogCSVResults: String = ""
@@ -285,7 +288,7 @@ object App {
       val articleHTMLResults: List[String] = sortedByWeightArticleResultsList.map(x => htmlString.generateHTMLRow(x))
       // write article results to string
       //Create a list of alerting pages and write to string
-      articleAlertList = for (result <- sortedByWeightArticleResultsList if result.alertStatusPageWeight) yield result
+      articlePageWeightAlertList = for (result <- sortedByWeightArticleResultsList if result.alertStatusPageWeight) yield result
       articleResults = articleResults.concat(articleHTMLResults.mkString)
       articleResults = articleResults + htmlString.closeTable + htmlString.closePage
       //write article results to file
@@ -323,7 +326,7 @@ object App {
       val liveBlogHTMLResults: List[String] = sortedLiveBlogResultsList.map(x => htmlString.generateHTMLRow(x))
       // write liveblog results to string
       //Create a list of alerting pages and write to string
-      liveBlogAlertList = for (result <- sortedLiveBlogResultsList if result.alertStatusPageWeight) yield result
+      liveBlogPageWeightAlertList = for (result <- sortedLiveBlogResultsList if result.alertStatusPageWeight) yield result
 
       liveBlogResults = liveBlogResults.concat(liveBlogHTMLResults.mkString)
       liveBlogResults = liveBlogResults + htmlString.closeTable + htmlString.closePage
@@ -361,7 +364,8 @@ object App {
       }
       val interactiveHTMLResults: List[String] = sortedInteractiveResultsList.map(x => htmlString.interactiveHTMLRow(x))
       //generate interactive alert message body
-      interactiveAlertList = for (result <- sortedInteractiveResultsList if result.alertStatusPageWeight) yield result
+      interactivePageWeightAlertList = for (result <- sortedInteractiveResultsList if result.alertStatusPageWeight) yield result
+      interactiveAlertList = for (result <- sortedInteractiveResultsList if result.alertStatusPageWeight || result.alertStatusPageSpeed) yield result
       // write interactive results to string
       interactiveResults = interactiveResults.concat(interactiveHTMLResults.mkString)
       interactiveResults = interactiveResults + htmlString.closeTable + htmlString.closePage
@@ -398,7 +402,7 @@ object App {
       }
       val frontsHTMLResults: List[String] = sortedFrontsResultsList.map(x => htmlString.generateHTMLRow(x))
       //Create a list of alerting pages and write to string
-      frontsAlertList = for (result <- sortedFrontsResultsList if result.alertStatusPageWeight) yield result
+      frontsPageWeightAlertList = for (result <- sortedFrontsResultsList if result.alertStatusPageWeight) yield result
 
       // write fronts results to string
       frontsResults = frontsResults.concat(frontsHTMLResults.mkString)
@@ -550,20 +554,20 @@ object App {
 
 
     //check if alert items have already been sent in earlier run
-    val newArticleAlertsList: List[PerformanceResultsObject] = for (result <- articleAlertList if !dedupedPreviousResultsToRestest.map(_.testUrl).contains(result.testUrl)) yield result
-    val newLiveBlogAlertsList: List[PerformanceResultsObject] = for (result <- liveBlogAlertList if !dedupedPreviousResultsToRestest.map(_.testUrl).contains(result.testUrl)) yield result
+    val newArticlePageWeightAlertsList: List[PerformanceResultsObject] = for (result <- articlePageWeightAlertList if !dedupedPreviousResultsToRestest.map(_.testUrl).contains(result.testUrl)) yield result
+    val newLiveBlogPageWeightAlertsList: List[PerformanceResultsObject] = for (result <- liveBlogPageWeightAlertList if !dedupedPreviousResultsToRestest.map(_.testUrl).contains(result.testUrl)) yield result
+    val newInteractivePageWeightAlertsList: List[PerformanceResultsObject] = for (result <- interactivePageWeightAlertList if !dedupedPreviousResultsToRestest.map(_.testUrl).contains(result.testUrl)) yield result
+    val newFrontsPageWeightAlertsList: List[PerformanceResultsObject] = for (result <- frontsPageWeightAlertList if !dedupedPreviousResultsToRestest.map(_.testUrl).contains(result.testUrl)) yield result
+
     val newInteractiveAlertsList: List[PerformanceResultsObject] = for (result <- interactiveAlertList if !dedupedPreviousResultsToRestest.map(_.testUrl).contains(result.testUrl)) yield result
-    val newFrontsAlertsList: List[PerformanceResultsObject] = for (result <- frontsAlertList if !dedupedPreviousResultsToRestest.map(_.testUrl).contains(result.testUrl)) yield result
 
-
-
-    /*    if (newArticleAlertsList.nonEmpty || newLiveBlogAlertsList.nonEmpty || newFrontsAlertsList.nonEmpty) {
-      println("\n\n articleAlertList contains: " + newArticleAlertsList.length + " pages")
-      println("\n\n liveBlogAlertList contains: " + newLiveBlogAlertsList.length + " pages")
-      println("\n\n frontsAlertList contains: " + newFrontsAlertsList.length + " pages")
-      val articleAlertMessageBody: String = htmlString.generateAlertEmailBodyElement(newArticleAlertsList)
-      val liveBlogAlertMessageBody: String = htmlString.generateAlertEmailBodyElement(newLiveBlogAlertsList)
-      val frontsAlertMessageBody: String = htmlString.generateAlertEmailBodyElement(newFrontsAlertsList)
+    /*    if (newArticlePageWeightAlertsList.nonEmpty || newLiveBlogPageWeightAlertsList.nonEmpty || newFrontsPageWeightAlertsList.nonEmpty) {
+      println("\n\n articlePageWeightAlertList contains: " + newArticlePageWeightAlertsList.length + " pages")
+      println("\n\n liveBlogPageWeightAlertList contains: " + newLiveBlogPageWeightAlertsList.length + " pages")
+      println("\n\n frontsPageWeightAlertList contains: " + newFrontsPageWeightAlertsList.length + " pages")
+      val articleAlertMessageBody: String = htmlString.generateAlertEmailBodyElement(newArticlePageWeightAlertsList)
+      val liveBlogAlertMessageBody: String = htmlString.generateAlertEmailBodyElement(newLiveBlogPageWeightAlertsList)
+      val frontsAlertMessageBody: String = htmlString.generateAlertEmailBodyElement(newFrontsPageWeightAlertsList)
       println("\n\n ***** \n\n" + "Full email Body:\n" + htmlString.generalAlertFullEmailBody(articleAlertMessageBody, liveBlogAlertMessageBody, frontsAlertMessageBody))
       println("compiling and sending email")
       val emailSuccess = emailer.send(generalAlertsAddressList, htmlString.generalAlertFullEmailBody(articleAlertMessageBody, liveBlogAlertMessageBody, frontsAlertMessageBody))
@@ -575,10 +579,10 @@ object App {
       println("No pages to alert on. Email not sent. \n Job complete")
     }
 
-    if (newInteractiveAlertsList.nonEmpty) {
-      println("\n\n interactiveAlertList contains: " + newInteractiveAlertsList.length + " pages")
+    if (newInteractivePageWeightAlertsList.nonEmpty) {
+      println("\n\n interactivePageWeightAlertList contains: " + newInteractivePageWeightAlertsList.length + " pages")
 
-      val interactiveAlertMessageBody: String = htmlString.generateInteractiveAlertBodyElement(newInteractiveAlertsList)
+      val interactiveAlertMessageBody: String = htmlString.generateInteractiveAlertBodyElement(newInteractivePageWeightAlertsList)
       println("\n\n ***** \n\n" + "Full interactive email Body:\n" + htmlString.interactiveAlertFullEmailBody(interactiveAlertMessageBody))
       println("compiling and sending email")
       val emailSuccess = emailer.send(interactiveAlertsAddressList, htmlString.interactiveAlertFullEmailBody(interactiveAlertMessageBody))
@@ -589,25 +593,32 @@ object App {
     } else {
       println("No pages to alert on. Email not sent. \n Job complete")
     }*/
-    val alertsToSend = newArticleAlertsList ::: newLiveBlogAlertsList ::: newInteractiveAlertsList
+    val alertsToSend = newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList
     if (alertsToSend.nonEmpty) {
-      val pageWeightEmailAlerts = new PageWeightEmailTemplate(newArticleAlertsList ::: newLiveBlogAlertsList ::: newInteractiveAlertsList, amazonDomain + s3BucketName + editorialPageweightFilename)
-      val interactiveEmailAlerts = new InteractiveEmailTemplate(newInteractiveAlertsList, amazonDomain + s3BucketName + interactiveDashboardFilename)
+      println("There are new pageWeight alerts to send! There are " + alertsToSend + " new alerts")
+      val pageWeightEmailAlerts = new PageWeightEmailTemplate(newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList, amazonDomain + "/" + s3BucketName + "/" + editorialPageweightFilename)
       val pageWeightEmailSuccess = emailer.send(generalAlertsAddressList, pageWeightEmailAlerts.toString())
-      val interactiveEmailSuccess = if(newInteractiveAlertsList.nonEmpty){
-        emailer.send(interactiveAlertsAddressList, interactiveEmailAlerts.toString())
-      } else {
-        println("no interactive alerts to send, therefore Interactive Alert Email not sent. \n Returning \"true\"")
-        true
-      }
-      if (pageWeightEmailSuccess && interactiveEmailSuccess)
-        println(DateTime.now + " General Alert Emails and (if any) Interactive Alert Emails sent successfully. ")
+      if (pageWeightEmailSuccess)
+        println(DateTime.now + " Page-Weight Alert Emails sent successfully. ")
       else
-        println(DateTime.now + "ERROR: Job completed, but sending of General Alert Emails and/or Interactive Alert Emails failed")
+        println(DateTime.now + "ERROR: Sending of Page-Weight Alert Emails failed")
     }else {
-      println("No pages to alert on. Email not sent. \n Job complete")
+      println("No pages to alert on Page-Weight. Email not sent.")
     }
 
+    if (newInteractiveAlertsList.nonEmpty) {
+      println("There are new interactive email alerts to send - length of list is: " + newInteractivePageWeightAlertsList.length)
+      val interactiveEmailAlerts = new InteractiveEmailTemplate(newInteractivePageWeightAlertsList, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardFilename)
+      val interactiveEmailSuccess = emailer.send(interactiveAlertsAddressList, interactiveEmailAlerts.toString())
+      if (interactiveEmailSuccess) {
+        println("Interactive Alert email sent successfully.")
+      } else {
+        println("ERROR: Sending of Page-Weight Alert Emails failed")
+      }
+    } else {
+      println("no interactive alerts to send, therefore Interactive Alert Email not sent.")
+    }
+    println("Job complete")
   }
 
   def getResultPages(urlList: List[String], urlFragments: List[String], wptBaseUrl: String, wptApiKey: String, wptLocation: String): List[(String, String)] = {
