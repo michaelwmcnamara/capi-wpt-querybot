@@ -94,6 +94,7 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject], url:
   // Access Methods
 
   override def toString(): String = {
+    println("Page Weight email list: \n" + resultsList)
     HTML_PAGE
   }
 
