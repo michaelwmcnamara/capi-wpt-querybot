@@ -563,7 +563,7 @@ object App {
     val alertsToSend = newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList
     if (alertsToSend.nonEmpty) {
       println("There are new pageWeight alerts to send! There are " + alertsToSend + " new alerts")
-      val pageWeightEmailAlerts = new PageWeightEmailTemplate(newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList, amazonDomain + "/" + s3BucketName + "/" + editorialPageweightFilename)
+      val pageWeightEmailAlerts = new PageWeightEmailTemplate(alertsToSend, amazonDomain + "/" + s3BucketName + "/" + editorialPageweightFilename)
       val pageWeightEmailSuccess = emailer.send(generalAlertsAddressList, pageWeightEmailAlerts.toString())
       if (pageWeightEmailSuccess)
         println(DateTime.now + " Page-Weight Alert Emails sent successfully. ")
