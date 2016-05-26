@@ -20,7 +20,7 @@
       "<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js\"></script>" + "\n" +
       "<link href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css\" rel=\"stylesheet\"/>" + "\n" +
       "<link rel=\"stylesheet\" href=\"/capi-wpt-querybot/assets/css/style.css\"/>"+ "\n" +
-      "<script src=\"/capi-wpt-querybot/assets/js/script.js\"></script>" + "\n" +
+//      "<script src=\"/capi-wpt-querybot/assets/js/script.js\"></script>" + "\n" +
       "</head>"
 
     //Page Container
@@ -64,31 +64,37 @@
     }
 
     def generateHTMLDataRows(resultsList: List[PerformanceResultsObject]): String = {
-      (for (result <- resultsList) yield {
+       val dataRows: String = (for (result <- resultsList) yield {
         if (result.alertStatusPageSpeed || result.alertStatusPageWeight) {
           if (result.alertStatusPageSpeed && result.alertStatusPageWeight) {
+            println("pageweight and speed alert")
             "<tr class=\"pageclass default\">" + "<td> The page: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
               "is showing both weight and speed issues:" + "</td></tr>\n" +
               "<tr class=\"pageclass default\">" + "<td> This page is weighing in at " + result.mBInFullyLoaded + " MB and shows a Speed Index of: " + result.speedIndex + "ms. " +
-              "for " + result.typeOfTestName + "s." +"</td></tr>\n" +
-              "<tr class=\"pageclass default\">" + "<td> <a href = \"" + dashboardUrl + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n"
-              "<tr class=\"pageclass default\">" + "<td>" + " " + "</td>" + "</tr>\n"
+              "for " + result.typeOfTestName + "s." + "</td></tr>\n" +
+              "<tr class=\"pageclass default\">" + "<td> <a href = \"" + dashboardUrl + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
+            "<tr class=\"pageclass default\">" + "<td>" + " " + "</td>" + "</tr>\n"
           } else {
             if (!result.alertStatusPageSpeed && result.alertStatusPageWeight) {
+              println("pageweight alert only")
               "<tr class=\"pageclass default\">" + "<td> The page: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
                 "is weighing in at " + result.mBInFullyLoaded + " MB. for " + result.typeOfTestName + "." + "</td></tr>" +
                 "<tr class=\"pageclass default\">" + "<td><a href = \"" + dashboardUrl + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n"
-                "<tr class=\"pageclass default\">" + "<td>" + " " + "</td>" + "</tr>\n"
+              "<tr class=\"pageclass default\">" + "<td>" + " " + "</td>" + "</tr>\n"
             } else {
+              println("pagespeed alert only")
               "<tr class=\"pageclass default\">" + "<td> The page: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
-                "is showing speed issues, despite being within weight thresholds. Page shows a Speed Index of:" + result.speedIndex + " ms. for " + result.typeOfTestName + "s." + "</td>" + "</tr>" + "\n" +
+                "is showing speed issues, despite being within weight thresholds. Page shows a Speed Index of: " + result.speedIndex + "ms. for " + result.typeOfTestName + "s." + "</td>" + "</tr>" + "\n" +
                 "<tr class=\"pageclass default\">" + "<td><a href = \"" + dashboardUrl + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n"
-                "<tr class=\"pageclass default\">" + "<td>" + " " + "</td>" + "</tr>\n"
+              "<tr class=\"pageclass default\">" + "<td>" + " " + "</td>" + "</tr>\n"
             }
           }
+        } else {
+          println("somehow neither alert is set")
+          "No alerts set"
         }
       }).mkString
-
+      dataRows
     }
 
     def generatePageElementTable(resultsObject: PerformanceResultsObject): String = {
@@ -111,8 +117,14 @@
     // Access Methods
 
     override def toString(): String = {
-     println("Interactive alerts results List: \n" + resultsList)
-      HTML_PAGE
+      if(resultsList.isEmpty){
+        println("Interactive Email Template called and passed an Empty list.")
+        return "I'm very sorry. This email was sent in error. Please ignore."
+      } else {
+        println("Interactive alerts results List: \n" + resultsList)
+        println("Interactive Email: " + HTML_PAGE)
+        HTML_PAGE
+      }
     }
 
 
