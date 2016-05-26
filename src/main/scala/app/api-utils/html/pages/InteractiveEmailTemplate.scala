@@ -111,6 +111,7 @@
     // Access Methods
 
     override def toString(): String = {
+     println("Interactive alerts results List: \n" + resultsList)
       HTML_PAGE
     }
 
