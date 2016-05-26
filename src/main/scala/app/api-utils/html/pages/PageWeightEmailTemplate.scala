@@ -94,8 +94,13 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject], url:
   // Access Methods
 
   override def toString(): String = {
-    println("Page Weight email list: \n" + resultsList)
-    HTML_PAGE
+    if(resultsList.isEmpty){
+      println("Interactive Email Template called and passed an Empty list.")
+      return "I'm very sorry. This email was sent in error. Please ignore."
+    } else {
+      println("Page Weight email list: \n" + resultsList)
+      HTML_PAGE
+    }
   }
 
 
