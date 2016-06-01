@@ -463,7 +463,7 @@ object App {
     val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
 
 //  strip out errors
-    val errorFreeSortedByWeightCombinedResults = for (result <- sortedByWeightCombinedResults if result.speedIndex != -1) yield result
+    val errorFreeSortedByWeightCombinedResults = for (result <- sortedByWeightCombinedResults if result.speedIndex > -1) yield result
 //record results
     val resultsToRecord = (errorFreeSortedByWeightCombinedResults ::: oldResults).take(1000)
     val resultsToRecordCSVString: String = resultsToRecord.map(_.toCSVString()).mkString
