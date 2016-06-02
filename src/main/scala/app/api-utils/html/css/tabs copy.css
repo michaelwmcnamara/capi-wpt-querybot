@@ -39,12 +39,6 @@ li.active a, li.active a:hover {
     color:#4c4c4c;
 }
 
-li:target a, li:target a:hover {
-    background:#fff;
-    color:#4c4c4c;
-}
-
-
 /*----- Content of Tabs -----*/
 .tab-content {
     padding:15px;
@@ -60,16 +54,3 @@ li:target a, li:target a:hover {
 .tab.active {
     display:block;
 }
-
-.tab:target {
-    display:block;
-}
-
-.tab:not(target) {
-    display:none;
-}
-
-.tab.default {
-    display:block;
-}
-

@@ -193,6 +193,17 @@ class S3Operations(s3BucketName: String, configFile: String, emailFile: String) 
     }
   }
 
+  def getVisualsFileFromS3(fileName:String): String = {
+    if (doesFileExist(fileName)) {
+      val s3Response = s3Client.getObject(new GetObjectRequest(s3BucketName, fileName))
+      val objectData = s3Response.getObjectContent
+      val myData = scala.io.Source.fromInputStream(objectData).getLines().toString()
+      myData
+    } else {
+        ""
+      }
+    }
+
   def writeFileToS3(fileName:String, outputString: String): Unit ={
     println(DateTime.now + " Writing the following to S3:\n" + outputString + "\n")
     s3Client.putObject(new PutObjectRequest(s3BucketName, fileName, createOutputFile(fileName, outputString)))

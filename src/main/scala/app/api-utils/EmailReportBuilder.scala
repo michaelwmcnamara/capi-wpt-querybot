@@ -44,7 +44,7 @@ class EmailReportBuilder(average: String, warning: String, alert: String, articl
   val htmlTitleEmailInteractive: String = h1EmailTag + "Current Performance of today's interactive pages</h1>"
   val htmlTitleEmailFronts: String = h1EmailTag + "Current Performance of today's fronts</h1>"
   val hTMLEmailJobStarted: String =  pEmailTag + "Job started at: " + DateTime.now + "\n</p>"
-  val hTMLAlertEmailTableHeaders: String = tableEmailTag + "\n" + tableHeaderRowEmailTag + "\n" + tableHeaderCellEmailTag + "Page Url</th>\n" + tableHeaderCellEmailTag + "Test Type</th>\n" + tableHeaderCellEmailTag + "Status</th>\n" + tableHeaderCellEmailTag + "Full results here</th>\n" + "</tr>\n"
+  val hTMLAlertEmailTableHeaders: String = tableEmailTag + "\n" + tableHeaderRowEmailTag + "\n" + tableHeaderCellEmailTag + "Page Url</th>\n" + tableHeaderCellEmailTag + "Test VisualsElementType</th>\n" + tableHeaderCellEmailTag + "Status</th>\n" + tableHeaderCellEmailTag + "Full results here</th>\n" + "</tr>\n"
   val hTMLEmailTableFooters: String = "</table>"
   val hTMLEmailPageFooterStart: String = "\n"+ pEmailTag +"<i>Job completed at: "
   val hTMLEmailPageFooterEnd: String = "</i></p>\n</body>\n</html>"

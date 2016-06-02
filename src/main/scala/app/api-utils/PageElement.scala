@@ -155,7 +155,7 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
   }
   def returnString():String = {
     val returnString:String  = "Resource: " + resource + ", \n" +
-      "Content Type: " + contentType + ", \n" +
+      "Content VisualsElementType: " + contentType + ", \n" +
       "Request Start Time: " + requestStart.toString + "ms, \n" +
       "DNS Look-up Time: " + dnsLookUp + "ms, \n" +
       "Initial Connection Time: " + initialConnection + "ms, \n" +
@@ -170,7 +170,7 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
 
   def printElement():Unit = {
     println("Resource: " + this.resource + ", \n")
-    println("Content Type: " + this.contentType + ", \n")
+    println("Content VisualsElementType: " + this.contentType + ", \n")
     println("Request Start Time: " + this.requestStart.toString + "ms, \n")
     println("DNS Look-up Time: " + this.dnsLookUp + "ms, \n")
     println("Initial Connection Time: " + this.initialConnection + "ms, \n")
@@ -206,7 +206,7 @@ class PageElementFromHTMLTableRow(htmlTableRow: String) extends PageElement{
 
   def alertHTMLString():String = {
     val returnString: String = "<tr>" +
-      "<td><a href = \"" + resource + "\">" + resource + "</a></td>" +
+      "<td><a href = \"" + resource + "\">" + resource.take(180) + "</a></td>" +
       "<td>" + contentType + "</td>" +
       "<td>" + sizeInMB + "MB</td>" +
       "</tr>"
