@@ -569,7 +569,7 @@ object App {
     //Confirm alert status by retesting alerting urls
     println("Confirming any items that have an alert")
     val confirmedTestResults = resultsWithAlerts.map(x => {
-      if (x.alertStatusPageWeight) {
+      if (x.alertStatusPageWeight || (x.timeFirstPaintInMs == -1)) {
         val confirmedResult: PerformanceResultsObject = confirmAlert(x, averages, urlFragments, wptBaseUrl, wptApiKey ,wptLocation)
         confirmedResult.headline = x.headline
         confirmedResult.pageType = x.pageType

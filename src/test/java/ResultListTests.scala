@@ -72,12 +72,6 @@ class ResultListTests extends ResultListUnitSpec with Matchers {
 
   val oldResultList = List(testResult1m, testResult1d, testResult2m, testResult3m, testResult3d, testResult4m, testResult4d, testResult5m,  testResult5d, testResult6m, testResult6d)
 
- // val amazonDomain = "https://s3-eu-west-1.amazonaws.com"
-  val s3BucketName = "capi-wpt-querybot"
-  val configFileName = "config.conf"
-  val emailFileName = "addresses.conf"
-
-  val s3Ops = new S3Operations(s3BucketName, configFileName, emailFileName)
   val prevResults = new ResultsFromPreviousTests(oldResultList)
 
 

@@ -462,7 +462,7 @@ class WebPageTest(baseUrl: String, passedKey: String, urlFragments: List[String]
   }
 
   def failedTestUnknown(url: String, rawResults: Elem): PerformanceResultsObject = {
-    val failIndicator: Int = -1
+    val failIndicator: Int = -2
     val testType: String = "Unknown"
     val failComment: String = "Test failed for unknown reason"
     // set warning status as result may have timed out due to very large page

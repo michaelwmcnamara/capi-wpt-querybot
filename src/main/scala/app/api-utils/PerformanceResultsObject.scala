@@ -119,7 +119,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def trimToEditorialElements(elementList: List[PageElementFromHTMLTableRow]): List[PageElementFromHTMLTableRow] = {
-    val returnList: List[PageElementFromHTMLTableRow] = for (element <- elementList if element.contentType.contains("image") || element.contentType.contains("video") || element.contentType.contains("application")) yield element
+    val returnList: List[PageElementFromHTMLTableRow] = for (element <- elementList if element.contentType.contains("image") || element.contentType.contains("video") || element.contentType.contains("x-shockwave-flash") || element.contentType.contains("application")) yield element
     returnList
   }
 
