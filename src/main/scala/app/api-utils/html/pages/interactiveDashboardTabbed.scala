@@ -61,7 +61,7 @@ class InteractiveDashboardTabbed(combinedResultsList: List[PerformanceResultsObj
   //Page Tables
   val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"report\">"+ "\n" +
     "<thead>" + "\n" +
-    "<tr> <th>Time Last Tested</th>" + "<th>Test Type</th>" + "<th>Headline</th>" + "<th>Type of Page</th>" + "<th>Time till page looks loaded</th>" + "<th>Page weight (MB)</th>" + "<th>Click for more details</th>" +  "</tr>"+ "\n" +
+    "<tr> <th>Time Last Tested</th>" + "<th>Test VisualsElementType</th>" + "<th>Headline</th>" + "<th>VisualsElementType of Page</th>" + "<th>Time till page looks loaded</th>" + "<th>Page weight (MB)</th>" + "<th>Click for more details</th>" +  "</tr>"+ "\n" +
     "</thead>" +"\n" +
     "<tbody>"
 
@@ -77,7 +77,7 @@ class InteractiveDashboardTabbed(combinedResultsList: List[PerformanceResultsObj
 
   val HTML_PAGE_ELEMENT_TABLE_HEADERSPT3: String =
   "<thead>" + "\n" +
-    "<tr>" + "<th>Resource</th>" + "<th>Content Type</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
+    "<tr>" + "<th>Resource</th>" + "<th>Content VisualsElementType</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
     "</thead>" +"\n" +
     "<tbody>"
 

@@ -5,14 +5,14 @@ import org.scalatest._
 /**
  * Created by mmcnamara on 26/05/16.
  */
-abstract class UnitSpec extends FlatSpec with Matchers with
+abstract class EmailUnitSpec extends FlatSpec with Matchers with
 OptionValues with Inside with Inspectors
 
-class EmailTests extends UnitSpec with Matchers {
+class EmailTests extends EmailUnitSpec with Matchers {
 
   val fakeDashboardUrl = "http://www.theguardian.com/uk"
-  val testResult1 = new PerformanceResultsObject("testResult1", "testResult1", "testResult1", 1, 1, 1, 1, 1, 1, 1, "testResult1", true, true, true)
-  val testResult2 = new PerformanceResultsObject("testResult2", "testResult2", "testResult2", 2, 2, 2, 2, 2, 2, 2, "testResult2", true, true, true)
+  val testResult1 = new PerformanceResultsObject("mobileArticlespeedIndexHigh", "mobileArticlespeedIndexHigh", "mobileArticlespeedIndexHigh", 1, 1, 1, 1, 1, 1, 1, "mobileArticlespeedIndexHigh", true, true, true)
+  val testResult2 = new PerformanceResultsObject("mobileArticletFpHigh", "mobileArticletFpHigh", "mobileArticletFpHigh", 2, 2, 2, 2, 2, 2, 2, "mobileArticletFpHigh", true, true, true)
   val testResult3 = new PerformanceResultsObject("testResult3", "testResult3", "testResult3", 3, 3, 3, 3, 3, 3, 3, "testResult3", true, true, true)
 
   val testResultListEmpty = List()
@@ -21,8 +21,8 @@ class EmailTests extends UnitSpec with Matchers {
   val testResultList3results = List(testResult1, testResult2, testResult3)
 
   val emptyListText = "I'm very sorry. This email was sent in error. Please ignore."
-  val singleResultText = "testResult1"
-  val twoResultsText = "testResult2"
+  val singleResultText = "mobileArticlespeedIndexHigh"
+  val twoResultsText = "mobileArticletFpHigh"
   val threeResultsText = "testResult3"
 
   "An pageWeight Email list with 0 Results" should "contain results and page elements" in {

@@ -74,21 +74,22 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def getFirstPublished: Long = {
-    if(firstPublished.nonEmpty){
-      firstPublished.get.dateTime
-    }else{
-      0
-    }
+    firstPublished.getOrElse(new CapiDateTime {
+      override def dateTime: Long = 0
+    }).dateTime
   }
 
   def getPageLastUpdated: Long = {
-    if(pageLastUpdated.nonEmpty){
-    pageLastUpdated.get.dateTime
-  }else{
-    0
-    }
+    pageLastUpdated.getOrElse(new CapiDateTime {
+      override def dateTime: Long = 0
+    }).dateTime
   }
 
+  def mostRecentUpdate: Long = {
+    pageLastUpdated.getOrElse(firstPublished.getOrElse(new CapiDateTime {
+      override def dateTime: Long = 0
+    })).dateTime
+  }
 
   def addtoElementList(element: PageElementFromHTMLTableRow): Boolean = {
     if (editorialElementList.length < editorialElementListMaxSize){
@@ -180,7 +181,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
     tableNormalRowEmailTag + tableNormalCellEmailTag + "<a href=" + testUrl + aHrefEmailStyle + ">" + headline.getOrElse(testUrl) + "</a>" + "</td>" + tableNormalCellEmailTag + typeOfTest + "</td>" + tableNormalCellEmailTag + genTestResultString() +"</td>" + tableNormalCellEmailTag + "<a href=" + friendlyResultUrl + aHrefEmailStyle + ">" + "Click here to see full results." + "</a>" + "</td>" + "</tr>\n" +
     tableMergedRowEmailTag +"List of 5 heaviest elements on page - Recommend reviewing these items </tr>\n" +
-    tableNormalRowEmailTag + tableNormalCellEmailTag + "Resource" + "</td>" + tableNormalCellEmailTag + "Content Type" + "</td>" + tableNormalCellEmailTag + "Bytes Transferred" + "</td>" + "</tr>\n" +
+    tableNormalRowEmailTag + tableNormalCellEmailTag + "Resource" + "</td>" + tableNormalCellEmailTag + "Content VisualsElementType" + "</td>" + tableNormalCellEmailTag + "Bytes Transferred" + "</td>" + "</tr>\n" +
       editorialElementList.map(element => element.emailHTMLString()).mkString
   }
 
@@ -197,7 +198,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
 
     tableNormalRowEmailTag + tableNormalCellEmailTag + "<a href=" + testUrl + aHrefEmailStyle + ">" + headline.getOrElse(testUrl) + "</a>" + "</td>" + tableNormalCellEmailTag + typeOfTest + "</td>" + tableNormalCellEmailTag + genTestResultString() +"</td>" + tableNormalCellEmailTag + "<a href=" + friendlyResultUrl + aHrefEmailStyle + ">" + "Click here to see full results." + "</a>" + "</td>" + "</tr>\n" +
       tableMergedRowEmailTag +"List of 5 heaviest elements on page - Recommend reviewing these items </tr>\n" +
-      tableNormalRowEmailTag + tableNormalCellEmailTag + "Resource" + "</td>" + tableNormalCellEmailTag + "Content Type" + "</td>" + tableNormalCellEmailTag + "Bytes Transferred" + "</td>" + "</tr>\n" +
+      tableNormalRowEmailTag + tableNormalCellEmailTag + "Resource" + "</td>" + tableNormalCellEmailTag + "Content VisualsElementType" + "</td>" + tableNormalCellEmailTag + "Bytes Transferred" + "</td>" + "</tr>\n" +
       firstFive.map(element => element.emailHTMLString()).mkString
   }
 

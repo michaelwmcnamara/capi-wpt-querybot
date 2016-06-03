@@ -60,7 +60,7 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
   //Page Tables
   val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"report\">"+ "\n" +
     "<thead>" + "\n" +
-    "<tr> <th>Time Page Last Updated</th>" + "<th>Test Type</th>" + "<th>Headline</th>" + "<th>Type of Page</th>" + "<th>Time till page looks loaded</th>" + "<th>Page weight (MB)</th>" + "<th>Click for more details</th>" +  "</tr>"+ "\n" +
+    "<tr> <th>Time Page Last Updated</th>" + "<th>Test VisualsElementType</th>" + "<th>Headline</th>" + "<th>VisualsElementType of Page</th>" + "<th>Time till page looks loaded</th>" + "<th>Page weight (MB)</th>" + "<th>Click for more details</th>" +  "</tr>"+ "\n" +
     "</thead>" +"\n" +
     "<tbody>"
 
@@ -70,7 +70,7 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
   val HTML_PAGE_ELEMENT_TABLE_HEADERSPT2: String =
     "<caption>List of 5 heaviest elements on page - Recommend reviewing these items </caption>" + "\n" +
     "<thead>" + "\n" +
-    "<tr>" + "<th>Resource</th>" + "<th>Content Type</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
+    "<tr>" + "<th>Resource</th>" + "<th>Content VisualsElementType</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
     "</thead>" +"\n" +
     "<tbody>"
 

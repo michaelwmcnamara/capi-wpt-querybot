@@ -36,7 +36,7 @@ class PageWeightDashboardMobile(resultsList: List[PerformanceResultsObject]) {
   //Page Tables
   val HTML_REPORT_TABLE_HEADERS: String = "<table id=\"report\">" + "\n" +
     "<thead>" + "\n" +
-    "<tr> <th>Time Last Tested</th>" + "<th>Test Type</th>" + "<th>Headline</th>" + "<th>Type of Page</th>" + "<th>Time till page looks loaded</th>" + "<th>Page weight (MB)</th>" + "<th>Click for more details</th>" + "</tr>" + "\n" +
+    "<tr> <th>Time Last Tested</th>" + "<th>Test VisualsElementType</th>" + "<th>Headline</th>" + "<th>VisualsElementType of Page</th>" + "<th>Time till page looks loaded</th>" + "<th>Page weight (MB)</th>" + "<th>Click for more details</th>" + "</tr>" + "\n" +
     "</thead>" + "\n" +
     "<tbody>"
 
@@ -44,7 +44,7 @@ class PageWeightDashboardMobile(resultsList: List[PerformanceResultsObject]) {
     "<td colspan=\"12\">" + "<table id=\"data\" class=\"data\">" + "\n" +
     "<caption>List of 5 heaviest elements on page - Recommend reviewing these items </caption>" + "\n" +
     "<thead>" + "\n" +
-    "<tr>" + "<th>Resource</th>" + "<th>Content Type</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
+    "<tr>" + "<th>Resource</th>" + "<th>Content VisualsElementType</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
     "</thead>" + "\n" +
     "<tbody>"
 
