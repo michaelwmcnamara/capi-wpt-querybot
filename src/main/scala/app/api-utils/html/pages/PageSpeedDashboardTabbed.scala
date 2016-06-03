@@ -113,7 +113,7 @@ class PageSpeedDashboardTabbed(combinedResultsList: List[PerformanceResultsObjec
 
   def generatePageElementTable(resultsObject: PerformanceResultsObject): String = {
     HTML_PAGE_ELEMENT_TABLE_HEADERSPT1 + "\n"  +
-      "<caption class=\"" + getAlertClass(resultsObject) + "\">" + "Alert was triggered because: " + resultsObject.genTestResultString() + "</caption>" +
+      "<caption class=\"" + getAlertClass(resultsObject) + "\">" + "Alert was triggered because: " + resultsObject.gentestResultStringForInteractivePage() + "</caption>" +
       HTML_PAGE_ELEMENT_TABLE_HEADERSPT2 + getHTMLForPageElements(resultsObject) + HTML_PAGE_ELEMENT_TABLE_END
   }
 

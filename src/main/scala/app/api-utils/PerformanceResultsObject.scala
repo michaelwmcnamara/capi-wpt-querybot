@@ -38,7 +38,8 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   val speedIndex: Int = sI
   val aboveTheFoldCompleteInSec: Double = roundAt(3)(speedIndex.toDouble/1000)
   val resultStatus:String = status
-  var alertDescription: String = "No alerts have been set for this page"
+  var pageWeightAlertDescription: String = "No alerts have been set for this page"
+  var pageSpeedAlertDescription: String = "No alerts have been set for this page"
   var alertStatusPageWeight: Boolean = alertWeight
   var alertStatusPageSpeed: Boolean = alertSpeed
   val brokenTest: Boolean = failedNeedsRetest
@@ -209,10 +210,30 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def genTestResultString(): String = {
-    if(this.alertStatusPageWeight)
-    this.alertDescription
-    else
-      this.resultStatus
+    if (alertStatusPageWeight) {
+      pageWeightAlertDescription
+    } else {
+      if (alertStatusPageSpeed) {
+        pageSpeedAlertDescription
+      } else {
+        this.resultStatus
+      }
+    }
+  }
+    def gentestResultStringForInteractivePage(): String = {
+      if(alertStatusPageWeight && alertStatusPageSpeed) {
+        pageWeightAlertDescription + " Also, " + pageSpeedAlertDescription
+      } else {
+        if(alertStatusPageWeight) {
+          pageWeightAlertDescription
+        } else {
+          if(alertStatusPageSpeed) {
+            pageSpeedAlertDescription
+          } else {
+            resultStatus
+          }
+        }
+      }
   }
 
   def fillRemainingGapsAndNewline(): String ={

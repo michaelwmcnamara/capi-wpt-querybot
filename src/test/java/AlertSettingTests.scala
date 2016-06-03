@@ -23,25 +23,25 @@ class AlertSettingTests extends AlertUnitSpec with Matchers {
 
   "A Mobile Performance Result with a SpeedIndex above threshold" should "contain a proper alert message" in {
     val testResult = app.App.setAlertStatus(mobileArticlespeedIndexHigh, articlePerformanceAverages)
-    println(testResult.alertDescription)
+    println(testResult.pageWeightAlertDescription)
     //      println(pageWeightEmail.toString())
-    assert(testResult.alertStatusPageSpeed && testResult.alertDescription.contains(speedIndexHighOnly))
+    assert(testResult.alertStatusPageSpeed && testResult.pageWeightAlertDescription.contains(speedIndexHighOnly))
   }
 
   "A Mobile Performance Result with a timeToFirstPaint above threshold" should "contain a proper alert message" in {
     val performanceAverages = new ArticleDefaultAverages("color string")
     val testResult = app.App.setAlertStatus(mobileArticletFpHigh, articlePerformanceAverages)
-    println(testResult.alertDescription)
+    println(testResult.pageWeightAlertDescription)
     //      println(pageWeightEmail.toString())
-    assert(testResult.alertStatusPageSpeed && testResult.alertDescription.contains(tFPHighOnly))
+    assert(testResult.alertStatusPageSpeed && testResult.pageWeightAlertDescription.contains(tFPHighOnly))
   }
 
   "A Mobile Performance Result with Both tFP and SpeedIndex above threshold" should "contain a proper alert message" in {
     val performanceAverages = new ArticleDefaultAverages("color string")
     val testResult = app.App.setAlertStatus(mobileArticletFpHigh, articlePerformanceAverages)
-    println(testResult.alertDescription)
+    println(testResult.pageWeightAlertDescription)
     //      println(pageWeightEmail.toString())
-    assert(testResult.alertStatusPageSpeed && testResult.alertDescription.contains(bothtFPandSpeedIndexAreHigh))
+    assert(testResult.alertStatusPageSpeed && testResult.pageWeightAlertDescription.contains(bothtFPandSpeedIndexAreHigh))
   }
 
 
