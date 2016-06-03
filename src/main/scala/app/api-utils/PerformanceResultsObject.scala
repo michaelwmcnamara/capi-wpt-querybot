@@ -48,6 +48,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   var firstPublished: Option[CapiDateTime] = None
   var pageLastUpdated: Option[CapiDateTime] = None
   var liveBloggingNow: Option[Boolean] = None
+  var anchorId: Option[Int] = None
 
   var fullElementList: List[PageElementFromHTMLTableRow] = List()
   var editorialElementList: List[PageElementFromHTMLTableRow] = List()

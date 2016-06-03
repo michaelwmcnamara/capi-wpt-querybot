@@ -103,7 +103,7 @@ class PageWeightDashboardTabbed(combinedResultsList: List[PerformanceResultsObje
       (for (result <- resultsList) yield {
 
         if(result.alertStatusPageWeight){
-          "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<td><div class=\"arrow\"></div></td></tr>" + "\n" +
+          "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<td><div class=\"arrow\"><a id=" + result.anchorId.getOrElse("") + "></a></div></td></tr>" + "\n" +
           generatePageElementTable(result)
         } else {
           "<tr class=\"pageclass " + getAlertClass(result) + "\">" + result.toHTMLBasicTableCells() + "<td><div>" + "" + "</div></td></tr>" + "\n"
