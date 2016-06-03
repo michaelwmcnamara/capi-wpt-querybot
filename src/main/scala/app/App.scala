@@ -36,14 +36,8 @@ object App {
     val articleOutputFilename = "articleperformancedata.html"
     val liveBlogOutputFilename = "liveblogperformancedata.html"
     val interactiveOutputFilename = "interactiveperformancedata.html"
-    val videoOutputFilename = "videoperformancedata.html"
-    val audioOutputFilename = "audioperformancedata.html"
     val frontsOutputFilename = "frontsperformancedata.html"
-    val combinedOutputFilename = "combinedperformancedata.html"
-    val combinedDesktopFilename = "combineddesktopperformancedata.html"
-    val combinedMobileFilename = "combinedmobileperformancedata.html"
     val editorialPageweightFilename = "editorialpageweightdashboard.html"
-    val editorialCombinedPageweightFilename = "editorialpageweightdashboardcombined.html"
     val editorialDesktopPageweightFilename = "editorialpageweightdashboarddesktop.html"
     val editorialMobilePageweightFilename = "editorialpageweightdashboardmobile.html"
 
@@ -94,6 +88,8 @@ object App {
     var frontsPageWeightAlertList: List[PerformanceResultsObject] = List()
     var audioPageWeightAlertList: List[PerformanceResultsObject] = List()
     var videoPageWeightAlertList: List[PerformanceResultsObject] = List()
+
+    var pageWeightAnchorId: Int = 0
 
     //Initialize Interactive email alerts lists - these will be used to generate emails
     var interactiveAlertList: List[PerformanceResultsObject] = List()
@@ -252,11 +248,15 @@ object App {
       articleResults = articleResults.concat(articleAverages.toHTMLString)
 
       val articleResultsList = listenForResultPages(combinedArticleList, "article", resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
-      combinedResultsList = articleResultsList
+      val getAnchorId: (List[PerformanceResultsObject], Int) = applyAnchorId(articleResultsList, pageWeightAnchorId)
+      val articleResultsWithAnchor = getAnchorId._1
+      pageWeightAnchorId = getAnchorId._2
+
+      combinedResultsList = articleResultsWithAnchor
 
       println("About to sort article results list. Length of list is: " + articleResultsList.length)
-      val sortedByWeightArticleResultsList = orderListByWeight(articleResultsList)
-      val sortedBySpeedArticleResultsList = orderListBySpeed(articleResultsList)
+      val sortedByWeightArticleResultsList = orderListByWeight(articleResultsWithAnchor)
+      val sortedBySpeedArticleResultsList = orderListBySpeed(articleResultsWithAnchor)
       if(sortedByWeightArticleResultsList.isEmpty || sortedBySpeedArticleResultsList.isEmpty) {
         println("Sorting algorithm for articles has returned empty list. Aborting")
         System exit 1
@@ -293,8 +293,13 @@ object App {
       liveBlogResults = liveBlogResults.concat(liveBlogAverages.toHTMLString)
 
       val liveBlogResultsList = listenForResultPages(combinedLiveBlogList, "liveBlog", resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
-      combinedResultsList = combinedResultsList ::: liveBlogResultsList
-      val sortedLiveBlogResultsList = orderListByWeight(liveBlogResultsList)
+      val getAnchorId: (List[PerformanceResultsObject], Int) = applyAnchorId(liveBlogResultsList, pageWeightAnchorId)
+      val liveBlogResultsWithAnchor = getAnchorId._1
+      pageWeightAnchorId = getAnchorId._2
+
+
+      combinedResultsList = combinedResultsList ::: liveBlogResultsWithAnchor
+      val sortedLiveBlogResultsList = orderListByWeight(liveBlogResultsWithAnchor)
       if(sortedLiveBlogResultsList.isEmpty) {
         println("Sorting algorithm for Liveblogs has returned empty list. Aborting")
         System exit 1
@@ -332,8 +337,12 @@ object App {
       interactiveResults = interactiveResults.concat(interactiveAverages.toHTMLString)
 
       val interactiveResultsList = listenForResultPages(combinedInteractiveList, "interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
-      combinedResultsList = combinedResultsList ::: interactiveResultsList
-      val sortedInteractiveResultsList = orderListByWeight(interactiveResultsList)
+      val getAnchorId: (List[PerformanceResultsObject], Int) = applyAnchorId(interactiveResultsList, pageWeightAnchorId)
+      val interactiveResultsWithAnchor = getAnchorId._1
+      pageWeightAnchorId = getAnchorId._2
+
+      combinedResultsList = combinedResultsList ::: interactiveResultsWithAnchor
+      val sortedInteractiveResultsList = orderListByWeight(interactiveResultsWithAnchor)
       if(sortedInteractiveResultsList.isEmpty) {
         println("Sorting algorithm has returned empty list. Aborting")
         System exit 1
@@ -370,8 +379,12 @@ object App {
       frontsResults = frontsResults.concat(frontsAverages.toHTMLString)
 
       val frontsResultsList = listenForResultPages(fronts, "front", resultUrlList, frontsAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
-//      combinedResultsList = combinedResultsList ::: frontsResultsList
-      val sortedFrontsResultsList = orderListByWeight(frontsResultsList)
+      val getAnchorId: (List[PerformanceResultsObject], Int) = applyAnchorId(frontsResultsList, pageWeightAnchorId)
+      val frontsResultsWithAnchor = getAnchorId._1
+      pageWeightAnchorId = getAnchorId._2
+
+      //      combinedResultsList = combinedResultsList ::: frontsResultsWithAnchor
+      val sortedFrontsResultsList = orderListByWeight(frontsResultsWithAnchor)
       if(sortedFrontsResultsList.isEmpty) {
         println("Sorting algorithm for fronts has returned empty list. Aborting")
         System exit 1
@@ -414,8 +427,8 @@ object App {
     //  strip out errors
     val errorFreeSortedByWeightCombinedResults = for (result <- sortedByWeightCombinedResults if result.speedIndex > 0) yield result
 
-    val editorialPageWeightDashboardDesktop = new PageWeightDashboardDesktop(sortedByWeightCombinedDesktopResults)
-    val editorialPageWeightDashboardMobile = new PageWeightDashboardMobile(sortedCombinedByWeightMobileResults)
+    val editorialPageWeightDashboardDesktop = new PageWeightDashboardDesktop(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
+    val editorialPageWeightDashboardMobile = new PageWeightDashboardMobile(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
     val editorialPageWeightDashboard = new PageWeightDashboardTabbed(sortedByWeightCombinedResults, sortedByWeightCombinedDesktopResults, sortedCombinedByWeightMobileResults)
 
 //record results
@@ -845,6 +858,15 @@ object App {
       leftE._1.speedIndex + leftE._2.speedIndex > rightE._1.speedIndex + rightE._2.speedIndex}
   }
 
+  def applyAnchorId(resultsObjectList: List[PerformanceResultsObject], lastIDAssigned: Int): (List[PerformanceResultsObject], Int) = {
+    var iterator = lastIDAssigned + 1
+    val resultList = for (result <- resultsObjectList) yield {
+      result.anchorId = Option(iterator)
+      iterator = iterator + 1
+      result
+    }
+    (resultList,iterator)
+  }
 
   def makeContentStub(passedHeadline: Option[String], passedLastModified: Option[CapiDateTime], passedLiveBloggingNow: Option[Boolean]): ContentFields = {
     val contentStub = new ContentFields {override def newspaperEditionDate: Option[CapiDateTime] = None
