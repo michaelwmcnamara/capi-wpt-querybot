@@ -120,7 +120,7 @@ class InteractiveDashboardDesktop(combinedResultsList: List[PerformanceResultsOb
 
   def generatePageElementTable(resultsObject: PerformanceResultsObject): String = {
     HTML_PAGE_ELEMENT_TABLE_HEADERSPT1 + "\n"  +
-      "<caption class=\"" + getAlertClass(resultsObject) + "\">" + "Alert was triggered because: " + resultsObject.genTestResultString() +
+      "<caption class=\"" + getAlertClass(resultsObject) + "\">" + "Alert was triggered because: " + resultsObject.gentestResultStringForInteractivePage() +
       "  <a href=\"" + resultsObject.friendlyResultUrl + "\">" + "Click here for full result summary" + "</a>" + "</caption>" +
       HTML_PAGE_ELEMENT_TABLE_HEADERSPT2A + "  <a href=\""+ resultsObject.friendlyResultUrl + "/1/details/\">Click here for full elements summary</a>" + HTML_PAGE_ELEMENT_TABLE_HEADERSPT2B +
       HTML_PAGE_ELEMENT_TABLE_HEADERSPT3 + getHTMLForPageElements(resultsObject) +
