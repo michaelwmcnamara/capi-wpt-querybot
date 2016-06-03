@@ -8,7 +8,7 @@ import org.joda.time.DateTime
 /**
  * Created by mmcnamara on 15/04/16.
  */
-class InteractiveDashboardTabbed(combinedResultsList: List[PerformanceResultsObject], desktopResultsList: List[PerformanceResultsObject], mobileResultsList: List[PerformanceResultsObject]) {
+class InteractiveDashboardMobile(combinedResultsList: List[PerformanceResultsObject], desktopResultsList: List[PerformanceResultsObject], mobileResultsList: List[PerformanceResultsObject]) {
 
   //HTML Page elements
   //Page Header
@@ -76,10 +76,10 @@ class InteractiveDashboardTabbed(combinedResultsList: List[PerformanceResultsObj
     ".</caption>" + "\n"
 
   val HTML_PAGE_ELEMENT_TABLE_HEADERSPT3: String =
-  "<thead>" + "\n" +
-    "<tr>" + "<th>Resource</th>" + "<th>Content VisualsElementType</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
-    "</thead>" +"\n" +
-    "<tbody>"
+    "<thead>" + "\n" +
+      "<tr>" + "<th>Resource</th>" + "<th>Content VisualsElementType</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
+      "</thead>" +"\n" +
+      "<tbody>"
 
   val HTML_TABLE_END: String = "</tbody>" + "\n" + "</table>"+ "\n"
 

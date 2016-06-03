@@ -6,11 +6,13 @@ import org.joda.time.DateTime
 /**
  * Created by mmcnamara on 15/04/16.
  */
-class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject], url: String) {
+class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject], mobileUrl: String, desktopUrl: String) {
 
   //HTML Page elements
   //Page Header
-  val dashboardUrl = url
+  val mobileDashboardUrl = mobileUrl
+  val desktopDashboardUrl = desktopUrl
+
 
   val HTML_PAGE_HEAD: String = "<!DOCTYPE html><html lang=\"en\">" + "\n" +
     "<head> <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>" + "\n" +
@@ -68,7 +70,7 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject], url:
     (for (result <- resultsList) yield {
       "<tr class=\"pageclass default\">" + "<td> The article: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
        " is weighing in at " + result.mBInFullyLoaded + " MB, for " + result.typeOfTestName + " pageviews." +  "</td>" + "</tr>" + "\n" +
-      "<tr class=\"pageclass default\">" + "<td> <a href = \"" + dashboardUrl + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
+      "<tr class=\"pageclass default\">" + "<td> <a href = \"" + getDashboardUrl(result) + "#" + result.anchorId + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
         "<tr class=\"pageclass default\">" + "<td>  </td>" + "</tr>" + "\n"
     }).mkString
 
@@ -88,6 +90,15 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject], url:
     } else {
       "default"
     }
+  }
+
+  def getDashboardUrl(result: PerformanceResultsObject): String = {
+    val url: String = result.typeOfTestName match {
+    case "Desktop" => desktopDashboardUrl
+    case "Mobile" => mobileDashboardUrl
+    case _ => desktopDashboardUrl
+    }
+    url
   }
   
 
