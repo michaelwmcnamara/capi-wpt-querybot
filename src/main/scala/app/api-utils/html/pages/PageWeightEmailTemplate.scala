@@ -70,7 +70,7 @@ class PageWeightEmailTemplate (resultsList: List[PerformanceResultsObject], mobi
     (for (result <- resultsList) yield {
       "<tr class=\"pageclass default\">" + "<td> The article: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
        " is weighing in at " + result.mBInFullyLoaded + " MB, for " + result.typeOfTestName + " pageviews." +  "</td>" + "</tr>" + "\n" +
-      "<tr class=\"pageclass default\">" + "<td> <a href = \"" + getDashboardUrl(result) + "#" + result.anchorId + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
+      "<tr class=\"pageclass default\">" + "<td> <a href = \"" + getDashboardUrl(result) + "#" + result.anchorId.getOrElse("") + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
         "<tr class=\"pageclass default\">" + "<td>  </td>" + "</tr>" + "\n"
     }).mkString
 

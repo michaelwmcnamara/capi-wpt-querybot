@@ -74,20 +74,20 @@
               " is showing both weight and speed issues:" + "</td></tr>\n" +
               "<tr class=\"pageclass default\">" + "<td> This page is weighing in at " + result.mBInFullyLoaded + " MB and shows a Speed Index of: " + result.speedIndex + "ms. " +
               "for " + result.typeOfTestName + "s." + "</td></tr>\n" +
-              "<tr class=\"pageclass default\">" + "<td> <a href = \"" + getDashboardUrl(result) + "#" + result.anchorId + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
+              "<tr class=\"pageclass default\">" + "<td> <a href = \"" + getDashboardUrl(result) + "#" + result.anchorId.getOrElse("") + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
             "<tr class=\"pageclass default\">" + "<td>" + " " + "</td>" + "</tr>\n"
           } else {
             if (!result.alertStatusPageSpeed && result.alertStatusPageWeight) {
               println("pageweight alert only")
               "<tr class=\"pageclass default\">" + "<td> The page: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
                 "is weighing in at " + result.mBInFullyLoaded + " MB. for " + result.typeOfTestName + "." + "</td></tr>" +
-                "<tr class=\"pageclass default\">" + "<td><a href = \"" + getDashboardUrl(result) + "#" + result.anchorId + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
+                "<tr class=\"pageclass default\">" + "<td><a href = \"" + getDashboardUrl(result) + "#" + result.anchorId.getOrElse("") + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
               "<tr class=\"pageclass default\">" + "<td>" + " " + "</td>" + "</tr>\n"
             } else {
               println("pagespeed alert only")
               "<tr class=\"pageclass default\">" + "<td> The page: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
                 "is showing speed issues, despite being within weight thresholds. Page shows a Speed Index of: " + result.speedIndex + "ms. for " + result.typeOfTestName + "s." + "</td>" + "</tr>" + "\n" +
-                "<tr class=\"pageclass default\">" + "<td><a href = \"" + getDashboardUrl(result) + "#" + result.anchorId + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
+                "<tr class=\"pageclass default\">" + "<td><a href = \"" + getDashboardUrl(result) + "#" + result.anchorId.getOrElse("") + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
               "<tr class=\"pageclass default\">" + "<td>" + " " + "</td>" + "</tr>\n"
             }
           }
