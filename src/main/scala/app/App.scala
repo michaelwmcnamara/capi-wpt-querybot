@@ -44,6 +44,8 @@ object App {
     val dotcomPageSpeedFilename = "dotcompagespeeddashboard.html"
 
     val interactiveDashboardFilename = "interactivedashboard.html"
+    val interactiveDashboardDesktopFilename = "interactivedashboarddesktop.html"
+    val interactiveDashboardMobileFilename = "interactivedashboardmobile.html"
 
     val articleResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + articleOutputFilename
     val liveBlogResultsUrl: String = amazonDomain + "/" + s3BucketName + "/" + liveBlogOutputFilename
@@ -373,7 +375,7 @@ object App {
       println("CAPI query found no interactives")
     }
 
-    if (frontsUrls.nonEmpty) {
+    /*if (frontsUrls.nonEmpty) {
       println("Generating average values for fronts")
       val frontsAverages: PageAverageObject = new FrontsDefaultAverages(averageColor)
       frontsResults = frontsResults.concat(frontsAverages.toHTMLString)
@@ -413,7 +415,7 @@ object App {
 
     } else {
       println("CAPI query found no Fronts")
-    }
+    }*/
 
     val sortedByWeightCombinedResults: List[PerformanceResultsObject] = orderListByWeight(combinedResultsList :::  previousTestResultsHandler.recentButNoRetestRequired)
     val combinedDesktopResultsList: List[PerformanceResultsObject] = for (result <- sortedByWeightCombinedResults if result.typeOfTest.contains("Desktop")) yield result
@@ -452,6 +454,8 @@ object App {
 
     val dotcomPageSpeedDashboard = new PageSpeedDashboardTabbed(sortedBySpeedCombinedResults, sortedBySpeedCombinedDesktopResults, sortedBySpeedCombinedMobileResults)
     val interactiveDashboard = new InteractiveDashboardTabbed(sortedInteractiveCombinedResults, sortedInteractiveDesktopResults, sortedInteractiveMobileResults)
+    val interactiveDashboardDesktop = new InteractiveDashboardDesktop(sortedInteractiveCombinedResults, sortedInteractiveDesktopResults, sortedInteractiveMobileResults)
+    val interactiveDashboardMobile = new InteractiveDashboardMobile(sortedInteractiveCombinedResults, sortedInteractiveDesktopResults, sortedInteractiveMobileResults)
 
       //write combined results to file
       if (!iamTestingLocally) {
@@ -461,6 +465,8 @@ object App {
         s3Interface.writeFileToS3(editorialPageweightFilename, editorialPageWeightDashboard.toString())
         s3Interface.writeFileToS3(dotcomPageSpeedFilename, dotcomPageSpeedDashboard.toString())
         s3Interface.writeFileToS3(interactiveDashboardFilename, interactiveDashboard.toString())
+        s3Interface.writeFileToS3(interactiveDashboardDesktopFilename, interactiveDashboardDesktop.toString())
+        s3Interface.writeFileToS3(interactiveDashboardMobileFilename, interactiveDashboardMobile.toString())
         s3Interface.writeFileToS3(resultsFromPreviousTests, resultsToRecordCSVString)
       }
       else {
@@ -510,7 +516,7 @@ object App {
     val alertsToSend = newArticlePageWeightAlertsList ::: newLiveBlogPageWeightAlertsList ::: newInteractivePageWeightAlertsList
     if (alertsToSend.nonEmpty) {
       println("There are new pageWeight alerts to send! There are " + alertsToSend + " new alerts")
-      val pageWeightEmailAlerts = new PageWeightEmailTemplate(alertsToSend, amazonDomain + "/" + s3BucketName + "/" + editorialPageweightFilename)
+      val pageWeightEmailAlerts = new PageWeightEmailTemplate(alertsToSend, amazonDomain + "/" + s3BucketName + "/" + editorialMobilePageweightFilename, amazonDomain + "/" + s3BucketName + "/" + editorialDesktopPageweightFilename )
       val pageWeightEmailSuccess = emailer.send(generalAlertsAddressList, pageWeightEmailAlerts.toString())
       if (pageWeightEmailSuccess)
         println(DateTime.now + " Page-Weight Alert Emails sent successfully. ")
@@ -522,7 +528,7 @@ object App {
 
     if (newInteractiveAlertsList.nonEmpty) {
       println("There are new interactive email alerts to send - length of list is: " + newInteractiveAlertsList.length)
-      val interactiveEmailAlerts = new InteractiveEmailTemplate(newInteractiveAlertsList, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardFilename)
+      val interactiveEmailAlerts = new InteractiveEmailTemplate(newInteractiveAlertsList, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardDesktopFilename )
       val interactiveEmailSuccess = emailer.send(interactiveAlertsAddressList, interactiveEmailAlerts.toString())
       if (interactiveEmailSuccess) {
         println("Interactive Alert email sent successfully.")
@@ -713,8 +719,11 @@ object App {
   }
 
   def orderListByWeight(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
+    println("orderListByWeightCalled with " + list.length + "elements")
       val validatedList = returnValidListOfPairs(list)
+      println("validated list has " + validatedList._1.length + " paired items, and " + validatedList._2.length + " leftover items")
       val tupleList = listSinglesToPairs(validatedList._1)
+      println("tuple List returned " + tupleList.length + " tuples")
       val leftOverAlerts = for (result <- validatedList._2 if result.alertStatusPageWeight) yield result
       val leftOverNormal = for (result <- validatedList._2 if !result.alertStatusPageWeight) yield result
       println("listSinglesToPairs returned a list of " + tupleList.length + " pairs.")
@@ -727,7 +736,9 @@ object App {
   def orderListBySpeed(list: List[PerformanceResultsObject]): List[PerformanceResultsObject] = {
       println("orderListBySpeed called. \n It has " + list.length + " elements.")
       val validatedList = returnValidListOfPairs(list)
+    println("validated list has " + validatedList._1.length + " paired items, and " + validatedList._2.length + " leftover items")
       val tupleList = listSinglesToPairs(validatedList._1)
+      println("tuple List returned " + tupleList.length + " tuples")
       val leftOverAlerts = for (result <- validatedList._2 if result.alertStatusPageSpeed) yield result
       val leftOverNormal = for (result <- validatedList._2 if !result.alertStatusPageSpeed) yield result
       println("listSinglesToPairs returned a list of " + tupleList.length + " pairs.")

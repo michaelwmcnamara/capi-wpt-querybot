@@ -8,7 +8,7 @@ import org.joda.time.DateTime
 /**
  * Created by mmcnamara on 15/04/16.
  */
-class InteractiveDashboardTabbed(combinedResultsList: List[PerformanceResultsObject], desktopResultsList: List[PerformanceResultsObject], mobileResultsList: List[PerformanceResultsObject]) {
+class InteractiveDashboardDesktop(combinedResultsList: List[PerformanceResultsObject], desktopResultsList: List[PerformanceResultsObject], mobileResultsList: List[PerformanceResultsObject]) {
 
   //HTML Page elements
   //Page Header
@@ -35,8 +35,8 @@ class InteractiveDashboardTabbed(combinedResultsList: List[PerformanceResultsObj
 
   val HTML_PAGE_TABS_LIST: String = "<div class=\"tabs\">" + "\n" +
     "<ul class=\"tab-links\">" + "\n" +
-    "<li class=\"active\">" + "<a href=\"#mobile\">Mobile view</a>" + "</li>" + "\n" +
-    "<li>" + "<a href=\"#desktop\">Desktop view</a>" + "</li>" + "\n" +
+    "<li>" + "<a href=\"#mobile\">Mobile view</a>" + "</li>" + "\n" +
+    "<li class=\"active\">" + "<a href=\"#desktop\">Desktop view</a>" + "</li>" + "\n" +
     "<li>" + "<a href=\"#combined\">Combined view</a>" + "</li>" + "\n" +
     "</ul>" + "\n"
   //close div added to HTML_FOOTER
@@ -47,10 +47,10 @@ class InteractiveDashboardTabbed(combinedResultsList: List[PerformanceResultsObj
   val HTML_TAB_HEADER: String = "<div class=\"tab-content\">" + "\n"
 
 
-  val HTML_MOBILE_TAB_CONTENT_HEADER: String = "<div id=\"mobile\" class=\"tab active\">" + "\n" +
+  val HTML_MOBILE_TAB_CONTENT_HEADER: String = "<div id=\"mobile\" class=\"tab\">" + "\n" +
     "<p>" + "<h2>Mobile view" + "</h2>" + "</p>" + "\n"
 
-  val HTML_DESKTOP_TAB_CONTENT_HEADER: String = "<div id=\"desktop\" class=\"tab\">" + "\n" +
+  val HTML_DESKTOP_TAB_CONTENT_HEADER: String = "<div id=\"desktop\" class=\"tab active\">" + "\n" +
     "<p>" + "<h2>Desktop view" + "</h2>" + "</p>" + "\n"
 
   val HTML_COMBINED_TAB_CONTENT_HEADER: String = "<div id=\"combined\" class=\"tab\">" + "\n" +
@@ -76,10 +76,10 @@ class InteractiveDashboardTabbed(combinedResultsList: List[PerformanceResultsObj
     ".</caption>" + "\n"
 
   val HTML_PAGE_ELEMENT_TABLE_HEADERSPT3: String =
-  "<thead>" + "\n" +
-    "<tr>" + "<th>Resource</th>" + "<th>Content VisualsElementType</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
-    "</thead>" +"\n" +
-    "<tbody>"
+    "<thead>" + "\n" +
+      "<tr>" + "<th>Resource</th>" + "<th>Content VisualsElementType</th>" + "<th>Bytes Transferred</th>" + "</tr>" + "\n" +
+      "</thead>" +"\n" +
+      "<tbody>"
 
   val HTML_TABLE_END: String = "</tbody>" + "\n" + "</table>"+ "\n"
 

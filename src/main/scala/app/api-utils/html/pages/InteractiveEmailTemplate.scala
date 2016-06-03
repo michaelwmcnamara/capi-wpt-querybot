@@ -6,11 +6,12 @@
   /**
    * Created by mmcnamara on 15/04/16.
    */
-  class InteractiveEmailTemplate (resultsList: List[PerformanceResultsObject], url: String) {
+  class InteractiveEmailTemplate (resultsList: List[PerformanceResultsObject], mobileUrl: String, desktopUrl: String) {
 
     //HTML Page elements
     //Page Header
-    val dashboardUrl = url
+    val mobileDashboardUrl = mobileUrl
+    val desktopDashboardUrl = desktopUrl
 
     val HTML_PAGE_HEAD: String = "<!DOCTYPE html><html lang=\"en\">" + "\n" +
       "<head> <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>" + "\n" +
@@ -60,6 +61,7 @@
 
     //page generation methods
     def generateHTMLTable(resultsList: List[PerformanceResultsObject]): String = {
+      println("interactive email template called with " + resultsList.length + " elements")
       HTML_REPORT_TABLE_HEADERS + "\n" + generateHTMLDataRows(resultsList) + "\n" + HTML_TABLE_END
     }
 
@@ -69,29 +71,29 @@
           if (result.alertStatusPageSpeed && result.alertStatusPageWeight) {
             println("pageweight and speed alert")
             "<tr class=\"pageclass default\">" + "<td> The page: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
-              "is showing both weight and speed issues:" + "</td></tr>\n" +
+              " is showing both weight and speed issues:" + "</td></tr>\n" +
               "<tr class=\"pageclass default\">" + "<td> This page is weighing in at " + result.mBInFullyLoaded + " MB and shows a Speed Index of: " + result.speedIndex + "ms. " +
               "for " + result.typeOfTestName + "s." + "</td></tr>\n" +
-              "<tr class=\"pageclass default\">" + "<td> <a href = \"" + dashboardUrl + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
+              "<tr class=\"pageclass default\">" + "<td> <a href = \"" + getDashboardUrl(result) + "#" + result.anchorId + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
             "<tr class=\"pageclass default\">" + "<td>" + " " + "</td>" + "</tr>\n"
           } else {
             if (!result.alertStatusPageSpeed && result.alertStatusPageWeight) {
               println("pageweight alert only")
               "<tr class=\"pageclass default\">" + "<td> The page: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
                 "is weighing in at " + result.mBInFullyLoaded + " MB. for " + result.typeOfTestName + "." + "</td></tr>" +
-                "<tr class=\"pageclass default\">" + "<td><a href = \"" + dashboardUrl + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n"
+                "<tr class=\"pageclass default\">" + "<td><a href = \"" + getDashboardUrl(result) + "#" + result.anchorId + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
               "<tr class=\"pageclass default\">" + "<td>" + " " + "</td>" + "</tr>\n"
             } else {
               println("pagespeed alert only")
               "<tr class=\"pageclass default\">" + "<td> The page: " + "<a href=\"" + result.testUrl + "\">" + result.headline.getOrElse(result.testUrl) + "</a>" +
                 "is showing speed issues, despite being within weight thresholds. Page shows a Speed Index of: " + result.speedIndex + "ms. for " + result.typeOfTestName + "s." + "</td>" + "</tr>" + "\n" +
-                "<tr class=\"pageclass default\">" + "<td><a href = \"" + dashboardUrl + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n"
+                "<tr class=\"pageclass default\">" + "<td><a href = \"" + getDashboardUrl(result) + "#" + result.anchorId + "\"> Click here for more information on how to resolve this.</a>" + "</td>" + "</tr>" + "\n" +
               "<tr class=\"pageclass default\">" + "<td>" + " " + "</td>" + "</tr>\n"
             }
           }
         } else {
           println("somehow neither alert is set")
-          "No alerts set"
+         "<tr class= \"pageclass default\"><td>No alerts set</td></tr>"
         }
       }).mkString
       dataRows
@@ -111,6 +113,15 @@
       } else {
         "default"
       }
+    }
+
+    def getDashboardUrl(result: PerformanceResultsObject): String = {
+      val url: String = result.typeOfTestName match {
+        case "Desktop" => desktopDashboardUrl
+        case "Mobile" => mobileDashboardUrl
+        case _ => desktopDashboardUrl
+      }
+      url
     }
 
 
