@@ -249,7 +249,7 @@ object App {
       val articleAverages: PageAverageObject = new ArticleDefaultAverages(averageColor)
       articleResults = articleResults.concat(articleAverages.toHTMLString)
 
-      val articleResultsList = listenForResultPages(combinedArticleList, "article", resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
+      val articleResultsList = listenForResultPages(combinedArticleList, "Article", resultUrlList, articleAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
       val getAnchorId: (List[PerformanceResultsObject], Int) = applyAnchorId(articleResultsList, pageWeightAnchorId)
       val articleResultsWithAnchor = getAnchorId._1
       pageWeightAnchorId = getAnchorId._2
@@ -294,7 +294,7 @@ object App {
       val liveBlogAverages: PageAverageObject = new LiveBlogDefaultAverages(averageColor)
       liveBlogResults = liveBlogResults.concat(liveBlogAverages.toHTMLString)
 
-      val liveBlogResultsList = listenForResultPages(combinedLiveBlogList, "liveBlog", resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
+      val liveBlogResultsList = listenForResultPages(combinedLiveBlogList, "LiveBlog", resultUrlList, liveBlogAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
       val getAnchorId: (List[PerformanceResultsObject], Int) = applyAnchorId(liveBlogResultsList, pageWeightAnchorId)
       val liveBlogResultsWithAnchor = getAnchorId._1
       pageWeightAnchorId = getAnchorId._2
@@ -338,7 +338,7 @@ object App {
       val interactiveAverages: PageAverageObject = new InteractiveDefaultAverages(averageColor)
       interactiveResults = interactiveResults.concat(interactiveAverages.toHTMLString)
 
-      val interactiveResultsList = listenForResultPages(combinedInteractiveList, "interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
+      val interactiveResultsList = listenForResultPages(combinedInteractiveList, "Interactive", resultUrlList, interactiveAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
       val getAnchorId: (List[PerformanceResultsObject], Int) = applyAnchorId(interactiveResultsList, pageWeightAnchorId)
       val interactiveResultsWithAnchor = getAnchorId._1
       pageWeightAnchorId = getAnchorId._2
@@ -380,7 +380,7 @@ object App {
       val frontsAverages: PageAverageObject = new FrontsDefaultAverages(averageColor)
       frontsResults = frontsResults.concat(frontsAverages.toHTMLString)
 
-      val frontsResultsList = listenForResultPages(fronts, "front", resultUrlList, frontsAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
+      val frontsResultsList = listenForResultPages(fronts, "Front", resultUrlList, frontsAverages, wptBaseUrl, wptApiKey, wptLocation, urlFragments)
       val getAnchorId: (List[PerformanceResultsObject], Int) = applyAnchorId(frontsResultsList, pageWeightAnchorId)
       val frontsResultsWithAnchor = getAnchorId._1
       pageWeightAnchorId = getAnchorId._2
