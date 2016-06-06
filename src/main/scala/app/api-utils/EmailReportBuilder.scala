@@ -51,7 +51,7 @@ class EmailReportBuilder(average: String, warning: String, alert: String, articl
 
   def generateHTMLRow(resultsObject: PerformanceResultsObject): String = {
     var returnString: String = ""
-    //  Define new web-page-test API request and send it the url to test
+    //  Define new web-page-test API request and sendPageWeightAlert it the url to test
     //  Add results to string which will eventually become the content of our results file
 
     if (resultsObject.alertStatusPageWeight) {
@@ -69,7 +69,7 @@ class EmailReportBuilder(average: String, warning: String, alert: String, articl
 
   def interactiveHTMLRow(resultsObject: PerformanceResultsObject): String = {
     var returnString: String = ""
-    //  Define new web-page-test API request and send it the url to test
+    //  Define new web-page-test API request and sendPageWeightAlert it the url to test
     //  Add results to string which will eventually become the content of our results file
 
     if (resultsObject.alertStatusPageWeight) {

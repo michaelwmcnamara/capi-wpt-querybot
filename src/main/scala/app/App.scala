@@ -221,7 +221,7 @@ object App {
     //get all pages from the visuals team api
 
 
-    // send all urls to webpagetest at once to enable parallel testing by test agents
+    // sendPageWeightAlert all urls to webpagetest at once to enable parallel testing by test agents
     val urlsToSend: List[String] = (pagesToRetest ::: articleUrls ::: liveBlogUrls ::: interactiveUrls).distinct
     println("Combined list of urls: \n" + urlsToSend)
 
@@ -517,7 +517,7 @@ object App {
     if (alertsToSend.nonEmpty) {
       println("There are new pageWeight alerts to send! There are " + alertsToSend + " new alerts")
       val pageWeightEmailAlerts = new PageWeightEmailTemplate(alertsToSend, amazonDomain + "/" + s3BucketName + "/" + editorialMobilePageweightFilename, amazonDomain + "/" + s3BucketName + "/" + editorialDesktopPageweightFilename )
-      val pageWeightEmailSuccess = emailer.send(generalAlertsAddressList, pageWeightEmailAlerts.toString())
+      val pageWeightEmailSuccess = emailer.sendPageWeightAlert(generalAlertsAddressList, pageWeightEmailAlerts.toString())
       if (pageWeightEmailSuccess)
         println(DateTime.now + " Page-Weight Alert Emails sent successfully. ")
       else
@@ -529,11 +529,11 @@ object App {
     if (newInteractiveAlertsList.nonEmpty) {
       println("There are new interactive email alerts to send - length of list is: " + newInteractiveAlertsList.length)
       val interactiveEmailAlerts = new InteractiveEmailTemplate(newInteractiveAlertsList, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardMobileFilename, amazonDomain + "/" + s3BucketName + "/" + interactiveDashboardDesktopFilename )
-      val interactiveEmailSuccess = emailer.send(interactiveAlertsAddressList, interactiveEmailAlerts.toString())
+      val interactiveEmailSuccess = emailer.sendInteractiveAlert(interactiveAlertsAddressList, interactiveEmailAlerts.toString())
       if (interactiveEmailSuccess) {
         println("Interactive Alert email sent successfully.")
       } else {
-        println("ERROR: Sending of Page-Weight Alert Emails failed")
+        println("ERROR: Sending of Interactive Alert Emails failed")
       }
     } else {
       println("no interactive alerts to send, therefore Interactive Alert Email not sent.")
@@ -872,7 +872,7 @@ object App {
   def applyAnchorId(resultsObjectList: List[PerformanceResultsObject], lastIDAssigned: Int): (List[PerformanceResultsObject], Int) = {
     var iterator = lastIDAssigned + 1
     val resultList = for (result <- resultsObjectList) yield {
-      result.anchorId = Option(iterator)
+      result.anchorId = Option(result.headline.getOrElse(iterator) + result.typeOfTest)
       iterator = iterator + 1
       result
     }

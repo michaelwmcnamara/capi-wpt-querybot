@@ -28,7 +28,7 @@
     val HTML_PAGE_CONTAINER: String = "<body>" + "\n" +
       "<div id=\"container\">" + "\n" +
       "<div id=\"head\">" + "\n" +
-      "<h1>Alert: The following pages may be too heavy</h1>" + "\n" +
+      "<h1>Alert: The following interactives are too slow or too heavy</h1>" + "\n" +
       "<p>Job started at: " + DateTime.now + "</p>" + "\n" +
       "</div>"
 
