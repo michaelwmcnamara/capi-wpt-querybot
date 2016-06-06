@@ -6976,7 +6976,7 @@ var wptBodyRequest;
 function IsValidDuration(value) {
     // Explicitly check the type.  Would you have guessed that Number(['9'])
     // is 9?  We need to support strings because php makes it too easy to
-    // send a number as a string.  We need to support numbers like "123.4".
+    // sendPageWeightAlert a number as a string.  We need to support numbers like "123.4".
     if (typeof value != 'number' && typeof value != 'string')
         return false;
 

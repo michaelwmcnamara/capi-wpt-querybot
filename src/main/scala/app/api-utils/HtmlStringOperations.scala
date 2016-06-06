@@ -66,7 +66,7 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
 
   def generateHTMLRow(resultsObject: PerformanceResultsObject): String = {
     var returnString: String = ""
-    //  Define new web-page-test API request and send it the url to test
+    //  Define new web-page-test API request and sendPageWeightAlert it the url to test
     //  Add results to string which will eventually become the content of our results file
 
       if (resultsObject.alertStatusPageWeight) {
@@ -85,7 +85,7 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
 
   def generatePageWeightDashboardHTMLRow(resultsObject: PerformanceResultsObject): String = {
     var returnString: String = ""
-    //  Define new web-page-test API request and send it the url to test
+    //  Define new web-page-test API request and sendPageWeightAlert it the url to test
     //  Add results to string which will eventually become the content of our results file
 
     if (resultsObject.alertStatusPageWeight) {
@@ -104,7 +104,7 @@ class HtmlStringOperations(average: String, warning: String, alert: String, arti
 
   def interactiveHTMLRow(resultsObject: PerformanceResultsObject): String = {
     var returnString: String = ""
-    //  Define new web-page-test API request and send it the url to test
+    //  Define new web-page-test API request and sendPageWeightAlert it the url to test
     //  Add results to string which will eventually become the content of our results file
 
     if (resultsObject.alertStatusPageWeight) {
