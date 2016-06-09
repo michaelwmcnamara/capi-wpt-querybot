@@ -125,6 +125,7 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
       element.contentType.contains("application") ||
       element.contentType.contains("image") ||
       element.contentType.contains("video") ||
+      element.contentType.contains("xhr") ||
       element.contentType.contains("x-shockwave-flash") ||
       element.resource.contains(".tv") ||
       element.resource.contains("abc") ||
