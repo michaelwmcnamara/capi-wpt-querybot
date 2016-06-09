@@ -121,7 +121,40 @@ class PerformanceResultsObject(url:String, testType: String, urlforTestResults: 
   }
 
   def trimToEditorialElements(elementList: List[PageElementFromHTMLTableRow]): List[PageElementFromHTMLTableRow] = {
-    val returnList: List[PageElementFromHTMLTableRow] = for (element <- elementList if element.contentType.contains("image") || element.contentType.contains("video") || element.contentType.contains("x-shockwave-flash") || element.contentType.contains("application")) yield element
+    val returnList: List[PageElementFromHTMLTableRow] = for (element <- elementList if
+      element.contentType.contains("application") ||
+      element.contentType.contains("image") ||
+      element.contentType.contains("video") ||
+      element.contentType.contains("x-shockwave-flash") ||
+      element.resource.contains(".tv") ||
+      element.resource.contains("abc") ||
+      element.resource.contains("audioboo") ||
+      element.resource.contains("brightcove") ||
+      element.resource.contains("cloud") ||
+      element.resource.contains("cnn") ||
+      element.resource.contains("comment") ||
+      element.resource.contains("dailymotion") ||
+      element.resource.contains("discussion") ||
+      element.resource.contains("facebook") ||
+      element.resource.contains("formstack") ||
+      element.resource.contains("hulu") ||
+      element.resource.contains("infostrada") ||
+      element.resource.contains("instagram") ||
+      element.resource.contains("itunes") ||
+      element.resource.contains("maps") ||
+      element.resource.contains("nbc") ||
+      element.resource.contains("reuters") ||
+      element.resource.contains("scribd") ||
+      element.resource.contains("soundcloud") ||
+      element.resource.contains("spotify") ||
+      element.resource.contains("twitter") ||
+      element.resource.contains("ustream") ||
+      element.resource.contains("video") ||
+      element.resource.contains("vimeo") ||
+      element.resource.contains("vine") ||
+      element.resource.contains("witness") ||
+      element.resource.contains("youtube")
+    ) yield element
     returnList
   }
 
